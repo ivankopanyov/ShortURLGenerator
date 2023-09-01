@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+option csharp_namespace = "Grpc.Dto";
+
+import "response.proto";
+
+message VerificationCodeDto {
+    string code = 1;
+    int32 lifeTimeMinutes = 2;
+}
+
+message ConnectionInfoDto {
+    optional string os = 1;
+    optional string browser = 2;
+    optional string ip = 3;
+    optional string location = 4;
+}
+
+message ConnectionDto {
+    string connectionId = 1;
+    int32 activeSecondsAgo = 2;
+    ConnectionInfoDto connectionInfo = 3;
+}
+
+message ConnectionsPageDto {
+    repeated ConnectionDto connections = 1;
+    PageInfoDto pageInfo = 2;
+}
+

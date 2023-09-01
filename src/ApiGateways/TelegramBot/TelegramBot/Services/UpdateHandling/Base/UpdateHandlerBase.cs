@@ -2,21 +2,29 @@
 
 public abstract class UpdateHandlerBase : IUpdateHandler, ICommandSetBuilder
 {
+    protected IIdentityService IdentityService { get; private init; }
+
     protected IUrlService UrlService { get; private init; }
 
     protected ITelegramBot TelegramBot { get; private init; }
 
     protected ILogger<IUpdateCommand> Logger { get; private init; }
 
+    protected IConfiguration Configuration { get; private init; }
+
     private readonly HashSet<IUpdateCommand> commands;
 
-    public UpdateHandlerBase(IUrlService urlService,
+    public UpdateHandlerBase(IIdentityService identityService,
+        IUrlService urlService,
         ITelegramBot telegramBot,
-        ILogger<IUpdateCommand> logger)
+        ILogger<IUpdateCommand> logger,
+        IConfiguration configuration)
     {
+        IdentityService = identityService;
         UrlService = urlService;
         TelegramBot = telegramBot;
         Logger = logger;
+        Configuration = configuration;
 
         commands = new HashSet<IUpdateCommand>();
 

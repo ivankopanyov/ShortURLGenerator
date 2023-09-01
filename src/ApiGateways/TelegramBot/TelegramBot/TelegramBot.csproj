@@ -32,6 +32,9 @@
     <Protobuf Include="..\..\..\Protos\V1\urlservice.proto" GrpcServices="Client" ProtoRoot="..\..\..\Protos\V1">
       <Link>Protos\V1\urlservice.proto</Link>
     </Protobuf>
+    <Protobuf Include="..\..\..\Protos\V1\identitydto.proto" GrpcServices="None" ProtoRoot="..\..\..\Protos\V1">
+      <Link>Protos\V1\identity.proto</Link>
+    </Protobuf>
   </ItemGroup>
 
   <ItemGroup>
@@ -43,5 +46,7 @@
     <Folder Include="Services\UpdateHandling\Commands\" />
     <Folder Include="Services\UpdateHandling\Commands\Abstract\" />
     <Folder Include="Services\UpdateHandling\Base\" />
+    <Folder Include="Services\Identity\" />
+    <Folder Include="Services\UpdateHandling\Commands\Base\" />
   </ItemGroup>
 </Project>

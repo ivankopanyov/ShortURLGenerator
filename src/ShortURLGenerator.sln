@@ -26,6 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "V1", "V1", "{376D3438-9AB6-
 		Protos\V1\urlservice.proto = Protos\V1\urlservice.proto
 		Protos\V1\response.proto = Protos\V1\response.proto
 		Protos\V1\urldto.proto = Protos\V1\urldto.proto
+		Protos\V1\identitydto.proto = Protos\V1\identitydto.proto
 	EndProjectSection
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{661B3E8B-A453-4D3B-95E2-DE1184A51BDF}"

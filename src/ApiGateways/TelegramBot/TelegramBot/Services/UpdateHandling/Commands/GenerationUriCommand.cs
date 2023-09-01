@@ -17,7 +17,8 @@ public class GenerationUrlCommand : IUpdateCommand
 
     public async Task<bool> ExecuteIfValidAsync(Update update)
     {
-        if (update is null || update.Message is not { } message || message.Text is not { } text ||
+        if (update is null || update.Message is not { } message || message.From is not { } user ||
+            user.IsBot || message.Text is not { } text ||
             !Uri.TryCreate(text, UriKind.Absolute, out Uri? uri) || uri is null ||
             (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
             return false;

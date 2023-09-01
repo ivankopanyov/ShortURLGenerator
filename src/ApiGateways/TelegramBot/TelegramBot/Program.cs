@@ -9,6 +9,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services
     .AddSingleton<ITelegramBot, TelegramBot>()
     .AddScoped<IUpdateHandler, UpdateHandler>()
+    .AddScoped<IIdentityService, IdentityMockService>()
     .AddScoped<IUrlService, UrlMockService>();
 
 var app = builder.Build();

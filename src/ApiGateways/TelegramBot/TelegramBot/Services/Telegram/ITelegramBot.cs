@@ -2,8 +2,16 @@
 
 public interface ITelegramBot : ITelegramBotClient
 {
-	Task SendUriAsync(long chatId, string url);
+    Task SendHelloAsync(long chatId, string firstName);
 
-    Task SendErrorMessageAsync(long chatId, string errorMessage);
+    Task SendUriAsync(long chatId, string url);
+
+    Task SendVerificationCodeAsync(long chatId, string code, int lifeTimeMinutes);
+
+    Task SendConnectionsAsync(long userId, ConnectionsPageDto connectionsPage);
+
+    Task SendCloseConnectionAsync(long userId, int messageId);
+
+    Task SendErrorMessageAsync(long chatId, string? errorMessage = null);
 }
 

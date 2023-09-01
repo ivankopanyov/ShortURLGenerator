@@ -14,3 +14,9 @@ message ResponseDto {
     ResponseStatus ResponseStatus = 1;
     optional string Error = 2;
 }
+
+message PageInfoDto {
+    int32 index = 1;
+    int32 count = 2;
+}
+
