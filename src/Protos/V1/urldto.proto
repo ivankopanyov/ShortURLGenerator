@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option csharp_namespace = "Grpc.Dto";
+
+import "response.proto";
+
+message SourceUriDto {
+    string value = 1;
+}
+
+message UrlResponseDto {
+    ResponseDto response = 1;
+    optional string url = 2;
+}

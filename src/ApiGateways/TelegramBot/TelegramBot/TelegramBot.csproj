@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>18596850-c92c-460c-8af1-0bc2e52f4a99</UserSecretsId>
+    <DockerComposeProjectPath>../../../docker-compose.dcproj</DockerComposeProjectPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.10" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Telegram.Bot" Version="19.0.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.24.2" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.56.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.57.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\..\..\Protos\V1\response.proto" GrpcServices="None">
+      <Link>Protos\V1\response.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\..\..\Protos\V1\urldto.proto" GrpcServices="None" ProtoRoot="..\..\..\Protos\V1">
+      <Link>Protos\V1\url.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\..\..\Protos\V1\urlservice.proto" GrpcServices="Client" ProtoRoot="..\..\..\Protos\V1">
+      <Link>Protos\V1\urlservice.proto</Link>
+    </Protobuf>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="Services\" />
+    <Folder Include="Services\Url\" />
+    <Folder Include="Services\Telegram\" />
+    <Folder Include="Services\UpdateHandling\" />
+    <Folder Include="Services\UpdateHandling\Commands\" />
+    <Folder Include="Services\UpdateHandling\Commands\Abstract\" />
+    <Folder Include="Services\UpdateHandling\Base\" />
+  </ItemGroup>
+</Project>

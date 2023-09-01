@@ -1,0 +1,18 @@
+version: '3.4'
+
+services:
+  telegrambot:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - FRONTEND=${FRONTEND}
+      - URI_SERVICE_HOST=""
+      - URI_SERVICE_PORT=""
+    ports:
+      - "5000:80"
+    networks:
+      - app-network
+
+networks:
+   app-network:
+

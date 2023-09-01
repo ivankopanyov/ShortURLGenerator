@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option csharp_namespace = "Grpc.Dto";
+
+enum ResponseStatus {
+    OK = 0;
+    UNAUTHORIZED = 1;
+    BAD_REQUEST = 2;
+    NOT_FOUND = 3;
+    CONFLICT = 4;
+}
+
+message ResponseDto {
+    ResponseStatus ResponseStatus = 1;
+    optional string Error = 2;
+}

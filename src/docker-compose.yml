@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  telegrambot:
+    image: ${DOCKER_REGISTRY-}telegrambot
+    container_name: telegrambot
+    build:
+      context: .
+      dockerfile: ApiGateways/TelegramBot/TelegramBot/Dockerfile

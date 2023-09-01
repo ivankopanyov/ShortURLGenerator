@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B4976827-6BEF-4404-9C59-D908C91D2C0F}"
 	ProjectSection(SolutionItems) = preProject
 		..\.gitignore = ..\.gitignore
+		.env = .env
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{7FF9D2CA-C0A2-4FE0-BC2B-40295A542AC0}"
@@ -15,6 +16,19 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateways", "ApiGateways", "{B6D858DE-C936-4BAD-B2BB-1382AE52403B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Protos", "Protos", "{696BA91A-C05C-41B6-9401-D3E01D5EC4CF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TelegramBot", "TelegramBot", "{F6925BE8-BD71-4F06-A834-5D1C22793295}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBot", "ApiGateways\TelegramBot\TelegramBot\TelegramBot.csproj", "{34E8A5CD-DD58-4C8D-9272-1898F1A0CA7D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "V1", "V1", "{376D3438-9AB6-43D3-A3EA-022BD7FA19DC}"
+	ProjectSection(SolutionItems) = preProject
+		Protos\V1\urlservice.proto = Protos\V1\urlservice.proto
+		Protos\V1\response.proto = Protos\V1\response.proto
+		Protos\V1\urldto.proto = Protos\V1\urldto.proto
+	EndProjectSection
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{661B3E8B-A453-4D3B-95E2-DE1184A51BDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +40,14 @@ Global
 		{A7689E60-362A-446D-A412-6CF47E102363}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7689E60-362A-446D-A412-6CF47E102363}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7689E60-362A-446D-A412-6CF47E102363}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34E8A5CD-DD58-4C8D-9272-1898F1A0CA7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34E8A5CD-DD58-4C8D-9272-1898F1A0CA7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34E8A5CD-DD58-4C8D-9272-1898F1A0CA7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34E8A5CD-DD58-4C8D-9272-1898F1A0CA7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{661B3E8B-A453-4D3B-95E2-DE1184A51BDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{661B3E8B-A453-4D3B-95E2-DE1184A51BDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{661B3E8B-A453-4D3B-95E2-DE1184A51BDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{661B3E8B-A453-4D3B-95E2-DE1184A51BDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -38,5 +60,8 @@ Global
 		{0E8E7527-1537-474E-8529-A2EFCD5AC7A8} = {B4976827-6BEF-4404-9C59-D908C91D2C0F}
 		{B6D858DE-C936-4BAD-B2BB-1382AE52403B} = {B4976827-6BEF-4404-9C59-D908C91D2C0F}
 		{696BA91A-C05C-41B6-9401-D3E01D5EC4CF} = {B4976827-6BEF-4404-9C59-D908C91D2C0F}
+		{F6925BE8-BD71-4F06-A834-5D1C22793295} = {B6D858DE-C936-4BAD-B2BB-1382AE52403B}
+		{34E8A5CD-DD58-4C8D-9272-1898F1A0CA7D} = {F6925BE8-BD71-4F06-A834-5D1C22793295}
+		{376D3438-9AB6-43D3-A3EA-022BD7FA19DC} = {696BA91A-C05C-41B6-9401-D3E01D5EC4CF}
 	EndGlobalSection
 EndGlobal
