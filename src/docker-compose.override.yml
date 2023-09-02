@@ -8,6 +8,8 @@ services:
       - FRONTEND=${FRONTEND}
       - URI_SERVICE_HOST=""
       - URI_SERVICE_PORT=""
+      - IDENTITY_SERVICE_HOST=""
+      - IDENTITY_SERVICE_PORT=""
     ports:
       - "5000:80"
     networks:

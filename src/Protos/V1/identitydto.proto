@@ -27,3 +27,27 @@ message ConnectionsPageDto {
     PageInfoDto pageInfo = 2;
 }
 
+message UserIdDto {
+    int64 userId = 1;
+}
+
+message ConnectionsRequestDto {
+    int64 userId = 1;
+    PageInfoDto pageInfo = 2;
+}
+
+message ConnectionRequestDto {
+    int64 userId = 1;
+    string connectionId = 2;
+}
+
+message VerificationCodeResponseDto {
+    ResponseDto response = 1;
+    VerificationCodeDto verificationCode = 2;
+}
+
+message ConnectionsPageResponseDto {
+    ResponseDto response = 1;
+    ConnectionsPageDto connectionsPage = 2;
+}
+

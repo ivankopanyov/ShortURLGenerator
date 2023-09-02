@@ -5,7 +5,7 @@ public interface IIdentityService
 {
     /// <summary>Method for requesting a verification code.</summary>
     /// <param name="userId">User ID.</param>
-    /// <returns>VerificationCode</returns>
+    /// <returns>Verification code.</returns>
     Task<VerificationCodeDto> GetVerificationCodeAsync(long userId);
 
     /// <summary>Method for requesting active connections on the site.</summary>

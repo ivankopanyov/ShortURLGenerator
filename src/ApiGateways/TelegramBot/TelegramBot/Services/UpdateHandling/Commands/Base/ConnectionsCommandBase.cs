@@ -18,6 +18,11 @@ public abstract class ConnectionsCommandBase : IUpdateCommand
     /// <summary>Abstract property that holds the command name.</summary>
     protected abstract string CommandName { get; }
 
+    /// <summary>Command object initialization.</summary>
+    /// <param name="identityService">User identification service.</param>
+    /// <param name="telegramBot">Service for sending Telegram messages to a bot.</param>
+    /// <param name="logger">Log service.</param>
+    /// <param name="configuration">Application configuration.</param>
     public ConnectionsCommandBase(IIdentityService identityService,
         ITelegramBot telegramBot,
         ILogger<IUpdateCommand> logger,

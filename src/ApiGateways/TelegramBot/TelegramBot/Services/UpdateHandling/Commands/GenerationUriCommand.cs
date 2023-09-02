@@ -1,6 +1,10 @@
 ﻿namespace ShortURLGenerator.TelegramBot.Services.UpdateHandling.Commands;
 
-/// <summary>Сlass that describes the command to generate and display a short URL.</summary>
+/// <summary>
+/// Сlass that describes the command to generate a short URL and send it with the code to the chat.
+/// The message must contain a valid http or https address.
+/// Does not support bots. Supports any chats.
+/// </summary>
 public class GenerationUrlCommand : IUpdateCommand
 {
     /// <summary>Service for generating short URLs.</summary>
