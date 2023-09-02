@@ -30,11 +30,31 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
     /// <summary>Method for sending the generated link to the chat.</summary>
     /// <param name="chatId">Chat ID.</param>
     /// <param name="url">Generated Url.</param>
-    public async Task SendUriAsync(long chatId, string url)
+    /// <param name="sourceUri">Source URI.</param>
+    /// <returns>Message ID.</returns>
+    public async Task<int> SendUriAsync(long chatId, string url, string sourceUri)
     {
-        string message = $"https://{_frontend}/{url}";
-        await this.SendTextMessageAsync(chatId: chatId, text: message);
-        _logger.LogInformation($"Send message to chat.\n\tChat ID: {chatId}\n\tMessage: {message}");
+        string text = $"https://{_frontend}/{url}";
+
+        if (!string.IsNullOrWhiteSpace(sourceUri))
+            text += $"\nИсходная ссылка:\n{sourceUri}";
+
+        var message = await this.SendTextMessageAsync(chatId: chatId, text: text);
+        _logger.LogInformation($"Send message to chat.\n\tChat ID: {chatId}\n\tMessage: {message}\n\tMessage ID: {message.MessageId}\n\tSource URI: {sourceUri}");
+        return message.MessageId;
+    }
+
+    /// <summary>Method for sending the generated link to the chat.</summary>
+    /// <param name="chatId">Chat ID.</param>
+    /// <param name="url">Generated Url.</param>
+    /// <param name="sourceMessageId">Source message ID.</param>
+    /// <returns>Message ID.</returns>
+    public async Task<int> SendUriAsync(long chatId, string url, int sourceMessageId)
+    {
+        string text = $"https://{_frontend}/{url}";
+        var message = await this.SendTextMessageAsync(chatId: chatId, text: text, replyToMessageId: sourceMessageId);
+        _logger.LogInformation($"Send message to chat.\n\tChat ID: {chatId}\n\tMessage: {message}\n\tMessage ID: {message.MessageId}\n\tSource message ID: {sourceMessageId}");
+        return message.MessageId;
     }
 
     /// <summary>Method for sending verification code to chat.</summary>

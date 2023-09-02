@@ -11,7 +11,16 @@ public interface ITelegramBot : ITelegramBotClient
     /// <summary>Method for sending the generated link to the chat.</summary>
     /// <param name="chatId">Chat ID.</param>
     /// <param name="url">Generated Url.</param>
-    Task SendUriAsync(long chatId, string url);
+    /// <param name="sourceUri">Source URI.</param>
+    /// <returns>Message ID.</returns>
+    Task<int> SendUriAsync(long chatId, string url, string sourceUri);
+
+    /// <summary>Method for sending the generated link to the chat.</summary>
+    /// <param name="chatId">Chat ID.</param>
+    /// <param name="url">Generated Url.</param>
+    /// <param name="sourceMessageId">Source message ID.</param>
+    /// <returns>Message ID.</returns>
+    Task<int> SendUriAsync(long chatId, string url, int sourceMessageId);
 
     /// <summary>Method for sending verification code to chat.</summary>
     /// <param name="chatId">Chat ID.</param>

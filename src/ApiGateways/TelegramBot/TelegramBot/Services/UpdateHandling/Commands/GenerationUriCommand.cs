@@ -44,8 +44,8 @@ public class GenerationUrlCommand : IUpdateCommand
         try
         {
             var url = await _urlService.GenerateUrlAsync(text);
-            await _telegramBot.SendUriAsync(chatId, url);
-            _logger.LogInformation($"Execute generation uri command: succesful.\n\tUpdate Id: {update.Id}\n\tChat ID: {chatId}\n\tSource URI: {text}");
+            var messageId = await _telegramBot.SendUriAsync(chatId, url, message.MessageId);
+            _logger.LogInformation($"Execute generation uri command: succesful.\n\tUpdate Id: {update.Id}\n\tChat ID: {chatId}\n\tSource URI: {text}\n\tMessage ID: {messageId}");
         }
         catch (InvalidOperationException ex)
         {
