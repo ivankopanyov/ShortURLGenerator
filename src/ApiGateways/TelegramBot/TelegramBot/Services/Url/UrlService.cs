@@ -1,18 +1,30 @@
 ﻿namespace ShortURLGenerator.TelegramBot.Services.Url;
 
+/// <summary>Service for generating short URLs. The connection is made using gRPC.</summary>
 public class UrlService : IUrlService
 {
+    /// <summary>Address of the service for generating short URLs.</summary>
     private static readonly string _urlServiceHost =
         "http://" + Environment.GetEnvironmentVariable("URI_SERVICE_HOST")! +
         ":" + Environment.GetEnvironmentVariable("URI_SERVICE_PORT")!;
 
+    /// <summary>Log service.</summary>
     private readonly ILogger<UrlService> _logger;
 
+    /// <summary>Initialization of the service object for generating short URLs.</summary>
+    /// <param name="logger">Log service.</param>
     public UrlService(ILogger<UrlService> logger)
     {
         _logger = logger;
     }
 
+    /// <summary>Short URL generation method. The connection is made using gRPC.</summary>
+    /// <param name="sourceUri">Source URI.</param>
+    /// <returns>The generated short URL.</returns>
+    /// <exception cref="ArgumentNullException">Source URI is null.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// Failed to complete the request to the service or the request is invalid.
+    /// </exception>
     public async Task<string> GenerateUrlAsync(string sourceUri)
     {
         if (sourceUri is null)

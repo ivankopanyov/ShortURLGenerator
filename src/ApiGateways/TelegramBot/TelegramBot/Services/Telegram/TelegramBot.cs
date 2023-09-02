@@ -1,20 +1,24 @@
-﻿using System;
-using Telegram.Bot.Exceptions;
-using Telegram.Bot.Types.ReplyMarkups;
+﻿namespace ShortURLGenerator.TelegramBot.Services.Telegram;
 
-namespace ShortURLGenerator.TelegramBot.Services.Telegram;
-
+/// <summary>Service for sending Telegram messages to a bot.</summary>
 public class TelegramBot : TelegramBotClient, ITelegramBot
 {
+    /// <summary>The domain name of the site to generate short URLs.</summary>
     private static readonly string _frontend = Environment.GetEnvironmentVariable("FRONTEND")!;
 
+    /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
+    /// <summary>Telegram bot object initialization.</summary>
+    /// <param name="logger">Log service.</param>
     public TelegramBot(ILogger<TelegramBot> logger) : base(Environment.GetEnvironmentVariable("TELEGRAM_BOT_TOKEN")!)
     {
         _logger = logger;
     }
 
+    /// <summary>Method for sending a welcome message to the chat.</summary>
+    /// <param name="chatId">Chat ID.</param>
+    /// <param name="firstName">First name of user.</param>
     public async Task SendHelloAsync(long chatId, string firstName)
     {
         string head = string.IsNullOrWhiteSpace(firstName) ? "О" : $"{firstName}, о";
@@ -23,6 +27,9 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         _logger.LogInformation($"Send message to chat.\n\tChat ID: {chatId}\n\tMessage: {message}");
     }
 
+    /// <summary>Method for sending the generated link to the chat.</summary>
+    /// <param name="chatId">Chat ID.</param>
+    /// <param name="url">Generated Url.</param>
     public async Task SendUriAsync(long chatId, string url)
     {
         string message = $"https://{_frontend}/{url}";
@@ -30,6 +37,10 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         _logger.LogInformation($"Send message to chat.\n\tChat ID: {chatId}\n\tMessage: {message}");
     }
 
+    /// <summary>Method for sending verification code to chat.</summary>
+    /// <param name="chatId">Chat ID.</param>
+    /// <param name="code">Verification code</param>
+    /// <param name="lifeTimeMinutes">Verification code lifetime in minutes.</param>
     public async Task SendVerificationCodeAsync(long chatId, string code, int lifeTimeMinutes)
     {
         var deadline = DateTime.UtcNow + TimeSpan.FromMinutes(lifeTimeMinutes);
@@ -40,6 +51,9 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         _logger.LogInformation($"Send message to chat.\n\tChat ID: {chatId}\n\tMessage: {message}");
     }
 
+    /// <summary>Method for sending a list of active connections to a chat.</summary>
+    /// <param name="chatId">Chat ID.</param>
+    /// <param name="connectionsPage">Page with a list of active connections.</param>
     public async Task SendConnectionsAsync(long chatId, ConnectionsPageDto connectionsPage)
     {
         if (connectionsPage is null)
@@ -63,6 +77,9 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         await SendSwitchPage(chatId, connectionsPage.PageInfo.Index, connectionsPage.PageInfo.Count);
     }
 
+    /// <summary>The method for sending a message to close the connection to a chat.</summary>
+    /// <param name="chatId">Chat ID.</param>
+    /// <param name="messageId">The ID of the original message with connection information.</param>
     public async Task SendCloseConnectionAsync(long chatId, int messageId)
     {
         try
@@ -81,6 +98,9 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         }
     }
 
+    /// <summary>Method for sending an error message to the chat.</summary>
+    /// <param name="chatId">Chat ID.</param>
+    /// <param name="errorMessage">Message describing the error.</param>
     public async Task SendErrorMessageAsync(long chatId, string? errorMessage = null)
     {
         string message = $"Ошибка: {errorMessage ?? "Неизвестная ошибка."} Попробуйте снова.";
@@ -88,7 +108,10 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         _logger.LogInformation($"Send message to chat.\n\tChat ID: {chatId}\n\tMessage: {message}");
     }
 
-    private async Task SendConnectionAsync(long userId, ConnectionDto connection)
+    /// <summary>Method for sending information about an active connection.</summary>
+    /// <param name="chatId">Chat ID.</param>
+    /// <param name="connection">Connection.</param>
+    private async Task SendConnectionAsync(long chatId, ConnectionDto connection)
     {
         var lastActive = DateTime.UtcNow - TimeSpan.FromSeconds(connection.ActiveSecondsAgo);
         var message = $"Последняя активность: {lastActive.ToString("dd.MM.yyyy HH:mm:ss")}\n"
@@ -98,11 +121,15 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
             + $"IP: {connection.ConnectionInfo.Ip ?? "Неизвестно"}";
 
         var key = new InlineKeyboardMarkup(InlineKeyboardButton.WithCallbackData(text: "Завершить", callbackData: $"close_{connection.ConnectionId}"));
-        await this.SendTextMessageAsync(chatId: userId, text: message, replyMarkup: key);
-        _logger.LogInformation($"Send connection.\n\tChat ID: {userId}\n\tMessage: {message}");
+        await this.SendTextMessageAsync(chatId: chatId, text: message, replyMarkup: key);
+        _logger.LogInformation($"Send connection.\n\tChat ID: {chatId}\n\tMessage: {message}");
     }
 
-    private async Task SendSwitchPage(long userId, int index, int count)
+    /// <summary>The method to send a page switcher with active connections.</summary>
+    /// <param name="chatId">Chat ID.</param>
+    /// <param name="index">Page index.</param>
+    /// <param name="count">The number of connections per page.</param>
+    private async Task SendSwitchPage(long chatId, int index, int count)
     {
         var back = InlineKeyboardButton.WithCallbackData(text: "<<", callbackData: $"connections_{index - 1}");
         var next = InlineKeyboardButton.WithCallbackData(text: ">>", callbackData: $"connections_{index + 1}");
@@ -115,8 +142,8 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
             keyboard = new InlineKeyboardMarkup(new InlineKeyboardButton[] { back, next });
 
         string message = $"Страница {index + 1} из {count}";
-        await this.SendTextMessageAsync(chatId: userId, text: message, replyMarkup: keyboard);
-        _logger.LogInformation($"Send switch page.\n\tChat ID: {userId}\n\tMessage: {message}");
+        await this.SendTextMessageAsync(chatId: chatId, text: message, replyMarkup: keyboard);
+        _logger.LogInformation($"Send switch page.\n\tChat ID: {chatId}\n\tMessage: {message}");
     }
 }
 

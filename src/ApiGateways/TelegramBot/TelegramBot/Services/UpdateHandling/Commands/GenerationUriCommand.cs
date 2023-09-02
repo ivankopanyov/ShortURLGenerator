@@ -1,13 +1,21 @@
 ﻿namespace ShortURLGenerator.TelegramBot.Services.UpdateHandling.Commands;
 
+/// <summary>Сlass that describes the command to generate and display a short URL.</summary>
 public class GenerationUrlCommand : IUpdateCommand
 {
+    /// <summary>Service for generating short URLs.</summary>
     private readonly IUrlService _urlService;
 
+    /// <summary>Service for sending Telegram messages to a bot.</summary>
     private readonly ITelegramBot _telegramBot;
 
+    /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
+    /// <summary>Command object initialization.</summary>
+    /// <param name="urlService">Service for generating short URLs.</param>
+    /// <param name="telegramBot">Service for sending Telegram messages to a bot.</param>
+    /// <param name="logger">Log service.</param>
     public GenerationUrlCommand(IUrlService urlService, ITelegramBot telegramBot, ILogger<IUpdateCommand> logger)
     {
         _urlService = urlService;
@@ -15,6 +23,8 @@ public class GenerationUrlCommand : IUpdateCommand
         _logger = logger;
     }
 
+    /// <summary>The method that executes the command if the update is valid.</summary>
+    /// <param name="update">Telegram bot update.</param>
     public async Task<bool> ExecuteIfValidAsync(Update update)
     {
         if (update is null || update.Message is not { } message || message.From is not { } user ||

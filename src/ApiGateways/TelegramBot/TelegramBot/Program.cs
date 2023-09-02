@@ -16,4 +16,6 @@ var app = builder.Build();
 
 app.MapControllers();
 
+var u = new Update();
+
 app.Run();

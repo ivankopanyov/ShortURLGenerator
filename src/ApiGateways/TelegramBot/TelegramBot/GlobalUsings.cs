@@ -5,6 +5,8 @@ global using Grpc.Dto;
 global using Grpc.Net.Client;
 global using Telegram.Bot;
 global using Telegram.Bot.Types;
+global using Telegram.Bot.Exceptions;
+global using Telegram.Bot.Types.ReplyMarkups;
 global using ShortURLGenerator.TelegramBot.Services.UpdateHandling;
 global using ShortURLGenerator.TelegramBot.Services.UpdateHandling.Commands.Abstract;
 global using ShortURLGenerator.TelegramBot.Services.UpdateHandling.Commands.Base;
