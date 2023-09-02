@@ -4,22 +4,24 @@
 public class UpdateHandler : UpdateHandlerBase
 {
     /// <summary>Update handler initialization.</summary>
+    /// <param name="eventBus">Service for sending integration events.</param>
     /// <param name="identityService">User identification service.</param>
     /// <param name="urlService">Service for generating short URLs.</param>
     /// <param name="telegramBot">Service for sending Telegram messages to a bot.</param>
     /// <param name="logger">Log service.</param>
     /// <param name="configuration">Application configuration.</param>
-    public UpdateHandler(IIdentityService identityService,
+    public UpdateHandler(IEventBus eventBus,
+        IIdentityService identityService,
         IUrlService urlService,
         ITelegramBot telegramBot,
         ILogger<IUpdateCommand> logger,
-        IConfiguration configuration) : base(identityService, urlService, telegramBot, logger, configuration) { }
+        IConfiguration configuration) : base(eventBus, identityService, urlService, telegramBot, logger, configuration) { }
 
     /// <summary>Overriding the method for adding commands to the handler.</summary>
     /// <param name="commandSetBuilder">Command set builder.</param>
     protected override void CommandSetConfiguration(ICommandSetBuilder commandSetBuilder) => commandSetBuilder
         .AddCommand(new StartCommand(TelegramBot, Logger))
-        .AddCommand(new GenerationUrlCommand(UrlService, TelegramBot, Logger))
+        .AddCommand(new GenerationUrlCommand(EventBus, UrlService, TelegramBot, Logger))
         .AddCommand(new VerificationCommand(IdentityService, TelegramBot, Logger))
         .AddCommand(new FirstPageConnectionsCommand(IdentityService, TelegramBot, Logger, Configuration))
         .AddCommand(new ChangePageConnectionsCommand(IdentityService, TelegramBot, Logger, Configuration))

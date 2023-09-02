@@ -1,7 +1,7 @@
 ﻿namespace ShortURLGenerator.EventBus.Events;
 
 /// <summary>Class that describes the event of sending the generated URI to the user.</summary>
-public sealed class UrlSentIntegrationEvent : IntegrationEventBase
+public sealed class UriSentIntegrationEvent : IntegrationEventBase
 {
     /// <summary>Chat ID.</summary>
     public long ChatId { get; set; }
@@ -16,10 +16,14 @@ public sealed class UrlSentIntegrationEvent : IntegrationEventBase
     /// <param name="chatId">Chat ID.</param>
     /// <param name="messageId">Source message ID.</param>
     /// <param name="uri">Generated URI.</param>
-    public UrlSentIntegrationEvent(long chatId, int messageId, string uri)
+    public UriSentIntegrationEvent(long chatId, int messageId, string uri)
     {
         ChatId = chatId;
         MessageId = messageId;
         Uri = uri;
     }
+
+    /// <summary>Overriding the method of casting an object to a string type.</summary>
+    /// <returns>Object cast to a string type.</returns>
+    public override string ToString() => $"{base.ToString()}Chat ID: {ChatId}\n\tMessage ID: {MessageId}\n\tURI: {Uri}";
 }

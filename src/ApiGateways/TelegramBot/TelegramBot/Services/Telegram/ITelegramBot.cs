@@ -10,17 +10,17 @@ public interface ITelegramBot : ITelegramBotClient
 
     /// <summary>Method for sending the generated link to the chat.</summary>
     /// <param name="chatId">Chat ID.</param>
-    /// <param name="url">Generated Url.</param>
+    /// <param name="uri">Generated URI.</param>
     /// <param name="sourceUri">Source URI.</param>
     /// <returns>Message ID.</returns>
-    Task<int> SendUriAsync(long chatId, string url, string sourceUri);
+    Task<int> SendUriAsync(long chatId, string uri, string sourceUri);
 
     /// <summary>Method for sending the generated link to the chat.</summary>
     /// <param name="chatId">Chat ID.</param>
-    /// <param name="url">Generated Url.</param>
+    /// <param name="uri">Generated URI.</param>
     /// <param name="sourceMessageId">Source message ID.</param>
     /// <returns>Message ID.</returns>
-    Task<int> SendUriAsync(long chatId, string url, int sourceMessageId);
+    Task<int> SendUriAsync(long chatId, string uri, int sourceMessageId);
 
     /// <summary>Method for sending verification code to chat.</summary>
     /// <param name="chatId">Chat ID.</param>
@@ -37,6 +37,12 @@ public interface ITelegramBot : ITelegramBotClient
     /// <param name="chatId">Chat ID.</param>
     /// <param name="messageId">The ID of the original message with connection information.</param>
     Task SendCloseConnectionAsync(long chatId, int messageId);
+
+    /// <summary>Method of sending QR code to chat.</summary>
+    /// <param name="chatId">Chat ID.</param>
+    /// <param name="messageId">Source message ID.</param>
+    /// <param name="data">QR code data.</param>
+    Task SendQRCodeAsync(long chatId, int messageId, byte[] data);
 
     /// <summary>Method for sending an error message to the chat.</summary>
     /// <param name="chatId">Chat ID.</param>

@@ -1,9 +1,16 @@
 version: '3.4'
 
 services:
+  rabbitmq:
+    image: rabbitmq:alpine
+    container_name: rabbitmq
+    restart: always
+
   telegrambot:
     image: ${DOCKER_REGISTRY-}telegrambot
     container_name: telegrambot
     build:
       context: .
       dockerfile: ApiGateways/TelegramBot/TelegramBot/Dockerfile
+    depends_on:
+      - rabbitmq

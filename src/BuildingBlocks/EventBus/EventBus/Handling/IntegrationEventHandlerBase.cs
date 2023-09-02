@@ -18,7 +18,7 @@ public abstract class IntegrationEventHandlerBase<T> : BackgroundService where T
     {
         var factory = new ConnectionFactory();
         OnConfigureConnection(factory);
-        _connection = factory.CreateConnection();
+        _connection = factory.TryCreateConnection(10, TimeSpan.FromSeconds(5));
         _channel = _connection.CreateModel();
         _channel.QueueDeclare(queue: _queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
     }

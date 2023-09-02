@@ -3,9 +3,6 @@
 /// <summary>Service for sending Telegram messages to a bot.</summary>
 public class TelegramBot : TelegramBotClient, ITelegramBot
 {
-    /// <summary>The domain name of the site to generate short URLs.</summary>
-    private static readonly string _frontend = Environment.GetEnvironmentVariable("FRONTEND")!;
-
     /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
@@ -29,30 +26,27 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
 
     /// <summary>Method for sending the generated link to the chat.</summary>
     /// <param name="chatId">Chat ID.</param>
-    /// <param name="url">Generated Url.</param>
+    /// <param name="uri">Generated URI.</param>
     /// <param name="sourceUri">Source URI.</param>
     /// <returns>Message ID.</returns>
-    public async Task<int> SendUriAsync(long chatId, string url, string sourceUri)
+    public async Task<int> SendUriAsync(long chatId, string uri, string sourceUri)
     {
-        string text = $"https://{_frontend}/{url}";
-
         if (!string.IsNullOrWhiteSpace(sourceUri))
-            text += $"\nИсходная ссылка:\n{sourceUri}";
+            uri += $"\nИсходная ссылка:\n{sourceUri}";
 
-        var message = await this.SendTextMessageAsync(chatId: chatId, text: text);
+        var message = await this.SendTextMessageAsync(chatId: chatId, text: uri);
         _logger.LogInformation($"Send message to chat.\n\tChat ID: {chatId}\n\tMessage: {message}\n\tMessage ID: {message.MessageId}\n\tSource URI: {sourceUri}");
         return message.MessageId;
     }
 
     /// <summary>Method for sending the generated link to the chat.</summary>
     /// <param name="chatId">Chat ID.</param>
-    /// <param name="url">Generated Url.</param>
+    /// <param name="uri">Generated Url.</param>
     /// <param name="sourceMessageId">Source message ID.</param>
     /// <returns>Message ID.</returns>
-    public async Task<int> SendUriAsync(long chatId, string url, int sourceMessageId)
+    public async Task<int> SendUriAsync(long chatId, string uri, int sourceMessageId)
     {
-        string text = $"https://{_frontend}/{url}";
-        var message = await this.SendTextMessageAsync(chatId: chatId, text: text, replyToMessageId: sourceMessageId);
+        var message = await this.SendTextMessageAsync(chatId: chatId, text: uri, replyToMessageId: sourceMessageId);
         _logger.LogInformation($"Send message to chat.\n\tChat ID: {chatId}\n\tMessage: {message}\n\tMessage ID: {message.MessageId}\n\tSource message ID: {sourceMessageId}");
         return message.MessageId;
     }
@@ -64,7 +58,7 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
     public async Task SendVerificationCodeAsync(long chatId, string code, int lifeTimeMinutes)
     {
         var deadline = DateTime.UtcNow + TimeSpan.FromMinutes(lifeTimeMinutes);
-        string message = $"Ваш проверочный код для авторизации на сайте {_frontend}: {code}.\n" +
+        string message = $"Ваш проверочный код для авторизации на сайте: {code}.\n" +
             $"Проверочный код перестанет действовать {deadline.ToString("dd.MM.yyyy HH:mm:ss")}, " +
             "после авторизации или после создания нового кода.";
         await this.SendTextMessageAsync(chatId: chatId, text: message);
@@ -116,6 +110,25 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         {
             _logger.LogError(ex, $"Send close connection to chat: failed.\n\tChat ID: {chatId}\n\tMessage ID: {messageId}\n\tError: {ex.Message}");
         }
+    }
+
+    /// <summary>Method of sending QR code to chat.</summary>
+    /// <param name="chatId">Chat ID.</param>
+    /// <param name="messageId">Source message ID.</param>
+    /// <param name="data">QR code data.</param>
+    /// <exception cref="ArgumentNullException">QR code data is null.</exception>
+    public async Task SendQRCodeAsync(long chatId, int messageId, byte[] data)
+    {
+        if (data is null)
+        {
+            _logger.LogError($"Send QR-Code to chat: failed.\n\tChat ID: {chatId}\n\tMessage ID: {messageId}\n\tError: QRCode data is null");
+            await SendErrorMessageAsync(chatId, "Не удалось получить QR-код.");
+            return;
+        }
+
+        using var stream = new MemoryStream(data);
+        await this.SendPhotoAsync(chatId, InputFile.FromStream(stream));
+        _logger.LogInformation($"Send QR-Code to chat.\n\tChat ID: {chatId}\n\tMessage ID: {messageId}");
     }
 
     /// <summary>Method for sending an error message to the chat.</summary>

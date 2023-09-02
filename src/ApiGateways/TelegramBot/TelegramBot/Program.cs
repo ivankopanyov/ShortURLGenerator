@@ -7,15 +7,20 @@ builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services
-    .AddSingleton<ITelegramBot, TelegramBot>()
+    .AddSingleton<IEventBus, EventBusRabbitMQ>()
+    .AddSingleton<ITelegramBot, TelegramBot>();
+
+builder.Services
     .AddScoped<IUpdateHandler, UpdateHandler>()
     .AddScoped<IIdentityService, IdentityMockService>()
     .AddScoped<IUrlService, UrlMockService>();
 
+builder.Services
+    .AddHostedService<UriGeneratedIntegrationEventHandler>()
+    .AddHostedService<QRCodeCreatedIntegrationEventHandler>(); 
+
 var app = builder.Build();
 
 app.MapControllers();
-
-var u = new Update();
 
 app.Run();

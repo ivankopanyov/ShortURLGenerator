@@ -15,26 +15,34 @@ public abstract class EventBusRabbitMQBase : IEventBus
 
     /// <summary>Method for publishing an RabbitMQ.</summary>
     /// <param name="event">Integration event.</param>
+    /// <exception cref="InvalidOperationException">Failed to connect to the broker.</exception>
     public void Publish(IntegrationEventBase @event)
     {
         string queueName = @event.GetType().Name;
         var message = JsonSerializer.Serialize(@event);
 
-        using var connection = _connectionFactory.CreateConnection();
-        using var channel = connection.CreateModel();
+        try
+        {
+            using var connection = _connectionFactory.CreateConnection();
+            using var channel = connection.CreateModel();
 
-        channel.QueueDeclare(queue: queueName,
-                        durable: false,
-                        exclusive: false,
-                        autoDelete: false,
-                        arguments: null);
+            channel.QueueDeclare(queue: queueName,
+                            durable: false,
+                            exclusive: false,
+                            autoDelete: false,
+                            arguments: null);
 
-        var body = Encoding.UTF8.GetBytes(message);
+            var body = Encoding.UTF8.GetBytes(message);
 
-        channel.BasicPublish(exchange: string.Empty,
-                        routingKey: queueName,
-                        basicProperties: null,
-                        body: body);
+            channel.BasicPublish(exchange: string.Empty,
+                            routingKey: queueName,
+                            basicProperties: null,
+                            body: body);
+        }
+        catch (BrokerUnreachableException ex)
+        {
+            throw new InvalidOperationException(ex.Message, ex);
+        }
     }
 
     /// <summary>Abstract method for configuring a connection to RabbitMQ.</summary>

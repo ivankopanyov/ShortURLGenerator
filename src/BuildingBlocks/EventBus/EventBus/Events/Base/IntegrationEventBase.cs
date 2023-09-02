@@ -15,5 +15,9 @@ public abstract class IntegrationEventBase
         Id = Guid.NewGuid();
         CreationDate = DateTime.UtcNow;
     }
+
+    /// <summary>Overriding the method of casting an object to a string type.</summary>
+    /// <returns>Object cast to a string type.</returns>
+    public override string ToString() => $"Event ID: {Id}\n\tCreated {CreationDate.ToString("dd.MM.yyyy HH.mm.ss")}";
 }
 

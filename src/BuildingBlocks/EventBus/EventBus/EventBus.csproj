@@ -11,12 +11,14 @@
     <None Remove="Events\" />
     <None Remove="Events\Base\" />
     <None Remove="Handling\" />
+    <None Remove="Extansions\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Abstraction\" />
     <Folder Include="Events\" />
     <Folder Include="Events\Base\" />
     <Folder Include="Handling\" />
+    <Folder Include="Extansions\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />

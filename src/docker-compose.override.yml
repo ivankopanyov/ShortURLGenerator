@@ -1,6 +1,14 @@
 version: '3.4'
 
 services:
+  rabbitmq:
+    hostname: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - app-network
+
   telegrambot:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -10,6 +18,7 @@ services:
       - URI_SERVICE_PORT=""
       - IDENTITY_SERVICE_HOST=""
       - IDENTITY_SERVICE_PORT=""
+      - EVENT_BUS_HOST_NAME=rabbitmq
     ports:
       - "5000:80"
     networks:

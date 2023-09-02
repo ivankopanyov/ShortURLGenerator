@@ -51,5 +51,16 @@
     <Folder Include="Services\UpdateHandling\Base\" />
     <Folder Include="Services\Identity\" />
     <Folder Include="Services\UpdateHandling\Commands\Base\" />
+    <Folder Include="IntegrationEventHandling\" />
+    <Folder Include="Services\EventBus\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\EventBus\EventBus\EventBus.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="IntegrationEventHandling\" />
+    <None Remove="Services\EventBus\" />
   </ItemGroup>
 </Project>

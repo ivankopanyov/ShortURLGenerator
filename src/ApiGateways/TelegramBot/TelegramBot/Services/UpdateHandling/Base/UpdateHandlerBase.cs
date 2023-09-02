@@ -3,6 +3,9 @@
 /// <summary>Abstract class that describes the basic handler for telegram bot updates.</summary>
 public abstract class UpdateHandlerBase : IUpdateHandler, ICommandSetBuilder
 {
+    /// <summary>Service for sending integration events.</summary>
+    protected IEventBus EventBus { get; private init; }
+
     /// <summary>User identification service.</summary>
     protected IIdentityService IdentityService { get; private init; }
 
@@ -22,17 +25,20 @@ public abstract class UpdateHandlerBase : IUpdateHandler, ICommandSetBuilder
     private readonly HashSet<IUpdateCommand> commands;
 
     /// <summary>Update handler initialization.</summary>
+    /// <param name="eventBus">Service for sending integration events.</param>
     /// <param name="identityService">User identification service.</param>
     /// <param name="urlService">Service for generating short URLs.</param>
     /// <param name="telegramBot">Service for sending Telegram messages to a bot.</param>
     /// <param name="logger">Log service.</param>
     /// <param name="configuration">Application configuration.</param>
-    public UpdateHandlerBase(IIdentityService identityService,
+    public UpdateHandlerBase(IEventBus eventBus,
+        IIdentityService identityService,
         IUrlService urlService,
         ITelegramBot telegramBot,
         ILogger<IUpdateCommand> logger,
         IConfiguration configuration)
     {
+        EventBus = eventBus;
         IdentityService = identityService;
         UrlService = urlService;
         TelegramBot = telegramBot;
