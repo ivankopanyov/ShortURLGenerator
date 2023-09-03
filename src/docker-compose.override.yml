@@ -24,6 +24,16 @@ services:
     networks:
       - app-network
 
+  qrcreator.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - EVENT_BUS_HOST_NAME=rabbitmq
+    ports:
+      - "5001:80"
+    networks:
+      - app-network
+
 networks:
    app-network:
+
 

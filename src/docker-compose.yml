@@ -14,3 +14,13 @@ services:
       dockerfile: ApiGateways/TelegramBot/TelegramBot/Dockerfile
     depends_on:
       - rabbitmq
+
+  qrcreator.api:
+    image: ${DOCKER_REGISTRY-}qrcreator
+    container_name: qrcreator.api
+    build:
+      context: .
+      dockerfile: Services/QR/QRCreator.API/Dockerfile
+    depends_on:
+      - rabbitmq
+

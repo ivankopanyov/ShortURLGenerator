@@ -25,5 +25,5 @@ public sealed class UriSentIntegrationEvent : IntegrationEventBase
 
     /// <summary>Overriding the method of casting an object to a string type.</summary>
     /// <returns>Object cast to a string type.</returns>
-    public override string ToString() => $"{base.ToString()}Chat ID: {ChatId}\n\tMessage ID: {MessageId}\n\tURI: {Uri}";
+    public override string ToString() => $"{base.ToString()}\n\tChat ID: {ChatId}\n\tMessage ID: {MessageId}\n\tURI: {Uri}";
 }

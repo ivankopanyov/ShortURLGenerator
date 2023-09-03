@@ -1,4 +1,4 @@
-﻿namespace ShortURLGenerator.TelegramBot.Services.EventBus;
+﻿namespace ShortURLGenerator.QRCreator.API.Services.EventBus;
 
 /// <summary>RabbitMQ service.</summary>
 public class EventBusRabbitMQ : EventBusRabbitMQBase

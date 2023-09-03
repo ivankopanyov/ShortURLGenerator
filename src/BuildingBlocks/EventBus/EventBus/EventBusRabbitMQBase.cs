@@ -14,9 +14,10 @@ public abstract class EventBusRabbitMQBase : IEventBus
     }
 
     /// <summary>Method for publishing an RabbitMQ.</summary>
+    /// <typeparam name="T">Integration event type.</typeparam>
     /// <param name="event">Integration event.</param>
     /// <exception cref="InvalidOperationException">Failed to connect to the broker.</exception>
-    public void Publish(IntegrationEventBase @event)
+    public void Publish<T>(T @event) where T : IntegrationEventBase
     {
         string queueName = @event.GetType().Name;
         var message = JsonSerializer.Serialize(@event);
