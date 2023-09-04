@@ -1,6 +1,25 @@
 version: '3.4'
 
 services:
+  urlgenerator.data:
+    environment:
+      - MSSQL_SA_PASSWORD=${URLGENERATOR_DB_PASSWORD}
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    volumes:
+      - urlgenerator-sql-data:/var/opt/urlgenerator-sql-data
+    networks:
+      - app-network
+  
+  urlgenerator.cache:
+    ports:
+      - "6379:6379"
+    volumes: 
+      - urlgenerator-cache-data:/urlgenerator-cache-data
+    networks:
+      - app-network
+
   rabbitmq:
     hostname: rabbitmq
     ports:
@@ -9,13 +28,25 @@ services:
     networks:
       - app-network
 
+  urlgenerator.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DB_HOST=urlgenerator.data
+      - DB_PASSWORD=${URLGENERATOR_DB_PASSWORD}
+      - CACHE_HOST=urlgenerator.cache
+      - CACHE_PORT=6379
+    ports:
+      - "5002:80"
+    networks:
+      - app-network
+
   telegrambot:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - FRONTEND=${FRONTEND}
-      - URI_SERVICE_HOST=""
-      - URI_SERVICE_PORT=""
+      - URL_SERVICE_HOST=urlgenerator.api
+      - URL_SERVICE_PORT=80
       - IDENTITY_SERVICE_HOST=""
       - IDENTITY_SERVICE_PORT=""
       - EVENT_BUS_HOST_NAME=rabbitmq
@@ -33,7 +64,14 @@ services:
     networks:
       - app-network
 
+volumes:
+  urlgenerator-sql-data:
+    driver: local
+  urlgenerator-cache-data:
+    driver: local
+
 networks:
    app-network:
+
 
 

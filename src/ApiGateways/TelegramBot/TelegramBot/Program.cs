@@ -13,7 +13,7 @@ builder.Services
 builder.Services
     .AddScoped<IUpdateHandler, UpdateHandler>()
     .AddScoped<IIdentityService, IdentityMockService>()
-    .AddScoped<IUrlService, UrlMockService>();
+    .AddScoped<IUrlService, UrlService>();
 
 builder.Services
     .AddHostedService<UriGeneratedIntegrationEventHandler>()

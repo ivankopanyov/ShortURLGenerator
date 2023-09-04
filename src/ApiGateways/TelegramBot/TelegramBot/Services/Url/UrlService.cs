@@ -5,8 +5,8 @@ public class UrlService : IUrlService
 {
     /// <summary>Address of the service for generating short URLs.</summary>
     private static readonly string _urlServiceHost =
-        "http://" + Environment.GetEnvironmentVariable("URI_SERVICE_HOST")! +
-        ":" + Environment.GetEnvironmentVariable("URI_SERVICE_PORT")!;
+        "http://" + Environment.GetEnvironmentVariable("URL_SERVICE_HOST")! +
+        ":" + Environment.GetEnvironmentVariable("URL_SERVICE_PORT")!;
 
     /// <summary>Log service.</summary>
     private readonly ILogger<UrlService> _logger;

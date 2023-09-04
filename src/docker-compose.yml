@@ -1,10 +1,31 @@
 version: '3.4'
 
 services:
+  urlgenerator.data:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: urlgenerator.data
+    restart: always
+  
+  urlgenerator.cache:
+    image: redis:alpine
+    container_name: urlgenerator.cache
+    restart: always
+
   rabbitmq:
     image: rabbitmq:alpine
     container_name: rabbitmq
     restart: always
+
+  urlgenerator.api:
+    image: ${DOCKER_REGISTRY-}urlgenerator
+    container_name: urlgenerator.api
+    build:
+      context: .
+      dockerfile: Services/URL/URLGenerator.API/Dockerfile
+    restart: always
+    depends_on:
+      - urlgenerator.data
+      - urlgenerator.cache
 
   telegrambot:
     image: ${DOCKER_REGISTRY-}telegrambot
@@ -12,8 +33,10 @@ services:
     build:
       context: .
       dockerfile: ApiGateways/TelegramBot/TelegramBot/Dockerfile
+    restart: always
     depends_on:
       - rabbitmq
+      - urlgenerator.api
 
   qrcreator.api:
     image: ${DOCKER_REGISTRY-}qrcreator
@@ -21,6 +44,7 @@ services:
     build:
       context: .
       dockerfile: Services/QR/QRCreator.API/Dockerfile
+    restart: always
     depends_on:
       - rabbitmq
 

@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <DockerComposeProjectPath>../../../docker-compose.dcproj</DockerComposeProjectPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.10" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.56.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\..\..\Protos\V1\response.proto" GrpcServices="None">
+      <Link>Protos\V1\response.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\..\..\Protos\V1\urldto.proto" GrpcServices="None" ProtoRoot="..\..\..\Protos\V1">
+      <Link>Protos\V1\urldto.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\..\..\Protos\V1\urlservice.proto" GrpcServices="Server" ProtoRoot="..\..\..\Protos\V1">
+      <Link>Protos\V1\urlservice.proto</Link>
+    </Protobuf>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Services\" />
+    <None Remove="Services\Generation\" />
+    <None Remove="Services\URL\" />
+    <None Remove="Repositories\" />
+    <None Remove="Repositories\URL\" />
+    <None Remove="Models\" />
+    <None Remove="Models\Abstract\" />
+    <None Remove="Infrastructure\" />
+    <None Remove="Infrastructure\EntityConfigurations\" />
+    <None Remove="Extensions\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Services\" />
+    <Folder Include="Services\Generation\" />
+    <Folder Include="Services\URL\" />
+    <Folder Include="Repositories\" />
+    <Folder Include="Repositories\URL\" />
+    <Folder Include="Models\" />
+    <Folder Include="Models\Abstract\" />
+    <Folder Include="Infrastructure\" />
+    <Folder Include="Infrastructure\EntityConfigurations\" />
+    <Folder Include="Extensions\" />
+  </ItemGroup>
+</Project>
