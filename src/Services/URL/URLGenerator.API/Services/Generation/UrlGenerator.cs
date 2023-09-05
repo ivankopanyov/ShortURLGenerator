@@ -1,31 +1,14 @@
 ﻿namespace ShortURLGenerator.URLGenerator.API.Services.Generation;
 
-public class UrlGenerator : IGeneratable
+public class UrlGenerator : UrlGeneratorBase
 {
-    private readonly ILogger _logger;
-
-    private readonly int _urlLength;
-
-    private readonly string _sourceSymbols;
-
 	public UrlGenerator(ILogger<UrlGenerator> logger, IConfiguration configuration)
-	{
-        _logger = logger;
-        _urlLength = configuration.GetSection("URL").GetValue<int>("Length");
-        _sourceSymbols = configuration.GetSection("URL").GetValue<string>("Source")!;
-	}
+		: base(logger, configuration) { }
 
-    public string GenerateString()
+    protected override void OnConfiguring(UrlGeneratorConfiguration configuration)
     {
-        _logger.LogInformation("Generate URL: start.");
-
-        var result = string.Empty;
-        for (int i = 0; i < _urlLength; i++)
-            result += _sourceSymbols[Random.Shared.Next(_sourceSymbols.Length)];
-
-        _logger.LogInformation($"Generate URL: succesful.\n\tURL: {result}");
-
-        return result;
+        configuration.UrlLength = AppConfiguration.GetSection("URL").GetValue<int>("Length");
+        configuration.SourceSymbols = AppConfiguration.GetSection("URL").GetValue<string>("SourceSymbols")!;
     }
 }
 

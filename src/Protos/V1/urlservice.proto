@@ -6,4 +6,5 @@ import "urldto.proto";
 
 service UrlService {
     rpc Generate (SourceUriDto) returns (UrlResponseDto);
+    rpc Get (UrlDto) returns (UriResponseDto);
 }

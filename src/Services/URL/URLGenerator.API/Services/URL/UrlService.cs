@@ -48,5 +48,36 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
             }
         }
     }
+
+    public override async Task<UriResponseDto> Get(UrlDto request, ServerCallContext context)
+    {
+        _logger.LogInformation($"Get URI: start.\n\tID: {request.Value}");
+
+        var url = await _repository.GetAsync(request.Value);
+
+        if (url is null)
+        {
+            _logger.LogInformation($"Get URI: failed.\n\tID: {request.Value}\n\tError: URL not found.");
+            return new UriResponseDto()
+            {
+                Response = new ResponseDto()
+                {
+                    ResponseStatus = ResponseStatus.NotFound,
+                    Error = "Страница не найдена."
+                }
+            };
+        }
+
+        _logger.LogInformation($"Get URI: succesful.\n\tID: {request.Value}\n\tURL: {url}");
+
+        return new UriResponseDto()
+        {
+            Response = new ResponseDto()
+            {
+                ResponseStatus = ResponseStatus.Ok
+            },
+            Uri = url.SourceUri
+        };
+    }
 }
 

@@ -4,6 +4,10 @@ option csharp_namespace = "Grpc.Dto";
 
 import "response.proto";
 
+message UrlDto {
+    string value = 1;
+}
+
 message SourceUriDto {
     string value = 1;
 }
@@ -11,4 +15,9 @@ message SourceUriDto {
 message UrlResponseDto {
     ResponseDto response = 1;
     optional string url = 2;
+}
+
+message UriResponseDto {
+    ResponseDto response = 1;
+    optional string uri = 2;
 }
