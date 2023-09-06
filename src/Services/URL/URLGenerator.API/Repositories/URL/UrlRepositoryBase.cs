@@ -49,21 +49,23 @@ public abstract class UrlRepositoryBase : IUrlRepository
     /// </exception>
 	public async Task CreateAsync(Url item)
 	{
-        _logger.LogInformation($"Create URL: start.\n\t{item}");
+        _logger.LogStart("Create URL", item);
 
         try
         {
-            _logger.LogInformation($"Create URL: save to database.\n\t{item}");
+            _logger.LogStart("Save URL to database", item);
             await _urlContext.Urls.AddAsync(item);
             await _urlContext.SaveChangesAsync();
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogWarning(ex, $"Create URL: failed.\n\t{item}\n\tWarning: {ex.Message}");
+            _logger.LogWarning(ex, "Save URL to database", "Duplicate", item);
             throw new DuplicateWaitObjectException(ex.Message, ex);
         }
 
-        _logger.LogInformation($"Create URL: save to cache.\n\t{item}");
+        _logger.LogSuccessfully("Save URL to database", item);
+
+        _logger.LogStart($"Save URL to cache", item);
 
         await _distributedCache.SetStringAsync(item.Id,
             JsonSerializer.Serialize(item),
@@ -72,8 +74,8 @@ public abstract class UrlRepositoryBase : IUrlRepository
                 SlidingExpiration = _lifeTimeCache
             });
 
-
-        _logger.LogInformation($"Create URL: succesful.\n\t{item}");
+        _logger.LogSuccessfully("Save URL to cache", item);
+        _logger.LogSuccessfully("Create URL", item);
     }
 
     /// <summary>Method for requesting a URL from a repository.</summary>
@@ -81,11 +83,11 @@ public abstract class UrlRepositoryBase : IUrlRepository
     /// <returns>The requested URL. Returns null if URL is not found.</returns>
     public async Task<Url?> GetAsync(string id)
     {
-        _logger.LogInformation($"Get URL: start.\n\tID: {id}");
+        _logger.LogStart("Get URL", id);
 
         Url? url = null;
 
-        _logger.LogInformation($"Get URL: get from cache.\n\tID: {id}");
+        _logger.LogStart("Get URL from cache", id);
 
         var urlString = await _distributedCache.GetStringAsync(id);
         if (urlString != null)
@@ -93,21 +95,27 @@ public abstract class UrlRepositoryBase : IUrlRepository
 
         if (url == null)
         {
-            _logger.LogInformation($"Get URL: get from database.\n\tID: {id}");
+            _logger.LogWarning("Get URL from cache", "URL not found.", id);
+            _logger.LogStart("Get URL from database", id);
+
             url = await _urlContext.Urls.FirstOrDefaultAsync(item => item.Id.Equals(id));
             if (url != null)
             {
-                _logger.LogInformation($"Get URL: save to cache.\n\tURL: {url}");
+                _logger.LogSuccessfully("Get URL from database", url);
+                _logger.LogStart("Save URL to cache", url);
                 await _distributedCache.SetStringAsync(url.Id,
                     JsonSerializer.Serialize(url),
                     new DistributedCacheEntryOptions
                     {
                         SlidingExpiration = _lifeTimeCache
                     });
+                _logger.LogSuccessfully("Save URL to cache", url);
             }
             else
-                _logger.LogInformation($"Get URL: failed.\n\tID: {id}\n\tError: URL not found.");
+                _logger.LogWarning("Get URL from database", "URL not found", id);
         }
+
+        _logger.LogSuccessfully("Get URL", url ?? (object)id);
 
         return url;
     }

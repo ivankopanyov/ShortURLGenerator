@@ -43,13 +43,13 @@ public abstract class UrlGeneratorBase : IGeneratable
     /// <returns>Random string.</returns>
     public string GenerateString()
     {
-        _logger.LogInformation("Generate URL: start.");
+        _logger.LogStart("Generate URL");
 
         var result = string.Empty;
         for (int i = 0; i < _urlLength; i++)
             result += _sourceSymbols[Random.Shared.Next(_sourceSymbols.Length)];
 
-        _logger.LogInformation($"Generate URL: succesful.\n\tURL: {result}");
+        _logger.LogSuccessfully("Generate URL", result);
 
         return result;
     }

@@ -57,4 +57,9 @@
     <Folder Include="Infrastructure\EntityConfigurations\" />
     <Folder Include="Extensions\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\BuildingBlocks\Logger\Logger\Logger.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

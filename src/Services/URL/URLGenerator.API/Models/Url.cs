@@ -15,6 +15,6 @@ public class Url : IModel<string>
     /// <summary>Overriding the method of casting an object to a string type.</summary>
     /// <returns>Object cast to a string type.</returns>
     public override string ToString() =>
-        $"URL ID: {Id}\n\tSource URI: {SourceUri}\n\tCreated: {Created.ToString("dd.MM.yyyy HH:mm:ss")}";
+        $"\tURL ID: {Id}\n\tSource URI: {SourceUri}\n\tCreated: {Created.ToString("dd.MM.yyyy HH:mm:ss")}";
 }
 

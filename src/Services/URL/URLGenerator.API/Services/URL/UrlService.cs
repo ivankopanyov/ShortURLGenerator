@@ -29,7 +29,7 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
     /// <returns>Response object containing the response status and data.</returns>
     public override async Task<UrlResponseDto> Generate(SourceUriDto request, ServerCallContext context)
     {
-        _logger.LogInformation($"Generate URL: start.\n\tSource URI: {request.Value}");
+        _logger.LogStart("Generate URL", request);
 
         while (true)
         {
@@ -43,9 +43,7 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
                     SourceUri = request.Value
                 });
 
-                _logger.LogInformation($"Generate URL: succesful.\n\tSource URI: {request.Value}\n\tURL: {url}");
-
-                return new UrlResponseDto()
+                var response = new UrlResponseDto()
                 {
                     Response = new ResponseDto()
                     {
@@ -53,10 +51,14 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
                     },
                     Url = url
                 };
+
+                _logger.LogSuccessfully($"Generate URL", request, response);
+
+                return response;
             }
             catch (DuplicateWaitObjectException ex)
             {
-                _logger.LogWarning(ex, $"Generate URL: failed.\n\tSource URI: {request.Value}\n\tURL: {url}\n\tWarning: duplicate.");
+                _logger.LogWarning(ex, "Generate URL", "Duplicate", request, url);
             }
         }
     }
@@ -67,13 +69,13 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
     /// <returns>Response object containing the response status and data.</returns>
     public override async Task<UriResponseDto> Get(UrlDto request, ServerCallContext context)
     {
-        _logger.LogInformation($"Get URI: start.\n\tID: {request.Value}");
+        _logger.LogStart("Get URI", request);
 
         var url = await _repository.GetAsync(request.Value);
 
         if (url is null)
         {
-            _logger.LogInformation($"Get URI: failed.\n\tID: {request.Value}\n\tError: URL not found.");
+            _logger.LogWarning("Get URI", "Not found", request);
             return new UriResponseDto()
             {
                 Response = new ResponseDto()
@@ -84,9 +86,7 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
             };
         }
 
-        _logger.LogInformation($"Get URI: succesful.\n\tID: {request.Value}\n\tURL: {url}");
-
-        return new UriResponseDto()
+        var response = new UriResponseDto()
         {
             Response = new ResponseDto()
             {
@@ -94,6 +94,10 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
             },
             Uri = url.SourceUri
         };
+
+        _logger.LogSuccessfully("Get URI", request, response);
+
+        return response;
     }
 }
 

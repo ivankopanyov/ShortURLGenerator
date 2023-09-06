@@ -6,6 +6,7 @@ global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 global using Microsoft.Extensions.Caching.Distributed;
 global using Grpc.Core;
 global using Grpc.Dto;
+global using ShortURLGenerator.Logger.Extansions;
 global using ShortURLGenerator.URLGenerator.API.Models;
 global using ShortURLGenerator.URLGenerator.API.Models.Abstract;
 global using ShortURLGenerator.URLGenerator.API.Infrastructure;
