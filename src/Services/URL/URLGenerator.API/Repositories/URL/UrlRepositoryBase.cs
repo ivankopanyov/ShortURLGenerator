@@ -1,17 +1,31 @@
 ﻿namespace ShortURLGenerator.URLGenerator.API.Repositories.URL;
 
+/// <summary>
+/// Abstract class that describes a repository of generated short URLs.
+/// Implements the IUrlRepository interface.
+/// </summary>
 public abstract class UrlRepositoryBase : IUrlRepository
 {
+    /// <summary>Database context.</summary>
     private readonly UrlContext _urlContext;
 
+    /// <summary>Cache service.</summary>
     private readonly IDistributedCache _distributedCache;
 
+    /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
+    /// <summary>How long the URL has been cached since the last request, in days.</summary>
     private readonly TimeSpan _lifeTimeCache;
 
+    /// <summary>Application configuration.</summary>
     protected IConfiguration AppConfiguration { get; private init; }
 
+    /// <summary>Repository object initialization.</summary>
+    /// <param name="urlContext">Database context.</param>
+    /// <param name="distributedCache">Cache service.</param>
+    /// <param name="logger">Log service.</param>
+    /// <param name="configuration">Application configuration.</param>
 	public UrlRepositoryBase(UrlContext urlContext,
         IDistributedCache distributedCache,
         ILogger<UrlRepositoryBase> logger,
@@ -28,6 +42,11 @@ public abstract class UrlRepositoryBase : IUrlRepository
         _lifeTimeCache = urlRepositoryConfiguration.LifeTimeCache;
 	}
 
+    /// <summary>Method for adding a new URL to the repository.</summary>
+    /// <param name="item">URL address.</param>
+    /// <exception cref="DuplicateWaitObjectException">
+    /// Exception is thrown if the repository already contains a URL with the passed identifier.
+    /// </exception>
 	public async Task CreateAsync(Url item)
 	{
         _logger.LogInformation($"Create URL: start.\n\t{item}");
@@ -57,6 +76,9 @@ public abstract class UrlRepositoryBase : IUrlRepository
         _logger.LogInformation($"Create URL: succesful.\n\t{item}");
     }
 
+    /// <summary>Method for requesting a URL from a repository.</summary>
+    /// <param name="id">URL identifier.</param>
+    /// <returns>The requested URL. Returns null if URL is not found.</returns>
     public async Task<Url?> GetAsync(string id)
     {
         _logger.LogInformation($"Get URL: start.\n\tID: {id}");
@@ -90,6 +112,8 @@ public abstract class UrlRepositoryBase : IUrlRepository
         return url;
     }
 
+    /// <summary>Abstract method for configuring a repository.</summary>
+    /// <param name="configuration">The repository configuration object.</param>
     protected abstract void OnConfiguring(UrlRepositoryConfiguration configuration);
 }
 

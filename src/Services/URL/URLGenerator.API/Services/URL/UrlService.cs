@@ -1,13 +1,21 @@
 ﻿namespace ShortURLGenerator.URLGenerator.API.Services.URL;
 
+/// <summary>Service for generating short URLs. Works on gRPC.</summary>
 public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
 {
+    /// <summary>Random string generator.</summary>
     private readonly IGeneratable _generator;
 
+    /// <summary>Repository of generated URLs.</summary>
     private readonly IUrlRepository _repository;
 
+    /// <summary>Log service.</summary>
     private readonly ILogger<UrlService> _logger;
 
+    /// <summary>Initialization of the service object for generating short URLs.</summary>
+    /// <param name="generator">Random string generator.</param>
+    /// <param name="repository">Repository of generated URLs.</param>
+    /// <param name="logger">Log service.</param>
     public UrlService(IGeneratable generator, IUrlRepository repository, ILogger<UrlService> logger)
 	{
         _generator = generator;
@@ -15,7 +23,11 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
         _logger = logger;
 	}
 
-    public override async Task<UrlResponseDto> Generate(SourceUriDto request, Grpc.Core.ServerCallContext context)
+    /// <summary>Short URL generation method. Works on gRPC.</summary>
+    /// <param name="request">The request object for generating a short URL.</param>
+    /// <param name="context">Server call context.</param>
+    /// <returns>Response object containing the response status and data.</returns>
+    public override async Task<UrlResponseDto> Generate(SourceUriDto request, ServerCallContext context)
     {
         _logger.LogInformation($"Generate URL: start.\n\tSource URI: {request.Value}");
 
@@ -49,6 +61,10 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
         }
     }
 
+    /// <summary>The request method is the original URI of the address at the generated URL. Works on gRPC.</summary>
+    /// <param name="request">Source URI request object.</param>
+    /// <param name="context">Server call context.</param>
+    /// <returns>Response object containing the response status and data.</returns>
     public override async Task<UriResponseDto> Get(UrlDto request, ServerCallContext context)
     {
         _logger.LogInformation($"Get URI: start.\n\tID: {request.Value}");
