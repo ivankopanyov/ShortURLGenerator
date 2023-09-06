@@ -43,18 +43,18 @@ public class VerificationCommand : IUpdateCommand
         if (chatId != user.Id)
             return false;
 
-        _logger.LogInformation($"Execute get verification code command: start.\n\tUpdate Id: {update.Id}\n\tUser ID: {chatId}");
+        _logger.LogStart("Execute get verification code command", update);
 
         try
         {
             var response = await _identityService.GetVerificationCodeAsync(chatId);
             await _telegramBot.SendVerificationCodeAsync(chatId, response.Code, response.LifeTimeMinutes);
-            _logger.LogInformation($"Execute get verification code: succesful.\n\tUpdate Id: {update.Id}\n\tUser ID: {chatId}\n\tVerification code: {response.Code}\n\tLifetime Minutes: {response.LifeTimeMinutes}");
+            _logger.LogSuccessfully("Execute get verification code", update, response);
         }
         catch (InvalidOperationException ex)
         {
             await _telegramBot.SendErrorMessageAsync(chatId, ex.Message);
-            _logger.LogInformation($"Execute get verification code command: failed.\n\tUpdate Id: {update.Id}\n\tChat ID: {chatId}\n\tError: {ex.Message}");
+            _logger.LogError("Execute get verification code command", ex.Message, update);
         }
 
         return true;

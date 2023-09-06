@@ -7,9 +7,6 @@
 /// </summary>
 public class GenerationUrlCommand : IUpdateCommand
 {
-    /// <summary>The domain name of the site to generate short URLs.</summary>
-    private static readonly string _frontend = Environment.GetEnvironmentVariable("FRONTEND")!;
-
     /// <summary>Service for sending integration events.</summary>
     private readonly IEventBus _eventBus;
 
@@ -22,16 +19,25 @@ public class GenerationUrlCommand : IUpdateCommand
     /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
+    /// <summary>The domain name of the site to generate short URLs.</summary>
+    private readonly string _frontend;
+
     /// <summary>Command object initialization.</summary>
     /// <param name="urlService">Service for generating short URLs.</param>
     /// <param name="telegramBot">Service for sending Telegram messages to a bot.</param>
     /// <param name="logger">Log service.</param>
-    public GenerationUrlCommand(IEventBus eventBus, IUrlService urlService, ITelegramBot telegramBot, ILogger<IUpdateCommand> logger)
+    /// <param name="frontend">Frontend address.</param>
+    public GenerationUrlCommand(IEventBus eventBus,
+        IUrlService urlService,
+        ITelegramBot telegramBot,
+        ILogger<IUpdateCommand> logger,
+        string frontend)
     {
         _eventBus = eventBus;
         _urlService = urlService;
         _telegramBot = telegramBot;
         _logger = logger;
+        _frontend = frontend;
     }
 
     /// <summary>The method that executes the command if the update is valid.</summary>
@@ -46,7 +52,7 @@ public class GenerationUrlCommand : IUpdateCommand
 
         long chatId = message.Chat.Id;
 
-        _logger.LogInformation($"Execute generation uri command: start.\n\tUpdate Id: {update.Id}\n\tChat ID: {chatId}\n\tSource URI: {text}");
+        _logger.LogStart("Execute generation uri command", update);
 
         try
         {
@@ -56,24 +62,24 @@ public class GenerationUrlCommand : IUpdateCommand
 
             var @event = new UriSentIntegrationEvent(chatId, messageId, result);
 
-            _logger.LogInformation($"Execute generation uri command: connection to broker.\n\tUpdate Id: {update.Id}\n\tChat ID: {chatId}\n\tSource URI: {text}");
+            _logger.LogStart("Send URI", @event);
 
             try
             {
                 _eventBus.Publish(@event);
+                _logger.LogSuccessfully("Send URI", @event);
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"Execute generation uri command: failed.\n\tUpdate Id: {update.Id}\n\tChat ID: {chatId}\n\tSource URI: {text}\n\tError: Failed to connect to the broker.");
+                _logger.LogError(ex, "Send URI", ex.Message, @event);
             }
 
-            _logger.LogInformation($"Execute generation uri command: The event was sent successfully.\n\tUpdate Id: {update.Id}\n\tChat ID: {chatId}\n\tSource URI: {text}\n\tMessage ID: {messageId}\n\tEvent ID {@event.Id}");
-            _logger.LogInformation($"Execute generation uri command: succesful.\n\tUpdate Id: {update.Id}\n\tChat ID: {chatId}\n\tSource URI: {text}\n\tMessage ID: {messageId}");
+            _logger.LogSuccessfully("Execute generation uri command", update, url);
         }
         catch (InvalidOperationException ex)
         {
             await _telegramBot.SendErrorMessageAsync(chatId, ex.Message);
-            _logger.LogError(ex, $"Execute generation uri command: failed.\n\tUpdate Id: {update.Id}\n\tChat ID: {chatId}\n\tSource URI: {text}\n\tError: {ex.Message}");
+            _logger.LogError(ex, "Execute generation uri command", ex.Message, update);
         }
 
         return true;

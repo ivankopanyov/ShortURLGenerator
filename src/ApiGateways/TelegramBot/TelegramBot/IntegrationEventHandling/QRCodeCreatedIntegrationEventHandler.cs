@@ -23,23 +23,22 @@ public class QRCodeCreatedIntegrationEventHandler : IntegrationEventHandlerBase<
     /// <param name="event">QR code creation event.</param>
     protected override async Task HandleAsync(QRCodeCreatedIntegrationEvent? @event)
     {
-        _logger.LogInformation("Handle QR code created event: start.");
-
         if (@event is null)
         {
-            _logger.LogError("Handle QR code created event: failed.\n\tError: Event is null.");
-            return;
-        }
-        else if (@event.Data is null)
-        {
-            _logger.LogError($"Handle QR code created event: failed.\n\t{@event}\n\tError: Event data is null.");
+            _logger.LogError("Handle QR code created event", "Event is null");
             return;
         }
 
-        _logger.LogInformation($"Handle QR code created event.\n\t{@event}");
+        _logger.LogStart("Handle QR code created event", @event);
+
+        if (@event.Data is null)
+        {
+            _logger.LogError("Handle QR code created event", "Event data is null", @event);
+            return;
+        }
 
         await _telegramBot.SendQRCodeAsync(@event.ChatId, @event.MessageId, @event.Data);
-        _logger.LogInformation($"Handle QR code created event: succesful.\n\t{@event}");
+        _logger.LogSuccessfully("Handle QR code created event", @event);
     }
 
     /// <summary>Overriding the broker connection configuration method.</summary>

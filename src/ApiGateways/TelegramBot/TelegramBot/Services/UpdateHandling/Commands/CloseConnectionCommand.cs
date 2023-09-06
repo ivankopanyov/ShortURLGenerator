@@ -47,18 +47,18 @@ public class CloseConnectionCommand : IUpdateCommand
         int messageId = message.MessageId;
         var connectionId = text.Split('_', StringSplitOptions.RemoveEmptyEntries)[1];
 
-        _logger.LogInformation($"Execute close connection command: start.\n\tUpdate Id: {update.Id}\n\tChat ID: {chatId}\n\tMessage ID: {messageId}\n\tConnection ID: {connectionId}");
+        _logger.LogStart("Execute close connection command", update);
 
         try
         {
             await _identityService.CloseConnectionAsync(chatId, connectionId);
             await _telegramBot.SendCloseConnectionAsync(chatId, messageId);
-            _logger.LogInformation($"Execute close connection command: succesful.\n\tUpdate Id: {update.Id}\n\tChat ID: {chatId}\n\tMessage ID: {messageId}\n\tConnection ID: {connectionId}");
+            _logger.LogSuccessfully("Execute close connection command", update);
         }
         catch (InvalidOperationException ex)
         {
             await _telegramBot.SendErrorMessageAsync(chatId, ex.Message);
-            _logger.LogInformation($"Execute close connection command: failed.\n\tUpdate Id: {update.Id}\n\tChat ID: {chatId}\n\tMessage ID: {messageId}\n\tConnection ID: {connectionId}\n\tError: {ex.Message}");
+            _logger.LogError(ex, "Execute close connection command", ex.Message, update);
         }
 
         return true;

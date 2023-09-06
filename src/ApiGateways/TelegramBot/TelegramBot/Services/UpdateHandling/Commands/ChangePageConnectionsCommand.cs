@@ -23,7 +23,7 @@ public class ChangePageConnectionsCommand : ConnectionsCommandBase
         ILogger<IUpdateCommand> logger,
         IConfiguration configuration) : base(identityService, telegramBot, logger, configuration) { }
 
-    /// <summary>Method for checking the validity of an update.</summary>
+    /// <summary>Method override for checking the validity of an update.</summary>
     /// <param name="update">Telegram bot ID.</param>
     /// <param name="chatId">Chat ID.</param>
     /// <param name="index">Page index.</param>
@@ -44,6 +44,13 @@ public class ChangePageConnectionsCommand : ConnectionsCommandBase
 
         index = int.Parse(text.Split('_')[1]);
         return true;
+    }
+
+    /// <summary>Method override for checking the validity of an update.</summary>
+    /// <param name="configuration">Connections command configuration</param>
+    protected override void OnConfiguring(ConnectionsCommandConfiguration configuration)
+    {
+        configuration.PageSize = AppConfiguration.GetSection("Telegram").GetValue<int>("ConnectionsPageSize");
     }
 }
 

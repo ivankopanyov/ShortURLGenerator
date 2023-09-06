@@ -21,7 +21,7 @@ public class UpdateHandler : UpdateHandlerBase
     /// <param name="commandSetBuilder">Command set builder.</param>
     protected override void CommandSetConfiguration(ICommandSetBuilder commandSetBuilder) => commandSetBuilder
         .AddCommand(new StartCommand(TelegramBot, Logger))
-        .AddCommand(new GenerationUrlCommand(EventBus, UrlService, TelegramBot, Logger))
+        .AddCommand(new GenerationUrlCommand(EventBus, UrlService, TelegramBot, Logger, Environment.GetEnvironmentVariable("FRONTEND")!))
         .AddCommand(new VerificationCommand(IdentityService, TelegramBot, Logger))
         .AddCommand(new FirstPageConnectionsCommand(IdentityService, TelegramBot, Logger, Configuration))
         .AddCommand(new ChangePageConnectionsCommand(IdentityService, TelegramBot, Logger, Configuration))
@@ -31,14 +31,18 @@ public class UpdateHandler : UpdateHandlerBase
     /// <param name="update">Telegram bot update.</param>
     protected override async Task NotFoundCommandHandleAsync(Update update)
     {
-        if (update is not null && update.Message is { } message && message.From is { } user && !user.IsBot)
+        Logger.LogStart("Handle update not found command", update);
+
+        if (update is null)
+            Logger.LogError("Handle update not found command", "Update is null");
+        else if (update.Message is { } message && message.From is { } user && !user.IsBot)
         {
             long chatId = message.Chat.Id;
-            Logger.LogInformation($"Handle update: failed.\n\tUpdate ID: {update.Id}\n\tChat ID: {chatId}\n\tMessage: {message.Text}\n\tError: Command not found.");
             await TelegramBot.SendErrorMessageAsync(chatId, "Ссылка некорректна.");
+            Logger.LogSuccessfully("Handle update not found command", update);
         }
         else
-            Logger.LogError($"Handle update: failed.\n\tError: Command not found.");
+            Logger.LogWarning("Handle update not found command", "Invalid update type", update);
     }
 }
 

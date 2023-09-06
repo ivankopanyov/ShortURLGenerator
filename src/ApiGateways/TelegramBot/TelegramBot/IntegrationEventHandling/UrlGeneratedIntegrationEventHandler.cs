@@ -29,33 +29,31 @@ public class UriGeneratedIntegrationEventHandler : IntegrationEventHandlerBase<U
     /// <param name="event">URI generated event.</param>
     protected override async Task HandleAsync(UriGeneratedIntegrationEvent? @event)
     {
-        _logger.LogInformation("Handle URL generated event: start.");
-
         if (@event is null)
         {
-            _logger.LogError("Handle URL generated event: failed.\n\tError: Event is null.");
+            _logger.LogError("Handle URL generated event", "Event is null");
             return;
         }
 
-        _logger.LogInformation($"Handle URL generated event.\n\t{@event}");
+        _logger.LogStart("Handle URL generated event", @event);
 
         var messageId = await _telegramBot.SendUriAsync(@event.ChatId, @event.Uri, @event.SourceUri);
 
         var uriSentEvent = new UriSentIntegrationEvent(@event.ChatId, messageId, @event.Uri);
 
-        _logger.LogInformation($"Handle URL generated event: connection to broker.\n\t{@event}\nURI sent event:\n\t{uriSentEvent}");
+        _logger.LogStart("Send URL generated event", uriSentEvent);
 
         try
         {
             _eventBus.Publish(uriSentEvent);
+            _logger.LogSuccessfully("Send URL generated event", uriSentEvent);
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogError(ex, $"Handle URL generated event: failed.\n\t{@event}\nURI sent event:\n\t{uriSentEvent}\n\tError: Failed to connect to the broker.");
+            _logger.LogError(ex, "Send URL generated event", "Failed to connect to the broker", uriSentEvent);
         }
 
-        _logger.LogInformation($"Handle URL generated event: The event was sent successfully.\n\t{@event}\nURI sent event:\n\t{uriSentEvent}");
-        _logger.LogInformation($"Handle URL generated event: succesful.\n\t{@event}");
+        _logger.LogSuccessfully("Handle URL generated event", @event);
     }
 
     /// <summary>Overriding the broker connection configuration method.</summary>

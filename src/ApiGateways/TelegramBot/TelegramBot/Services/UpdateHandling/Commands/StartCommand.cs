@@ -38,19 +38,17 @@ public class StartCommand : IUpdateCommand
         if (chatId != user.Id)
             return false;
 
-        string firstName = user.FirstName;
-
-        _logger.LogInformation($"Execute start command: start.\n\tUpdate Id: {update.Id}\n\tChat ID: {chatId}\n\tFirst name: {firstName}");
+        _logger.LogStart("Execute start command", update);
 
         try
         {
             await _telegramBot.SendHelloAsync(chatId, user.FirstName);
-            _logger.LogInformation($"Execute start command: succesful.\n\tUpdate Id: {update.Id}\n\tChat ID: {chatId}\n\tFirst name: {firstName}");
+            _logger.LogSuccessfully("Execute start command", update);
         }
         catch (InvalidOperationException ex)
         {
             await _telegramBot.SendErrorMessageAsync(chatId, ex.Message);
-            _logger.LogError(ex, $"Execute start command: failed.\n\tUpdate Id: {update.Id}\n\tChat ID: {chatId}\n\tFirst name: {firstName}\n\tError: {ex.Message}");
+            _logger.LogError(ex, "Execute start command", ex.Message, update);
         }
 
         return true;
