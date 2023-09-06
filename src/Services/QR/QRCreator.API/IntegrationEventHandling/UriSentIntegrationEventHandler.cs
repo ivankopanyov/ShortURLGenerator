@@ -11,8 +11,6 @@ public class UriSentIntegrationEventHandler : IntegrationEventHandlerBase<UriSen
     /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
-    private int _qRCodeSize;
-
     /// <summary>Handler initialization.</summary>
     /// <param name="qRCodeCreationService"></param>
     /// <param name="eventBus">The sender of integration events.</param>
@@ -25,28 +23,24 @@ public class UriSentIntegrationEventHandler : IntegrationEventHandlerBase<UriSen
         _qRCodeCreationService = qRCodeCreationService;
         _eventBus = eventBus;
         _logger = logger;
-        _qRCodeSize = configuration.GetSection("QRCode").GetValue<int>("Size");
     }
 
     /// <summary>Overriding the event handling method.</summary>
     /// <param name="event">URI sent event.</param>
     protected override Task HandleAsync(UriSentIntegrationEvent? @event)
     {
-        _logger.LogInformation("Handle URI sent event: start.");
-
         if (@event is null)
         {
-            _logger.LogError("Handle URI sent event: failed.\n\tError: Event is null.");
+            _logger.LogError("Handle URI sent event", "Event is null.");
             return Task.CompletedTask;
         }
 
-        _logger.LogInformation($"Handle URI sent event.\n\t{@event}");
+        _logger.LogStart("Handle URI sent event", @event);
 
-        var qrcode = _qRCodeCreationService.GenerateJpeg(@event.Uri, _qRCodeSize);
-
+        var qrcode = _qRCodeCreationService.GenerateJpeg(@event.Uri);
         var qrCodeCreatedEvent = new QRCodeCreatedIntegrationEvent(@event.ChatId, @event.MessageId, qrcode);
 
-        _logger.LogInformation($"Handle URI sent event: connection to broker.\n\t{@event}\nQR code created event: \n\t{qrCodeCreatedEvent}");
+        _logger.LogInformation("Handle URI sent event", "connection to broker.", @event, qrCodeCreatedEvent);
 
         try
         {
@@ -54,11 +48,10 @@ public class UriSentIntegrationEventHandler : IntegrationEventHandlerBase<UriSen
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogError(ex, $"Handle URI sent event: failed.\n\t{@event}\nQR code created event: \n\t{qrCodeCreatedEvent}\n\tError: Failed to connect to the broker.");
+            _logger.LogError(ex, "Handle URI sent event", "Failed to connect to the broker.", @event, qrCodeCreatedEvent);
         }
 
-        _logger.LogInformation($"Handle URI sent event: The event was sent successfully.\n\t{@event}\nQR code created event: \n\t{qrCodeCreatedEvent}");
-        _logger.LogInformation($"Handle URI sent event: succesful.\n\t{@event}");
+        _logger.LogSuccessfully("Handle URI sent event", @event, qrCodeCreatedEvent);
         return Task.CompletedTask;
     }
 
