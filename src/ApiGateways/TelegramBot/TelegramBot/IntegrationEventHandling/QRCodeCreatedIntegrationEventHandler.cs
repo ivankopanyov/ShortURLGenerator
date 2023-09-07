@@ -32,7 +32,6 @@ public class QRCodeCreatedIntegrationEventHandler : IntegrationEventHandlerBase<
         string eventId = @event.Id.ToString();
 
         _logger.LogStart("Handle QR code created event", eventId);
-        _logger.LogObject("Handle QR code created event", @event);
 
         if (@event.Data is null)
         {

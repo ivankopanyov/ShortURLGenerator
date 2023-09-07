@@ -32,7 +32,6 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
         var requestId = request.Value;
 
         _logger.LogStart("Generate URL", requestId);
-        _logger.LogObject("Generate URL", request);
 
         while (true)
         {
@@ -55,7 +54,6 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
                     Url = url
                 };
 
-                _logger.LogObject("Generate URL", response);
                 _logger.LogSuccessfully($"Generate URL", requestId);
 
                 return response;
@@ -76,7 +74,6 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
         var requestId = request.Value;
 
         _logger.LogStart("Get URI", requestId);
-        _logger.LogObject("Get URI", request);
 
         var url = await _repository.GetAsync(request.Value);
 
@@ -91,7 +88,6 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
                 }
             };
 
-            _logger.LogObject("Get URI", response);
             _logger.LogInformation("Get URI", "Not found", requestId);
 
             return response;
@@ -107,7 +103,6 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
                 Uri = url.SourceUri
             };
 
-            _logger.LogObject("Get URI", response);
             _logger.LogSuccessfully("Get URI", requestId);
 
             return response;

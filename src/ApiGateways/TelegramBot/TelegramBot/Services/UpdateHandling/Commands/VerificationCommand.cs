@@ -46,7 +46,6 @@ public class VerificationCommand : IUpdateCommand
         var updateId = update.Id.ToString();
 
         _logger.LogStart("Execute get verification code command", updateId);
-        _logger.LogObject("Execute get verification code command", update);
 
         try
         {

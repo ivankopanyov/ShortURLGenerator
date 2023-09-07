@@ -52,7 +52,6 @@ public abstract class ConnectionsCommandBase : IUpdateCommand
         string updateId = update.Id.ToString();
 
         _logger.LogStart($"Execute {CommandName} command", updateId);
-        _logger.LogObject($"Execute {CommandName} command", update);
 
         try
         {

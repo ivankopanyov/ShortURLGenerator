@@ -25,5 +25,5 @@ public sealed class QRCodeCreatedIntegrationEvent : IntegrationEventBase
 
     /// <summary>Overriding the method of casting an object to a string type.</summary>
     /// <returns>Object cast to a string type.</returns>
-    public override string ToString() => $"{base.ToString()}\n\tChat ID: {ChatId}\n\tMessage ID: {MessageId}";
+    public override string ToString() => $"{base.ToString()}, Chat ID: {ChatId}, Message ID: {MessageId}";
 }

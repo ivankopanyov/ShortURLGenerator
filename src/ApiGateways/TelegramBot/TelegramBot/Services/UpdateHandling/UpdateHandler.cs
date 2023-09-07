@@ -41,8 +41,6 @@ public class UpdateHandler : UpdateHandlerBase
 
         var updteId = update.Id.ToString();
 
-        Logger.LogObject("Handle update not found command", update);
-
         if (update.Message is { } message && message.From is { } user && !user.IsBot)
         {
             long chatId = message.Chat.Id;

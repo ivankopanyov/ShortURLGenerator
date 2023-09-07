@@ -38,7 +38,6 @@ public class UriGeneratedIntegrationEventHandler : IntegrationEventHandlerBase<U
         string eventId = @event.Id.ToString();
 
         _logger.LogStart("Handle URL generated event", eventId);
-        _logger.LogObject("Handle URL generated event", @event);
 
         var messageId = await _telegramBot.SendUriAsync(@event.ChatId, @event.Uri, @event.SourceUri);
         var uriSentEvent = new UriSentIntegrationEvent(@event.ChatId, messageId, @event.Uri);
@@ -46,7 +45,6 @@ public class UriGeneratedIntegrationEventHandler : IntegrationEventHandlerBase<U
 
 
         _logger.LogStart("Send URL generated event", uriSentEventId);
-        _logger.LogObject("Send URL generated event", uriSentEvent);
 
         try
         {

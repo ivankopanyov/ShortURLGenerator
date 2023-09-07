@@ -24,7 +24,6 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         string message = $"{head}тправьте сообщение со ссылкой для генерирования короткого адреса.";
         var sentMessage = await this.SendTextMessageAsync(chatId: chatId, text: message);
 
-        _logger.LogObject("Send hello message", sentMessage);
         _logger.LogSuccessfully("Send hello message", sentMessage.MessageId.ToString());
     }
 
@@ -42,7 +41,6 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
 
         var message = await this.SendTextMessageAsync(chatId: chatId, text: uri);
 
-        _logger.LogObject("Send URI message", message);
         _logger.LogSuccessfully("Send URI message", message.MessageId.ToString());
 
         return message.MessageId;
@@ -59,7 +57,6 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
 
         var message = await this.SendTextMessageAsync(chatId: chatId, text: uri, replyToMessageId: sourceMessageId);
 
-        _logger.LogObject("Send URI message", message);
         _logger.LogSuccessfully("Send URI message", message.MessageId.ToString());
 
         return message.MessageId;
@@ -79,7 +76,6 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
             "после авторизации или после создания нового кода.";
         var sentMessage = await this.SendTextMessageAsync(chatId: chatId, text: message);
 
-        _logger.LogObject("Send verification code message", sentMessage);
         _logger.LogSuccessfully("Send verification code message", sentMessage.MessageId.ToString());
     }
 
@@ -127,7 +123,6 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
                     "Подключение завершено.",
                     replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton[0]));
 
-            _logger.LogObject("Send close connection message", message);
             _logger.LogSuccessfully("Send close connection message", message.MessageId.ToString());
         }
         catch (ApiRequestException ex)
@@ -155,7 +150,6 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         using var stream = new MemoryStream(data);
         var message = await this.SendPhotoAsync(chatId, InputFile.FromStream(stream), replyToMessageId: messageId);
 
-        _logger.LogObject("Send QR code message", message);
         _logger.LogSuccessfully("Send QR code message", message.MessageId.ToString());
     }
 
@@ -169,7 +163,6 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         string message = $"Ошибка: {errorMessage ?? "Неизвестная ошибка."} Попробуйте снова.";
         var sentMessage = await this.SendTextMessageAsync(chatId: chatId, text: message);
 
-        _logger.LogObject("Send error message", sentMessage);
         _logger.LogSuccessfully("Send error message", sentMessage.MessageId.ToString());
     }
 
@@ -190,7 +183,6 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         var key = new InlineKeyboardMarkup(InlineKeyboardButton.WithCallbackData(text: "Завершить", callbackData: $"close_{connection.ConnectionId}"));
         var sentMessage = await this.SendTextMessageAsync(chatId: chatId, text: message, replyMarkup: key);
 
-        _logger.LogObject("Send connections message", sentMessage);
         _logger.LogSuccessfully("Send connections message", sentMessage.MessageId.ToString());
     }
 
@@ -215,7 +207,6 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         string message = $"Страница {index + 1} из {count}";
         var sentMessage = await this.SendTextMessageAsync(chatId: chatId, text: message, replyMarkup: keyboard);
 
-        _logger.LogObject("Send switch page message", sentMessage);
         _logger.LogSuccessfully("Send switch page message", sentMessage.MessageId.ToString());
     }
 }

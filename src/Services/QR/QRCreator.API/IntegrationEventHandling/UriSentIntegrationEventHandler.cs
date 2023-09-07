@@ -38,14 +38,12 @@ public class UriSentIntegrationEventHandler : IntegrationEventHandlerBase<UriSen
         var eventId = @event.Id.ToString();
 
         _logger.LogStart("Handle URI sent event", eventId);
-        _logger.LogObject("Handle URI sent event", @event);
 
         var qrcode = _qRCodeCreationService.GenerateJpeg(@event.Uri);
         var qrCodeCreatedEvent = new QRCodeCreatedIntegrationEvent(@event.ChatId, @event.MessageId, qrcode);
         var qrCodeCreatedEventId = qrCodeCreatedEvent.Id.ToString();
 
         _logger.LogStart("Send QR code created event", qrCodeCreatedEventId);
-        _logger.LogObject("Send QR code created event", qrCodeCreatedEvent);
 
         try
         {

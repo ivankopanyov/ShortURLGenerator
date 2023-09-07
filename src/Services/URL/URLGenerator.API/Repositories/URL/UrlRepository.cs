@@ -52,7 +52,6 @@ public class UrlRepository : IUrlRepository
         var itemId = item.Id;
 
         _logger.LogStart("Create URL", itemId);
-        _logger.LogObject("Create URL", item);
 
         try
         {
@@ -107,7 +106,6 @@ public class UrlRepository : IUrlRepository
             }
         }
 
-        _logger.LogObject("Get URL", url);
         _logger.LogSuccessfully("Get URL", id);
 
         return url;

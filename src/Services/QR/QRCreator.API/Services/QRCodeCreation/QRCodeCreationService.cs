@@ -40,7 +40,6 @@ public class QRCodeCreationService : IQRCodeCreationService
 
         GeneratedBarcode barcode = QRCodeWriter.CreateQrCode(uri, _sizePixels, QRCodeWriter.QrErrorCorrectionLevel.Medium);
 
-        _logger.LogObject("Create QR code", barcode);
         _logger.LogSuccessfully("Create QR code", uri);
 
         return barcode.ToJpegBinaryData();

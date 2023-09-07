@@ -41,15 +41,12 @@ public class IdentityService : IIdentityService
         var requestId = request.UserId.ToString();
 
         _logger.LogStart("Get verification code", requestId);
-        _logger.LogObject("Get verification code", request);
 
         try
         {
             using var channel = GrpcChannel.ForAddress(_identityServiceHost);
             var client = new Grpc.Services.IdentityService.IdentityServiceClient(channel);
             var response = await client.GetVerificationCodeAsync(request);
-
-            _logger.LogObject("Get verification code", response);
 
             if (response.Response.ResponseStatus == ResponseStatus.Ok)
             {
@@ -91,15 +88,12 @@ public class IdentityService : IIdentityService
         var requestId = request.UserId.ToString();
 
         _logger.LogStart("Get connections", requestId);
-        _logger.LogObject("Get connections", request);
 
         try
         {
             using var channel = GrpcChannel.ForAddress(_identityServiceHost);
             var client = new Grpc.Services.IdentityService.IdentityServiceClient(channel);
             var response = await client.GetConnectionsAsync(request);
-
-            _logger.LogObject("Get connections", response);
 
             if (response.Response.ResponseStatus == ResponseStatus.Ok)
             {
@@ -142,15 +136,12 @@ public class IdentityService : IIdentityService
         var requestId = request.UserId.ToString();
 
         _logger.LogStart("Close connection", requestId);
-        _logger.LogObject("Close connection", request);
 
         try
         {
             using var channel = GrpcChannel.ForAddress(_identityServiceHost);
             var client = new Grpc.Services.IdentityService.IdentityServiceClient(channel);
             var response = await client.CloseConnectionAsync(request);
-
-            _logger.LogObject("Close connection", response);
 
             if (response.ResponseStatus == ResponseStatus.Ok)
             {

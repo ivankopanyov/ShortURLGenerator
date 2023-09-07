@@ -41,7 +41,6 @@ public class StartCommand : IUpdateCommand
         var updateId = update.Id.ToString();
 
         _logger.LogStart("Execute start command", updateId);
-        _logger.LogObject("Execute start command", update);
 
         try
         {

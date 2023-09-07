@@ -54,7 +54,6 @@ public class GenerationUrlCommand : IUpdateCommand
         var updateId = update.Id.ToString();
 
         _logger.LogStart("Execute generation uri command", updateId);
-        _logger.LogObject("Execute generation uri command", update);
 
         try
         {
@@ -66,7 +65,6 @@ public class GenerationUrlCommand : IUpdateCommand
             var eventId = @event.Id.ToString();
 
             _logger.LogStart("Send URI", eventId);
-            _logger.LogObject("Send URI", @event);
 
             try
             {

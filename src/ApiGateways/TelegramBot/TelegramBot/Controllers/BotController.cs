@@ -26,7 +26,6 @@ public class BotController : ControllerBase
     public async void HandleUpdateAsync(Update update)
     {
         _logger.LogStart("Find command", update.Id.ToString());
-        _logger.LogObject("Find command", update);
 
         try
         {

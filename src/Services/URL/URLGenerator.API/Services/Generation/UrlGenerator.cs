@@ -45,11 +45,13 @@ public class UrlGenerator : IGeneratable
     {
         _logger.LogStart("Generate URL");
 
-        var result = string.Empty;
-        for (int i = 0; i < _urlLength; i++)
-            result += _sourceSymbols[Random.Shared.Next(_sourceSymbols.Length)];
+        var stringBuilder = new StringBuilder(capacity: _urlLength, maxCapacity: _urlLength);
 
-        _logger.LogObject("Generate URL", result);
+        for (int i = 0; i < _urlLength; i++)
+            stringBuilder.Append(_sourceSymbols[Random.Shared.Next(_sourceSymbols.Length)]);
+
+        var result = stringBuilder.ToString();
+
         _logger.LogSuccessfully("Generate URL");
 
         return result;

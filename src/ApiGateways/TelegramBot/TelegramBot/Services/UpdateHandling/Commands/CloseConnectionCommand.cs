@@ -50,7 +50,6 @@ public class CloseConnectionCommand : IUpdateCommand
         string updateId = update.Id.ToString();
 
         _logger.LogStart("Execute close connection command", updateId);
-        _logger.LogObject("Execute close connection command", update);
 
         try
         {

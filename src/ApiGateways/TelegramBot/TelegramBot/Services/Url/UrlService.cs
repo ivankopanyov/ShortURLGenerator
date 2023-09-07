@@ -48,15 +48,12 @@ public class UrlService : IUrlService
         var requestId = sourceUri;
 
         _logger.LogStart("Generate URL", requestId);
-        _logger.LogObject("Generate URL", request);
 
         try
         {
             using var channel = GrpcChannel.ForAddress(_urlServiceHost);
             var client = new Grpc.Services.UrlService.UrlServiceClient(channel);
             var response = await client.GenerateAsync(request);
-
-            _logger.LogObject("Generate URL", response);
 
             if (response.Response.ResponseStatus == ResponseStatus.Ok)
             {

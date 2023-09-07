@@ -4,7 +4,7 @@
 public static class LoggerExtansions
 {
     /// <summary>The current date and time.</summary>
-    private static string Now => DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss");
+    private static string Now => DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss.ffff");
 
     /// <summary>Method of logging the beginning of the operation.</summary>
     /// <param name="logger">Logger.</param>
@@ -12,19 +12,6 @@ public static class LoggerExtansions
     /// <param name="objectId">Operation object ID.</param>
     public static void LogStart(this ILogger logger, string operationName, string? objectId = null) =>
         logger.LogInformation($"{Now} {operationName}: start.{GetObjectId(objectId)}");
-
-    /// <summary>Method for logging information about the operation object.</summary>
-    /// <param name="logger">Logger.</param>
-    /// <param name="operationName">Operation name.</param>
-    /// <param name="obj">Operation object.</param>
-    public static void LogObject(this ILogger logger, string operationName, object obj)
-    {
-        var log = $"{operationName}: object. " + obj is null
-            ? "Object: null."
-            : $"{obj.GetType().Name}: {JsonSerializer.Serialize(obj)}";
-
-        logger.LogInformation($"{Now} {operationName}: object. {log}");
-    }
 
     /// <summary>Method for logging successful completion of the operation.</summary>
     /// <param name="logger">Logger.</param>
