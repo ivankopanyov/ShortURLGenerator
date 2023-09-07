@@ -40,12 +40,5 @@ public class FirstPageConnectionsCommand : ConnectionsCommandBase
 
         return message.From is { } user && !user.IsBot && user.Id == chatId && message.Text == FIRST_PAGE_CONNECTIONS_PATTERN;
     }
-
-    /// <summary>Method override for checking the validity of an update.</summary>
-    /// <param name="configuration">Connections command configuration</param>
-    protected override void OnConfiguring(ConnectionsCommandConfiguration configuration)
-    {
-        configuration.PageSize = AppConfiguration.GetSection("Telegram").GetValue<int>("ConnectionsPageSize");
-    }
 }
 

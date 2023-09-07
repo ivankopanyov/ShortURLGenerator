@@ -17,7 +17,7 @@ public abstract class IntegrationEventHandlerBase<T> : BackgroundService where T
     public IntegrationEventHandlerBase()
     {
         var factory = new ConnectionFactory();
-        OnConfigureConnection(factory);
+        OnConfiguringConnection(factory);
         _connection = factory.TryCreateConnection(10, TimeSpan.FromSeconds(5));
         _channel = _connection.CreateModel();
         _channel.QueueDeclare(queue: _queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
@@ -44,7 +44,7 @@ public abstract class IntegrationEventHandlerBase<T> : BackgroundService where T
 
     /// <summary>Abstract method for configuring a connection to a message broker.</summary>
     /// <param name="connectionFactory">Factory for creating connections to the message broker.</param>
-    protected abstract void OnConfigureConnection(ConnectionFactory connectionFactory);
+    protected abstract void OnConfiguringConnection(ConnectionFactory connectionFactory);
 
     /// <summary>Abstract event handling method.</summary>
     /// <param name="event">Event.</param>

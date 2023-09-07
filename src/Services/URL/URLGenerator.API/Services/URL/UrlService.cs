@@ -29,7 +29,10 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
     /// <returns>Response object containing the response status and data.</returns>
     public override async Task<UrlResponseDto> Generate(SourceUriDto request, ServerCallContext context)
     {
-        _logger.LogStart("Generate URL", request);
+        var requestId = request.Value;
+
+        _logger.LogStart("Generate URL", requestId);
+        _logger.LogObject("Generate URL", request);
 
         while (true)
         {
@@ -52,13 +55,14 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
                     Url = url
                 };
 
-                _logger.LogSuccessfully($"Generate URL", request, response);
+                _logger.LogObject("Generate URL", response);
+                _logger.LogSuccessfully($"Generate URL", requestId);
 
                 return response;
             }
             catch (DuplicateWaitObjectException ex)
             {
-                _logger.LogWarning(ex, "Generate URL", "Duplicate", request, url);
+                _logger.LogWarning(ex, "Generate URL", "Duplicate", requestId);
             }
         }
     }
@@ -69,14 +73,16 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
     /// <returns>Response object containing the response status and data.</returns>
     public override async Task<UriResponseDto> Get(UrlDto request, ServerCallContext context)
     {
-        _logger.LogStart("Get URI", request);
+        var requestId = request.Value;
+
+        _logger.LogStart("Get URI", requestId);
+        _logger.LogObject("Get URI", request);
 
         var url = await _repository.GetAsync(request.Value);
 
         if (url is null)
         {
-            _logger.LogWarning("Get URI", "Not found", request);
-            return new UriResponseDto()
+            var response = new UriResponseDto()
             {
                 Response = new ResponseDto()
                 {
@@ -84,20 +90,28 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
                     Error = "Страница не найдена."
                 }
             };
+
+            _logger.LogObject("Get URI", response);
+            _logger.LogInformation("Get URI", "Not found", requestId);
+
+            return response;
         }
-
-        var response = new UriResponseDto()
+        else
         {
-            Response = new ResponseDto()
+            var response = new UriResponseDto()
             {
-                ResponseStatus = ResponseStatus.Ok
-            },
-            Uri = url.SourceUri
-        };
+                Response = new ResponseDto()
+                {
+                    ResponseStatus = ResponseStatus.Ok
+                },
+                Uri = url.SourceUri
+            };
 
-        _logger.LogSuccessfully("Get URI", request, response);
+            _logger.LogObject("Get URI", response);
+            _logger.LogSuccessfully("Get URI", requestId);
 
-        return response;
+            return response;
+        }
     }
 }
 

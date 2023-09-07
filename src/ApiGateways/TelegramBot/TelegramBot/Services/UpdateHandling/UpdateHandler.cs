@@ -19,7 +19,7 @@ public class UpdateHandler : UpdateHandlerBase
 
     /// <summary>Overriding the method for adding commands to the handler.</summary>
     /// <param name="commandSetBuilder">Command set builder.</param>
-    protected override void CommandSetConfiguration(ICommandSetBuilder commandSetBuilder) => commandSetBuilder
+    protected override void OnCommandSetConfiguring(ICommandSetBuilder commandSetBuilder) => commandSetBuilder
         .AddCommand(new StartCommand(TelegramBot, Logger))
         .AddCommand(new GenerationUrlCommand(EventBus, UrlService, TelegramBot, Logger, Environment.GetEnvironmentVariable("FRONTEND")!))
         .AddCommand(new VerificationCommand(IdentityService, TelegramBot, Logger))
@@ -31,18 +31,26 @@ public class UpdateHandler : UpdateHandlerBase
     /// <param name="update">Telegram bot update.</param>
     protected override async Task NotFoundCommandHandleAsync(Update update)
     {
-        Logger.LogStart("Handle update not found command", update);
+        Logger.LogStart("Handle update not found command");
 
         if (update is null)
+        {
             Logger.LogError("Handle update not found command", "Update is null");
-        else if (update.Message is { } message && message.From is { } user && !user.IsBot)
+            return;
+        }
+
+        var updteId = update.Id.ToString();
+
+        Logger.LogObject("Handle update not found command", update);
+
+        if (update.Message is { } message && message.From is { } user && !user.IsBot)
         {
             long chatId = message.Chat.Id;
             await TelegramBot.SendErrorMessageAsync(chatId, "Ссылка некорректна.");
-            Logger.LogSuccessfully("Handle update not found command", update);
+            Logger.LogSuccessfully("Handle update not found command", updteId);
         }
         else
-            Logger.LogWarning("Handle update not found command", "Invalid update type", update);
+            Logger.LogWarning("Handle update not found command", "Invalid update type", updteId);
     }
 }
 

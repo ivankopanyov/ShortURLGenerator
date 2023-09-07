@@ -3,6 +3,7 @@
 /// <summary>Class that describes the URI sent event.</summary>
 public class UriSentIntegrationEventHandler : IntegrationEventHandlerBase<UriSentIntegrationEvent>
 {
+    /// <summary>QR code creation service</summary>
     private readonly IQRCodeCreationService _qRCodeCreationService;
 
     /// <summary>The sender of integration events.</summary>
@@ -17,8 +18,7 @@ public class UriSentIntegrationEventHandler : IntegrationEventHandlerBase<UriSen
     /// <param name="logger">Log service.</param>
     public UriSentIntegrationEventHandler(IQRCodeCreationService qRCodeCreationService,
         IEventBus eventBus,
-        ILogger<UriSentIntegrationEventHandler> logger,
-        IConfiguration configuration)
+        ILogger<UriSentIntegrationEventHandler> logger)
     {
         _qRCodeCreationService = qRCodeCreationService;
         _eventBus = eventBus;
@@ -35,29 +35,35 @@ public class UriSentIntegrationEventHandler : IntegrationEventHandlerBase<UriSen
             return Task.CompletedTask;
         }
 
-        _logger.LogStart("Handle URI sent event", @event);
+        var eventId = @event.Id.ToString();
+
+        _logger.LogStart("Handle URI sent event", eventId);
+        _logger.LogObject("Handle URI sent event", @event);
 
         var qrcode = _qRCodeCreationService.GenerateJpeg(@event.Uri);
         var qrCodeCreatedEvent = new QRCodeCreatedIntegrationEvent(@event.ChatId, @event.MessageId, qrcode);
+        var qrCodeCreatedEventId = qrCodeCreatedEvent.Id.ToString();
 
-        _logger.LogInformation("Handle URI sent event", "connection to broker.", @event, qrCodeCreatedEvent);
+        _logger.LogStart("Send QR code created event", qrCodeCreatedEventId);
+        _logger.LogObject("Send QR code created event", qrCodeCreatedEvent);
 
         try
         {
             _eventBus.Publish(qrCodeCreatedEvent);
+            _logger.LogSuccessfully("Send QR code created event", qrCodeCreatedEventId);
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogError(ex, "Handle URI sent event", "Failed to connect to the broker.", @event, qrCodeCreatedEvent);
+            _logger.LogError(ex, "Send QR code created event", ex.Message, qrCodeCreatedEventId);
         }
 
-        _logger.LogSuccessfully("Handle URI sent event", @event, qrCodeCreatedEvent);
+        _logger.LogSuccessfully("Handle URI sent event", eventId);
         return Task.CompletedTask;
     }
 
     /// <summary>Overriding the broker connection configuration method.</summary>
     /// <param name="connectionFactory">Connection factory.</param>
-    protected override void OnConfigureConnection(ConnectionFactory connectionFactory)
+    protected override void OnConfiguringConnection(ConnectionFactory connectionFactory)
     {
         connectionFactory.HostName = Environment.GetEnvironmentVariable("EVENT_BUS_HOST_NAME");
     }

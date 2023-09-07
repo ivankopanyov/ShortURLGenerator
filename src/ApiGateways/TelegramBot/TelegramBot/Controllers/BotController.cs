@@ -14,8 +14,7 @@ public class BotController : ControllerBase
     /// <summary>Controller initialization.</summary>
     /// <param name="updateHandler">Telegram update handler.</param>
     /// <param name="logger">Log service.</param>
-    public BotController(IUpdateHandler updateHandler,
-        ILogger<BotController> logger)
+    public BotController(IUpdateHandler updateHandler, ILogger<BotController> logger)
     {
         _updateHandler = updateHandler;
         _logger = logger;
@@ -26,9 +25,13 @@ public class BotController : ControllerBase
     [HttpPost]
     public async void HandleUpdateAsync(Update update)
     {
+        _logger.LogStart("Find command", update.Id.ToString());
+        _logger.LogObject("Find command", update);
+
         try
         {
             await _updateHandler.HandleAsync(update);
+            _logger.LogSuccessfully("Find command", update.Id.ToString());
         }
         catch (Exception ex)
         {

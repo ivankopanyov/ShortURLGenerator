@@ -47,7 +47,7 @@ public abstract class UpdateHandlerBase : IUpdateHandler, ICommandSetBuilder
 
         commands = new HashSet<IUpdateCommand>();
 
-        CommandSetConfiguration(this);
+        OnCommandSetConfiguring(this);
     }
 
     /// <summary>Telegram bot update handling method.</summary>
@@ -76,7 +76,7 @@ public abstract class UpdateHandlerBase : IUpdateHandler, ICommandSetBuilder
 
     /// <summary>Abstract method for adding commands to the handler using the command set builder.</summary>
     /// <param name="commandSetBuilder">Command set builder.</param>
-    protected abstract void CommandSetConfiguration(ICommandSetBuilder commandSetBuilder);
+    protected abstract void OnCommandSetConfiguring(ICommandSetBuilder commandSetBuilder);
 
     /// <summary>Abstract method is called if no suitable update command is found.</summary>
     /// <param name="update">Telegram bot update.</param>

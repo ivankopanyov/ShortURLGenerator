@@ -35,30 +35,35 @@ public class UriGeneratedIntegrationEventHandler : IntegrationEventHandlerBase<U
             return;
         }
 
-        _logger.LogStart("Handle URL generated event", @event);
+        string eventId = @event.Id.ToString();
+
+        _logger.LogStart("Handle URL generated event", eventId);
+        _logger.LogObject("Handle URL generated event", @event);
 
         var messageId = await _telegramBot.SendUriAsync(@event.ChatId, @event.Uri, @event.SourceUri);
-
         var uriSentEvent = new UriSentIntegrationEvent(@event.ChatId, messageId, @event.Uri);
+        var uriSentEventId = uriSentEvent.Id.ToString();
 
-        _logger.LogStart("Send URL generated event", uriSentEvent);
+
+        _logger.LogStart("Send URL generated event", uriSentEventId);
+        _logger.LogObject("Send URL generated event", uriSentEvent);
 
         try
         {
             _eventBus.Publish(uriSentEvent);
-            _logger.LogSuccessfully("Send URL generated event", uriSentEvent);
+            _logger.LogSuccessfully("Send URL generated event", uriSentEventId);
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogError(ex, "Send URL generated event", "Failed to connect to the broker", uriSentEvent);
+            _logger.LogError(ex, "Send URL generated event", "Failed to connect to the broker", uriSentEventId);
         }
 
-        _logger.LogSuccessfully("Handle URL generated event", @event);
+        _logger.LogSuccessfully("Handle URL generated event", eventId);
     }
 
     /// <summary>Overriding the broker connection configuration method.</summary>
     /// <param name="connectionFactory">Connection factory.</param>
-    protected override void OnConfigureConnection(ConnectionFactory connectionFactory)
+    protected override void OnConfiguringConnection(ConnectionFactory connectionFactory)
     {
         connectionFactory.HostName = Environment.GetEnvironmentVariable("EVENT_BUS_HOST_NAME");
     }

@@ -29,21 +29,24 @@ public class QRCodeCreatedIntegrationEventHandler : IntegrationEventHandlerBase<
             return;
         }
 
-        _logger.LogStart("Handle QR code created event", @event);
+        string eventId = @event.Id.ToString();
+
+        _logger.LogStart("Handle QR code created event", eventId);
+        _logger.LogObject("Handle QR code created event", @event);
 
         if (@event.Data is null)
         {
-            _logger.LogError("Handle QR code created event", "Event data is null", @event);
+            _logger.LogError("Handle QR code created event", "Event data is null", eventId);
             return;
         }
 
         await _telegramBot.SendQRCodeAsync(@event.ChatId, @event.MessageId, @event.Data);
-        _logger.LogSuccessfully("Handle QR code created event", @event);
+        _logger.LogSuccessfully("Handle QR code created event", eventId);
     }
 
     /// <summary>Overriding the broker connection configuration method.</summary>
     /// <param name="connectionFactory">Connection factory.</param>
-    protected override void OnConfigureConnection(ConnectionFactory connectionFactory)
+    protected override void OnConfiguringConnection(ConnectionFactory connectionFactory)
     {
         connectionFactory.HostName = Environment.GetEnvironmentVariable("EVENT_BUS_HOST_NAME");
     }

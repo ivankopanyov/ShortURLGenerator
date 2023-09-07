@@ -24,3 +24,5 @@ global using ShortURLGenerator.TelegramBot.Services.UpdateHandling.Base;
 global using ShortURLGenerator.TelegramBot.Services.UpdateHandling.Commands;
 global using ShortURLGenerator.TelegramBot.IntegrationEventHandling;
 
+
+
