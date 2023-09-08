@@ -20,6 +20,14 @@ services:
     networks:
       - app-network
 
+  identity.nosql-data:
+    ports:
+      - "16379:6379"
+    volumes: 
+      - identity-nosql-data:/identity-nosql-data
+    networks:
+      - app-network
+
   rabbitmq:
     hostname: rabbitmq
     ports:
@@ -64,14 +72,27 @@ services:
     networks:
       - app-network
 
+  identity.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - REDIS_HOST=identity.nosql-data
+      - REDIS_PORT=6379
+    ports:
+      - "5003:80"
+    networks:
+      - app-network
+
 volumes:
   urlgenerator-sql-data:
     driver: local
   urlgenerator-cache-data:
     driver: local
+  identity-nosql-data:
+    driver: local
 
 networks:
    app-network:
+
 
 
 

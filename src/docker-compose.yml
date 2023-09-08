@@ -11,6 +11,11 @@ services:
     container_name: urlgenerator.cache
     restart: always
 
+  identity.nosql-data:
+    image: redis:alpine
+    container_name: identity.nosql-data
+    restart: always
+
   rabbitmq:
     image: rabbitmq:alpine
     container_name: rabbitmq
@@ -36,7 +41,6 @@ services:
     restart: always
     depends_on:
       - rabbitmq
-      - urlgenerator.api
 
   qrcreator.api:
     image: ${DOCKER_REGISTRY-}qrcreator
@@ -47,4 +51,14 @@ services:
     restart: always
     depends_on:
       - rabbitmq
+
+  identity.api:
+    image: ${DOCKER_REGISTRY-}identity
+    container_name: identity.api
+    build:
+      context: .
+      dockerfile: Services/Identity/Identity.API/Dockerfile
+    restart: always
+    depends_on:
+      - identity.nosql-data
 

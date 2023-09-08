@@ -1,12 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 25.0.1706.3
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B4976827-6BEF-4404-9C59-D908C91D2C0F}"
 	ProjectSection(SolutionItems) = preProject
-		..\.gitignore = ..\.gitignore
 		.env = .env
+		..\.gitignore = ..\.gitignore
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{7FF9D2CA-C0A2-4FE0-BC2B-40295A542AC0}"
@@ -21,32 +21,36 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TelegramBot", "TelegramBot"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "V1", "V1", "{376D3438-9AB6-43D3-A3EA-022BD7FA19DC}"
 	ProjectSection(SolutionItems) = preProject
-		Protos\V1\urlservice.proto = Protos\V1\urlservice.proto
-		Protos\V1\response.proto = Protos\V1\response.proto
-		Protos\V1\urldto.proto = Protos\V1\urldto.proto
 		Protos\V1\identitydto.proto = Protos\V1\identitydto.proto
 		Protos\V1\identityservice.proto = Protos\V1\identityservice.proto
+		Protos\V1\response.proto = Protos\V1\response.proto
+		Protos\V1\urldto.proto = Protos\V1\urldto.proto
+		Protos\V1\urlservice.proto = Protos\V1\urlservice.proto
 	EndProjectSection
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{661B3E8B-A453-4D3B-95E2-DE1184A51BDF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EventBus", "EventBus", "{0C696C1E-0277-48BC-A1F7-D09A2EBA8D1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventBus", "BuildingBlocks\EventBus\EventBus\EventBus.csproj", "{562BE01F-91EA-4F8D-BBBF-723ACF99CA09}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EventBus", "BuildingBlocks\EventBus\EventBus\EventBus.csproj", "{562BE01F-91EA-4F8D-BBBF-723ACF99CA09}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QR", "QR", "{2DD19ABE-6569-4DE5-B4ED-46C59251077B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRCreator.API", "Services\QR\QRCreator.API\QRCreator.API.csproj", "{404AF86C-F8B0-4FAA-8374-880069BC005A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCreator.API", "Services\QR\QRCreator.API\QRCreator.API.csproj", "{404AF86C-F8B0-4FAA-8374-880069BC005A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "URL", "URL", "{06ABE9F9-1844-4235-8168-19D61A145C35}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "URLGenerator.API", "Services\URL\URLGenerator.API\URLGenerator.API.csproj", "{EFC2722B-4004-4834-BBDE-CE23C7914D17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "URLGenerator.API", "Services\URL\URLGenerator.API\URLGenerator.API.csproj", "{EFC2722B-4004-4834-BBDE-CE23C7914D17}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Logger", "Logger", "{8DB82A4F-B6B4-467A-BBE5-A566D045A62C}"
 EndProject
-Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "TelegramBot", "ApiGateways\TelegramBot\TelegramBot\TelegramBot.csproj", "{9138B16E-AD65-465A-AEE0-550EFF32F674}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBot", "ApiGateways\TelegramBot\TelegramBot\TelegramBot.csproj", "{9138B16E-AD65-465A-AEE0-550EFF32F674}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logger", "BuildingBlocks\Logger\Logger\Logger.csproj", "{CBEB5BB6-D7E8-418A-9FD0-18BC3BAAE749}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Logger", "BuildingBlocks\Logger\Logger\Logger.csproj", "{CBEB5BB6-D7E8-418A-9FD0-18BC3BAAE749}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{982F04DC-9EDB-49E9-957A-0900ED18992A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.API", "Services\Identity\Identity.API\Identity.API.csproj", "{566B8993-A107-45F2-876A-108AB6A76EA2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,10 +58,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A7689E60-362A-446D-A412-6CF47E102363}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A7689E60-362A-446D-A412-6CF47E102363}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A7689E60-362A-446D-A412-6CF47E102363}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A7689E60-362A-446D-A412-6CF47E102363}.Release|Any CPU.Build.0 = Release|Any CPU
 		{661B3E8B-A453-4D3B-95E2-DE1184A51BDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{661B3E8B-A453-4D3B-95E2-DE1184A51BDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{661B3E8B-A453-4D3B-95E2-DE1184A51BDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -82,12 +82,13 @@ Global
 		{CBEB5BB6-D7E8-418A-9FD0-18BC3BAAE749}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBEB5BB6-D7E8-418A-9FD0-18BC3BAAE749}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBEB5BB6-D7E8-418A-9FD0-18BC3BAAE749}.Release|Any CPU.Build.0 = Release|Any CPU
+		{566B8993-A107-45F2-876A-108AB6A76EA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{566B8993-A107-45F2-876A-108AB6A76EA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{566B8993-A107-45F2-876A-108AB6A76EA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{566B8993-A107-45F2-876A-108AB6A76EA2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {2AF3D96E-2B84-4F72-846E-9F3E7BD0200B}
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7FF9D2CA-C0A2-4FE0-BC2B-40295A542AC0} = {B4976827-6BEF-4404-9C59-D908C91D2C0F}
@@ -105,5 +106,10 @@ Global
 		{8DB82A4F-B6B4-467A-BBE5-A566D045A62C} = {0E8E7527-1537-474E-8529-A2EFCD5AC7A8}
 		{9138B16E-AD65-465A-AEE0-550EFF32F674} = {F6925BE8-BD71-4F06-A834-5D1C22793295}
 		{CBEB5BB6-D7E8-418A-9FD0-18BC3BAAE749} = {8DB82A4F-B6B4-467A-BBE5-A566D045A62C}
+		{982F04DC-9EDB-49E9-957A-0900ED18992A} = {7FF9D2CA-C0A2-4FE0-BC2B-40295A542AC0}
+		{566B8993-A107-45F2-876A-108AB6A76EA2} = {982F04DC-9EDB-49E9-957A-0900ED18992A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2AF3D96E-2B84-4F72-846E-9F3E7BD0200B}
 	EndGlobalSection
 EndGlobal
