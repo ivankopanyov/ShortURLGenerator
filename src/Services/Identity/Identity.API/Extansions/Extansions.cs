@@ -9,10 +9,10 @@ public static class Extensions
     public static IServiceCollection AddRedis(this IServiceCollection services) =>
         services.AddStackExchangeRedisCache(options =>
         {
-            var host = Environment.GetEnvironmentVariable("CACHE_HOST");
-            var port = Environment.GetEnvironmentVariable("CACHE_PORT");
+            var host = Environment.GetEnvironmentVariable("REDIS_HOST");
+            var port = Environment.GetEnvironmentVariable("REDIS_PORT");
             options.Configuration = $"{host}:{port}";
-            options.InstanceName = "url";
+            options.InstanceName = "identity";
         });
 }
 

@@ -29,4 +29,9 @@
     </Protobuf>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Repositories\Connection\" />
+    <Folder Include="Services\Token\" />
+  </ItemGroup>
+
 </Project>
