@@ -7,6 +7,8 @@ builder.Services.AddGrpc();
 builder.Services.AddRedis();
 
 builder.Services
+    .AddScoped<IVerificationCodeGenerationService, VerificationCodeGenerationService>()
+    .AddScoped<IRefreshTokenGenerationService, RefreshTokenGenerationService>()
     .AddScoped<IIdentityService, IdentityService>();
 
 var app = builder.Build();

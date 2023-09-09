@@ -30,8 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Repositories\Connection\" />
-    <Folder Include="Services\Token\" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\StringGenerator\StringGenerator\StringGenerator.csproj" />
   </ItemGroup>
 
 </Project>
