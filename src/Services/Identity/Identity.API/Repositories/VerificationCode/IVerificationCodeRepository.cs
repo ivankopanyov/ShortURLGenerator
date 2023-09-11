@@ -2,7 +2,7 @@
 
 public interface IVerificationCodeRepository
 {
-    Task<TimeSpan> CreateAsync(string userId, string verificationCode);
+    Task<TimeSpan> CreateOrUpdateAsync(string userId, string verificationCode);
 
     Task<string?> GetAndRemoveAsync(string verificationCode);
 }

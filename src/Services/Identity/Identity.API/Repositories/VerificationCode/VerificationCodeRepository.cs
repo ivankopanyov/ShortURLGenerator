@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
-
-namespace ShortURLGenerator.Identity.API.Repositories.VerificationCode;
+﻿namespace ShortURLGenerator.Identity.API.Repositories.VerificationCode;
 
 public class VerificationCodeRepository : IVerificationCodeRepository
 {
@@ -8,18 +6,12 @@ public class VerificationCodeRepository : IVerificationCodeRepository
 
     private const string PREFIX = "code_";
 
-    /// <summary>Cache service.</summary>
     private readonly IDistributedCache _distributedCache;
 
-    /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
     private readonly TimeSpan _verificationCodeLifeTime;
 
-    /// <summary>Repository object initialization.</summary>
-    /// <param name="distributedCache">Cache service.</param>
-    /// <param name="logger">Log service.</param>
-    /// <param name="configuration">Application configuration.</param>
 	public VerificationCodeRepository(IDistributedCache distributedCache,
         ILogger<VerificationCodeRepository> logger,
         IConfiguration? configuration = null)
@@ -36,10 +28,15 @@ public class VerificationCodeRepository : IVerificationCodeRepository
                 : repositoryConfiguration.VerificationCodeLifeTime;
     }
 
-    public async Task<TimeSpan> CreateAsync(string userId, string verificationCode)
+    public async Task<TimeSpan> CreateOrUpdateAsync(string userId, string verificationCode)
     {
+        _logger.LogStart("Create or update verification code", verificationCode);
+
         if (_distributedCache.GetStringAsync(verificationCode) != null)
+        {
+            _logger.LogError("Create or update verification code", "Duplicate", verificationCode);
             throw new DuplicateWaitObjectException(nameof(verificationCode));
+        }
 
         string prefixedUserId = $"{PREFIX}{userId}";
 
@@ -58,11 +55,15 @@ public class VerificationCodeRepository : IVerificationCodeRepository
         await _distributedCache.SetStringAsync(verificationCode, userId, options); 
         await _distributedCache.SetStringAsync(prefixedUserId, verificationCode, options);
 
+        _logger.LogSuccessfully("Create or update verification code", verificationCode);
+        
         return _verificationCodeLifeTime;
     }
 
     public async Task<string?> GetAndRemoveAsync(string verificationCode)
     {
+        _logger.LogStart("Create or update verification code", verificationCode);
+
         var userId = await _distributedCache.GetStringAsync(verificationCode);
         
         if (userId != null)
@@ -70,6 +71,8 @@ public class VerificationCodeRepository : IVerificationCodeRepository
             await _distributedCache.RemoveAsync($"{PREFIX}{userId}");
             await _distributedCache.RemoveAsync(verificationCode);
         }
+
+        _logger.LogSuccessfully("Create or update verification code", verificationCode);
 
         return userId;
     }
