@@ -11,7 +11,8 @@ public class ConnectionRepository : IConnectionRepository
     private readonly ILogger _logger;
 
     private readonly TimeSpan _connectionLifeTime;
-	public ConnectionRepository(IDistributedCache distributedCache,
+
+    public ConnectionRepository(IDistributedCache distributedCache,
         ILogger<ConnectionRepository> logger,
         IConfiguration? configuration = null)
     {
@@ -27,47 +28,13 @@ public class ConnectionRepository : IConnectionRepository
                 : repositoryConfiguration.ConnectionLifeTime;
     }
 
-    public async Task CreateAsync(string userId, string connectionId, ConnectionInfoDto connectionInfo)
-    {
-        _logger.LogStart("Create connection", userId);
-
-        if (_distributedCache.GetStringAsync(connectionId) != null)
-        {
-            _logger.LogError("Create connection", userId);
-            throw new DuplicateWaitObjectException(nameof(connectionId));
-        }
-
-        string prefixedUserId = $"{PREFIX}{userId}";
-
-        var userConnectionsData = await _distributedCache.GetStringAsync(prefixedUserId);
-        if (userConnectionsData is null || JsonSerializer.Deserialize<ISet<string>>(userConnectionsData) is not { } userConnections)
-            userConnections = new HashSet<string>();
-
-        userConnections.Add(connectionId);
-
-        var options = new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = _connectionLifeTime
-        };
-
-        var connection = new Models.Connection()
-        {
-            UserId = userId,
-            ConnectionInfo = connectionInfo
-        };
-
-        await _distributedCache.SetStringAsync(prefixedUserId, JsonSerializer.Serialize(userConnections));
-        await _distributedCache.SetStringAsync(connectionId, JsonSerializer.Serialize(connection), options);
-
-        _logger.LogSuccessfully("Create connection", userId);
-    }
+    public async Task<Models.Connection?> GetAsync(string connectionId) =>
+        await _distributedCache.GetStringAsync(connectionId) is not { } connectionData
+            ? null : JsonSerializer.Deserialize<Models.Connection>(connectionData);
 
     public async Task<ConnectionsPageDto> GetAsync(string userId, int index, int size)
     {
-        _logger.LogStart("Get connections", userId);
-
         string prefixedUserId = $"{PREFIX}{userId}";
-        var userConnectionsData = await _distributedCache.GetStringAsync(prefixedUserId);
 
         var response = new ConnectionsPageDto()
         {
@@ -78,22 +45,14 @@ public class ConnectionRepository : IConnectionRepository
             }
         };
 
-        if (userConnectionsData is null)
-        {
-            _logger.LogError("Get connections", "User connections data is null", userId);
-            throw new InvalidOperationException("User connections data is null");
-        }
-
-        if (JsonSerializer.Deserialize<SortedSet<string>>(userConnectionsData) is not { } userConnections)
-        {
-            _logger.LogError("Get connections", "User connections data is not deserialized", userId);
-            throw new InvalidOperationException("User connections data is not deserialized");
-        }
+        if (await _distributedCache.GetStringAsync(prefixedUserId) is not { } connectionsData ||
+            JsonSerializer.Deserialize<SortedSet<string>>(connectionsData) is not { } userConnections)
+            return response;
 
         var counter = -1;
 
         foreach (var connectionId in userConnections)
-        { 
+        {
             var connectionString = await _distributedCache.GetStringAsync(connectionId);
             if (connectionString is null)
             {
@@ -117,18 +76,64 @@ public class ConnectionRepository : IConnectionRepository
                     ConnectionId = connectionId,
                     ActiveSecondsAgo = (DateTime.Now - connection.Created).Seconds,
                     ConnectionInfo = connection.ConnectionInfo
-                }); 
+                });
             }
         }
 
         await _distributedCache.SetStringAsync(prefixedUserId, JsonSerializer.Serialize(userConnections));
 
-        response.PageInfo.Index = index;
         response.PageInfo.Count = (int)Math.Ceiling((double)userConnections.Count / size);
 
-        _logger.LogSuccessfully("Get connections", userId);
-
         return response;
+    }
+
+    public async Task<bool> Contains(string id) =>
+        await _distributedCache.GetStringAsync(id) is not null;
+
+    public async Task<Models.Connection?> CreateAsync(Models.Connection connection)
+    {
+        if (connection is null ||
+            string.IsNullOrWhiteSpace(connection.Id) ||
+            string.IsNullOrWhiteSpace(connection.UserId))
+            return null;
+
+        connection.Created = DateTime.UtcNow;
+        if (connection.ConnectionInfo is null)
+            connection.ConnectionInfo = new ConnectionInfoDto();
+
+        var prefixedUserId = $"{PREFIX}{connection.UserId}";
+
+        if (await _distributedCache.GetStringAsync(prefixedUserId) is not { } connectionsData ||
+            JsonSerializer.Deserialize<SortedSet<string>>(connectionsData) is not { } connections)
+            connections = new SortedSet<string>();
+
+        connections.Add(connection.Id);
+
+        await _distributedCache.SetStringAsync(prefixedUserId, JsonSerializer.Serialize(connection));
+        await _distributedCache.SetStringAsync(connection.Id, JsonSerializer.Serialize(connection), new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = _connectionLifeTime
+        });
+
+        return connection;
+    }
+
+    public async Task RemoveAsync(string connectionId)
+    {
+        if (string.IsNullOrWhiteSpace(connectionId))
+            return;
+
+        if (await _distributedCache.GetAsync(connectionId) is not { } connectionData ||
+            JsonSerializer.Deserialize<Models.Connection>(connectionData) is not { } connection)
+            return;
+
+        var prefixedUserId = $"{PREFIX}{connection.UserId}";
+
+        if (await _distributedCache.GetStringAsync(prefixedUserId) is { } connectionsData &&
+            JsonSerializer.Deserialize<ISet<string>>(connectionsData) is { } connections)
+            connections.Remove(connection.Id);
+
+        await _distributedCache.RemoveAsync(connection.Id);
     }
 
     protected virtual void OnConfiguring(

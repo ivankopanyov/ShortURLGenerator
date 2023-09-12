@@ -6,6 +6,7 @@ import "response.proto";
 import "identitydto.proto";
 
 service IdentityService {
+    rpc SignIn(SignInRequestDto) returns (SignInResponseDto);
     rpc GetVerificationCode(UserIdDto) returns (VerificationCodeResponseDto);
     rpc GetConnections(ConnectionsRequestDto) returns (ConnectionsPageResponseDto);
     rpc CloseConnection(ConnectionRequestDto) returns (ResponseDto);

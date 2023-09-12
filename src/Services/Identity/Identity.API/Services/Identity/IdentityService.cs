@@ -28,79 +28,76 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
     public override async Task<VerificationCodeResponseDto> GetVerificationCode(UserIdDto request, ServerCallContext context)
     {
         var userId = request.UserId.ToString();
+        string code;
 
-        _logger.LogStart("Get verification code", userId);
-
-        VerificationCodeDto? verificationCode = null;
-
-        while (verificationCode == null)
+        do
         {
-            try
-            {
-                var code = _verificationCodeGenerationService.GenerateString();
-                var lifeTime = await _verificationCodeRepository.CreateOrUpdateAsync(userId, code);
-                verificationCode = new VerificationCodeDto()
-                {
-                    Code = code,
-                    LifeTimeMinutes = lifeTime.Minutes
-                };
-            }
-            catch (DuplicateWaitObjectException)
-            {
-                _logger.LogInformation("Get verification code", "Duplicate", userId);
-            }
+            code = _verificationCodeGenerationService.GenerateString();
         }
+        while (!await _verificationCodeRepository.Contains(code));
 
-        _logger.LogSuccessfully("Get verification code", userId);
-
-        return new VerificationCodeResponseDto()
+        var verificationCode = await _verificationCodeRepository.CreateAsync(new Models.VerificationCode()
         {
-            Response = new ResponseDto()
-            {
-                ResponseStatus = ResponseStatus.Ok
-            },
-            VerificationCode = verificationCode
-        };
-    }
+            Id = code,
+            UserId = userId
+        });
 
-    public override async Task<ConnectionsPageResponseDto> GetConnections(ConnectionsRequestDto request, ServerCallContext context)
-    {
-        var userId = request.UserId.ToString();
-
-        _logger.LogStart("Get connections", userId);
-
-        try
-        {
-            var response = await _connectionRepository.GetAsync(userId, request.PageInfo.Index, request.PageInfo.Count);
-
-            _logger.LogSuccessfully("Get connections", userId);
-
-            return new ConnectionsPageResponseDto()
+        return verificationCode is not null
+            ? new VerificationCodeResponseDto()
             {
                 Response = new ResponseDto()
                 {
                     ResponseStatus = ResponseStatus.Ok
                 },
-                ConnectionsPage = response
-            };
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogError(ex, "Get connections", ex.Message, userId);
-
-            return new ConnectionsPageResponseDto()
+                VerificationCode = new VerificationCodeDto()
+                { 
+                    Code = code,
+                    LifeTimeMinutes = verificationCode.LifeTime.Minutes
+                }
+            }
+            : new VerificationCodeResponseDto()
             {
                 Response = new ResponseDto()
                 {
                     ResponseStatus = ResponseStatus.BadRequest,
-                    Error = "Не удалось получить активные подключения пользователя."
+                    Error = "Не удалось получить проверочный код."
                 }
             };
-        }
+    }
+
+    public override async Task<ConnectionsPageResponseDto> GetConnections(ConnectionsRequestDto request, ServerCallContext context)
+    {
+        var userId = request.UserId.ToString();
+        var response = await _connectionRepository.GetAsync(userId, request.PageInfo.Index, request.PageInfo.Count);
+
+        return new ConnectionsPageResponseDto()
+        {
+            Response = new ResponseDto()
+            {
+                ResponseStatus = ResponseStatus.Ok
+            },
+            ConnectionsPage = response
+        };
     }
 
     public override async Task<ResponseDto> CloseConnection(ConnectionRequestDto request, ServerCallContext context)
     {
-        throw new NotImplementedException();
+        var userId = request.UserId.ToString();
+        var connectionId = request.ConnectionId;
+
+        if (await _connectionRepository.GetAsync(connectionId) is { } connection && connection.UserId == userId)
+        {
+            await _connectionRepository.RemoveAsync(connectionId);
+            return new ResponseDto()
+            {
+                ResponseStatus = ResponseStatus.Ok
+            };
+        }
+
+        return new ResponseDto()
+        {
+            ResponseStatus = ResponseStatus.BadRequest,
+            Error = "Подключение не найдено."
+        };
     }
 }

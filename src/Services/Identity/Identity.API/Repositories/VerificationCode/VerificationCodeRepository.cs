@@ -28,54 +28,46 @@ public class VerificationCodeRepository : IVerificationCodeRepository
                 : repositoryConfiguration.VerificationCodeLifeTime;
     }
 
-    public async Task<TimeSpan> CreateOrUpdateAsync(string userId, string verificationCode)
+    public async Task<Models.VerificationCode?> GetAsync(string id) => 
+        string.IsNullOrWhiteSpace(id) || await _distributedCache.GetStringAsync(id) is not { } userId
+            ? null : new Models.VerificationCode()
+            {
+                Id = id,
+                UserId = userId,
+                LifeTime = _verificationCodeLifeTime
+            };
+
+    public async Task<Models.VerificationCode?> CreateAsync(Models.VerificationCode verificationCode)
     {
-        _logger.LogStart("Create or update verification code", verificationCode);
+        if (verificationCode is null ||
+            string.IsNullOrWhiteSpace(verificationCode.Id) ||
+            string.IsNullOrWhiteSpace(verificationCode.UserId))
+            return null;
 
-        if (_distributedCache.GetStringAsync(verificationCode) != null)
-        {
-            _logger.LogError("Create or update verification code", "Duplicate", verificationCode);
-            throw new DuplicateWaitObjectException(nameof(verificationCode));
-        }
-
-        string prefixedUserId = $"{PREFIX}{userId}";
-
-        var code = await _distributedCache.GetStringAsync(prefixedUserId);
-        if (code != null)
-        {
-            await _distributedCache.RemoveAsync(prefixedUserId);
-            await _distributedCache.RemoveAsync(code);
-        }   
+        verificationCode.LifeTime = _verificationCodeLifeTime;
 
         var options = new DistributedCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = _verificationCodeLifeTime
         };
 
-        await _distributedCache.SetStringAsync(verificationCode, userId, options); 
-        await _distributedCache.SetStringAsync(prefixedUserId, verificationCode, options);
+        await _distributedCache.SetStringAsync(verificationCode.Id, verificationCode.UserId, options);
+        await _distributedCache.SetStringAsync($"{PREFIX}{verificationCode.UserId}", verificationCode.Id, options);
 
-        _logger.LogSuccessfully("Create or update verification code", verificationCode);
-        
-        return _verificationCodeLifeTime;
+        return verificationCode;
     }
 
-    public async Task<string?> GetAndRemoveAsync(string verificationCode)
+    public async Task RemoveAsync(string id)
     {
-        _logger.LogStart("Create or update verification code", verificationCode);
+        if (await _distributedCache.GetStringAsync(id) is not { } userId)
+            return;
 
-        var userId = await _distributedCache.GetStringAsync(verificationCode);
-        
-        if (userId != null)
-        {
-            await _distributedCache.RemoveAsync($"{PREFIX}{userId}");
-            await _distributedCache.RemoveAsync(verificationCode);
-        }
-
-        _logger.LogSuccessfully("Create or update verification code", verificationCode);
-
-        return userId;
+        await _distributedCache.RemoveAsync($"{PREFIX}{userId}");
+        await _distributedCache.RemoveAsync(id);
     }
+
+    public async Task<bool> Contains(string id) =>
+        await _distributedCache.GetStringAsync(id) is not null;
 
     protected virtual void OnConfiguring(
         VerificationCodeRepositoryConfiguration repositoryConfiguration,

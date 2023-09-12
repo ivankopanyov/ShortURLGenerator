@@ -2,7 +2,11 @@
 
 public interface IVerificationCodeRepository
 {
-    Task<TimeSpan> CreateOrUpdateAsync(string userId, string verificationCode);
+    Task<Models.VerificationCode?> GetAsync(string id);
 
-    Task<string?> GetAndRemoveAsync(string verificationCode);
+    Task<Models.VerificationCode?> CreateAsync(Models.VerificationCode verificationCode);
+
+    Task RemoveAsync(string id);
+
+    Task<bool> Contains(string id);
 }
