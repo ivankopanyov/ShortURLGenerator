@@ -55,8 +55,8 @@ services:
       - FRONTEND=${FRONTEND}
       - URL_SERVICE_HOST=urlgenerator.api
       - URL_SERVICE_PORT=80
-      - IDENTITY_SERVICE_HOST=""
-      - IDENTITY_SERVICE_PORT=""
+      - IDENTITY_SERVICE_HOST=identity.api
+      - IDENTITY_SERVICE_PORT=80
       - EVENT_BUS_HOST_NAME=rabbitmq
     ports:
       - "5000:80"

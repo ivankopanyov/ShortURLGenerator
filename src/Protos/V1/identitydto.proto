@@ -31,16 +31,6 @@ message UserIdDto {
     int64 userId = 1;
 }
 
-message TokenDto {
-    string accessToken = 1;
-    string refreshToken = 2;
-}
-
-message SignInRequestDto {
-    string verificationCode = 1;
-    ConnectionInfoDto connectionInfo = 2;
-}
-
 message ConnectionsRequestDto {
     int64 userId = 1;
     PageInfoDto pageInfo = 2;
@@ -61,7 +51,3 @@ message ConnectionsPageResponseDto {
     ConnectionsPageDto connectionsPage = 2;
 }
 
-message SignInResponseDto {
-    ResponseDto response = 1;
-    TokenDto token = 2;
-}

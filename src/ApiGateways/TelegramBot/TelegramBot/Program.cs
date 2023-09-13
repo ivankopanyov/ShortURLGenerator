@@ -12,7 +12,7 @@ builder.Services
 
 builder.Services
     .AddScoped<IUpdateHandler, UpdateHandler>()
-    .AddScoped<IIdentityService, IdentityMockService>()
+    .AddScoped<IIdentityService, IdentityService>()
     .AddScoped<IUrlService, UrlService>();
 
 builder.Services

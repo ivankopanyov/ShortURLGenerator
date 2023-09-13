@@ -2,13 +2,13 @@
 
 public interface IConnectionRepository
 {
-    Task<Models.Connection?> GetAsync(string connectionId);
+    Task<Models.Connection?> GetOrDefaultAsync(string id);
 
-    Task<ConnectionsPageDto> GetAsync(string userId, int index, int size);
+    Task<ConnectionsPageDto> GetByUserIdAsync(string userId, int index, int size);
 
-    Task<Models.Connection?> CreateAsync(Models.Connection connection);
+    Task<Models.Connection> CreateAsync(Models.Connection item);
 
-    Task RemoveAsync(string connectionId);
+    Task RemoveAsync(string id);
 
-    Task<bool> Contains(string id);
+    Task<bool> ContainsAsync(string id);
 }

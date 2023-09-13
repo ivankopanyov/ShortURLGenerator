@@ -1,6 +1,6 @@
 ﻿namespace ShortURLGenerator.Identity.API.Models;
 
-public class Connection : IModel<string>
+public class Connection
 {
     public string Id { get; set; }
 

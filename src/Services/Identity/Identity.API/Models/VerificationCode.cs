@@ -1,6 +1,6 @@
 ﻿namespace ShortURLGenerator.Identity.API.Models;
 
-public class VerificationCode : IModel<string>
+public class VerificationCode
 {
     public string Id { get; set; }
 

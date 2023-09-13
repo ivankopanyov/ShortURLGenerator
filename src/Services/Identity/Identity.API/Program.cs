@@ -9,7 +9,8 @@ builder.Services.AddRedis();
 builder.Services
     .AddScoped<IVerificationCodeGenerationService, VerificationCodeGenerationService>()
     .AddScoped<IRefreshTokenGenerationService, RefreshTokenGenerationService>()
-    .AddScoped<IIdentityService, IdentityService>();
+    .AddScoped<IVerificationCodeRepository, VerificationCodeRepository>()
+    .AddScoped<IConnectionRepository, ConnectionRepository>();
 
 var app = builder.Build();
 

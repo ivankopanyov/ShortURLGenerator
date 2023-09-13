@@ -6,6 +6,7 @@ global using Grpc.Core;
 global using Grpc.Dto;
 global using ShortURLGenerator.StringGenerator;
 global using ShortURLGenerator.Logger.Extansions;
+global using ShortURLGenerator.Identity.API.Models;
 global using ShortURLGenerator.Identity.API.Services.Identity;
 global using ShortURLGenerator.Identity.API.Extensions;
 global using ShortURLGenerator.Identity.API.Services.VerificationCodeGenerator;
