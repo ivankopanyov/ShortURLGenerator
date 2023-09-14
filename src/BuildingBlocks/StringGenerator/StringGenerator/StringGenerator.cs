@@ -10,7 +10,7 @@ public class StringGenerator : IGeneratable
     private const string DEFAULT_SOURCE_SYMBOLS = "0123456789";
 
     /// <summary>Default length of generated string.</summary>
-    private const int DEFAULT_STRING_LENGTH = 10;
+    private const int DEFAULT_STRING_LENGTH = 1;
 
     /// <summary>The length of the generated string.</summary>
     private readonly int _stringLength;
@@ -20,7 +20,7 @@ public class StringGenerator : IGeneratable
 
     /// <summary>Initialization of the random string generator object.</summary>
     /// <param name="configuration">Application configuration.</param>
-    public StringGenerator(IConfiguration configuration)
+    public StringGenerator(IConfiguration? configuration = null)
     {
         var stringGeneratorConfiguration = new StringGeneratorConfiguration();
         OnConfiguring(stringGeneratorConfiguration, configuration);
@@ -52,17 +52,32 @@ public class StringGenerator : IGeneratable
     /// The length of the generated string is set from the parameter with the "Length" key.
     /// The value of the source string is set from the parameter with the "SourceString" key.
     /// </summary>
-    /// <param name="stringGeneratorConfiguration">Random string generator configuration object.</param>
-    /// <param name="configuration">Application configuration.</param>Application configuration.
-    protected virtual void OnConfiguring(StringGeneratorConfiguration stringGeneratorConfiguration,
-        IConfiguration configuration)
+    /// <param name="generatorConfiguration">Random string generator configuration object.</param>
+    /// <param name="appConfiguration">Application configuration.</param>Application configuration.
+    protected virtual void OnConfiguring(StringGeneratorConfiguration generatorConfiguration,
+        IConfiguration? appConfiguration)
     {
-        stringGeneratorConfiguration.StringLength = configuration
-            .GetSection("StringGenerator")
-            .GetValue<int>("Length");
 
-        stringGeneratorConfiguration.SourceSymbols = configuration
-            .GetSection("StringGenerator")
-            .GetValue<string>("SourceSymbols")!;
+        if (appConfiguration != null)
+        {
+            var length = appConfiguration
+                .GetSection("StringGenerator")
+                .GetValue<int>("Length");
+
+            var stringLength = appConfiguration
+                .GetSection("StringGenerator")
+                .GetValue<string>("SourceSymbols");
+
+            generatorConfiguration.StringLength = Math.Max(DEFAULT_STRING_LENGTH, length);
+
+            generatorConfiguration.SourceSymbols = string.IsNullOrEmpty(stringLength)
+                ? DEFAULT_SOURCE_SYMBOLS
+                : stringLength;
+        }
+        else
+        {
+            generatorConfiguration.StringLength = DEFAULT_STRING_LENGTH;
+            generatorConfiguration.SourceSymbols = DEFAULT_SOURCE_SYMBOLS;
+        }
     }
 }
