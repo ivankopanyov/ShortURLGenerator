@@ -1,7 +1,11 @@
 ﻿namespace ShortURLGenerator.URLGenerator.API.Services.URL;
 
-/// <summary>Service for generating short URLs. Works on gRPC.</summary>
-public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
+/// <summary>
+/// Service for generating short URLs.
+/// Inherited from the class Grpc.Services.UrlService.UrlServiceBase.
+/// Works on gRPC.
+/// </summary>
+public class UrlService : Grpc.Services.UrlService.UrlServiceBase
 {
     /// <summary>Random string generator.</summary>
     private readonly IGeneratable _generator;
@@ -29,11 +33,11 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
     /// <returns>Response object containing the response status and data.</returns>
     public override async Task<UrlResponseDto> Generate(SourceUriDto request, ServerCallContext context)
     {
-        var requestId = request.Value;
+        _logger.LogInformation($"Generate URL: Start. Source URI: {request.LogInfo()}.");
 
-        _logger.LogStart("Generate URL", requestId);
+        UrlResponseDto? response = null;
 
-        while (true)
+        while (response is null)
         {
             var url = _generator.GenerateString();
 
@@ -45,7 +49,7 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
                     SourceUri = request.Value
                 });
 
-                var response = new UrlResponseDto()
+                response = new UrlResponseDto()
                 {
                     Response = new ResponseDto()
                     {
@@ -54,15 +58,28 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
                     Url = url
                 };
 
-                _logger.LogSuccessfully($"Generate URL", requestId);
-
-                return response;
+                _logger.LogInformation($"Generate URL: Succesfully. URL response: {response.LogInfo()}.");
             }
             catch (DuplicateWaitObjectException ex)
             {
-                _logger.LogWarning(ex, "Generate URL", "Duplicate", requestId);
+                _logger.LogWarning(ex, $"Generate URL: {ex.Message}. Source URI: {request.LogInfo()}");
+            }
+            catch (Exception ex)
+            {
+                response = new UrlResponseDto()
+                {
+                    Response = new ResponseDto()
+                    {
+                        ResponseStatus = ResponseStatus.BadRequest,
+                        Error = "Не удалось сгенерировать URL."
+                    }
+                };
+
+                _logger.LogError(ex, $"Generate URL: {ex.Message}. URL response: {response.LogInfo()}.");
             }
         }
+
+        return response;
     }
 
     /// <summary>The request method is the original URI of the address at the generated URL. Works on gRPC.</summary>
@@ -71,13 +88,9 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
     /// <returns>Response object containing the response status and data.</returns>
     public override async Task<UriResponseDto> Get(UrlDto request, ServerCallContext context)
     {
-        var requestId = request.Value;
+        _logger.LogInformation($"Get URI: Start. URL: {request.LogInfo()}.");
 
-        _logger.LogStart("Get URI", requestId);
-
-        var url = await _repository.GetAsync(request.Value);
-
-        if (url is null)
+        if (await _repository.GetAsync(request.Value) is not { } uri)
         {
             var response = new UriResponseDto()
             {
@@ -88,7 +101,7 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
                 }
             };
 
-            _logger.LogInformation("Get URI", "Not found", requestId);
+            _logger.LogInformation($"Get URI: URL not found. URI response: {response.LogInfo()}.");
 
             return response;
         }
@@ -100,10 +113,10 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase, IUrlService
                 {
                     ResponseStatus = ResponseStatus.Ok
                 },
-                Uri = url.SourceUri
+                Uri = uri
             };
 
-            _logger.LogSuccessfully("Get URI", requestId);
+            _logger.LogInformation($"Get URI: Succesfully. URI response: {response.LogInfo()}.");
 
             return response;
         }

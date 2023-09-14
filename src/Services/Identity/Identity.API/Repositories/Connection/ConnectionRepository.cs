@@ -142,7 +142,7 @@ public class ConnectionRepository : IConnectionRepository
 
         response.PageInfo.Count = (int)Math.Ceiling((double)userConnections.Count / size);
 
-        _logger.LogInformation($"Get connection by user ID: Succesfully. Connections page: ${response.LogInfo()}.");
+        _logger.LogInformation($"Get connection by user ID: Succesfully. Connections page: {response.LogInfo()}.");
 
         return response;
     }

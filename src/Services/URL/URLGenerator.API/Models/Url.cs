@@ -1,7 +1,7 @@
 ﻿namespace ShortURLGenerator.URLGenerator.API.Models;
 
 /// <summary>Сlass that describes the generated URL model.</summary>
-public class Url : IModel<string>
+public class Url
 {
     /// <summary>URL identifier.</summary>
     public string Id { get; set; }
@@ -15,6 +15,6 @@ public class Url : IModel<string>
     /// <summary>Overriding the method of casting an object to a string type.</summary>
     /// <returns>Object cast to a string type.</returns>
     public override string ToString() =>
-        $"Url: URL ID: {Id}, Source URI: {SourceUri}, Created: {Created.ToString("dd.MM.yyyy HH:mm:ss.ffff")}";
+        $"URL ID: {Id}, Source URI: {SourceUri}, Created: {Created.ToString("dd.MM.yyyy HH:mm:ss.ffff")}";
 }
 

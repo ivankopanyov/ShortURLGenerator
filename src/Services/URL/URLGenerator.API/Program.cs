@@ -9,7 +9,7 @@ builder.Services.AddRedis();
 
 builder.Services
     .AddScoped<IUrlRepository, UrlRepository>()
-    .AddScoped<IGeneratable, UrlGenerator>();
+    .AddScoped<IGeneratable, StringGenerator>();
 
 var app = builder.Build();
 

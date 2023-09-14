@@ -148,7 +148,7 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
                 Error = "Подключение не найдено."
             };
 
-            _logger.LogError($"Close connection: Connection not found. Response: ${errorResponse.LogInfo()}.");
+            _logger.LogError($"Close connection: Connection not found. Response: {errorResponse.LogInfo()}.");
 
             return errorResponse;
         }
@@ -160,7 +160,7 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
             ResponseStatus = ResponseStatus.Ok
         };
 
-        _logger.LogInformation($"Close connection: Successfully. Response: ${okResponse.LogInfo()}.");
+        _logger.LogInformation($"Close connection: Successfully. Response: {okResponse.LogInfo()}.");
 
         return okResponse;
     }

@@ -35,30 +35,26 @@
 
   <ItemGroup>
     <None Remove="Services\" />
-    <None Remove="Services\Generation\" />
     <None Remove="Services\URL\" />
     <None Remove="Repositories\" />
     <None Remove="Repositories\URL\" />
     <None Remove="Models\" />
-    <None Remove="Models\Abstract\" />
     <None Remove="Infrastructure\" />
     <None Remove="Infrastructure\EntityConfigurations\" />
     <None Remove="Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
-    <Folder Include="Services\Generation\" />
     <Folder Include="Services\URL\" />
     <Folder Include="Repositories\" />
     <Folder Include="Repositories\URL\" />
     <Folder Include="Models\" />
-    <Folder Include="Models\Abstract\" />
     <Folder Include="Infrastructure\" />
     <Folder Include="Infrastructure\EntityConfigurations\" />
     <Folder Include="Extensions\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\BuildingBlocks\Logger\Logger\Logger.csproj">
+    <ProjectReference Include="..\..\..\BuildingBlocks\StringGenerator\StringGenerator\StringGenerator.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
   </ItemGroup>

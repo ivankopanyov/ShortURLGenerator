@@ -6,19 +6,22 @@
 /// </summary>
 public class UrlRepository : IUrlRepository
 {
+    /// <summary>
+    /// The default number of days to store a url in cache.
+    /// Used if the url storage period is not set or set incorrectly.
+    /// </summary>
+    private const int DEFAULT_URL_CACHE_LIFE_TIME_DAYS = 1;
+
     /// <summary>Database context.</summary>
     private readonly UrlContext _urlContext;
 
-    /// <summary>Cache service.</summary>
+    /// <summary>Distributed cache.</summary>
     private readonly IDistributedCache _distributedCache;
 
     /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
-    /// <summary>Application configuration.</summary>
-    protected IConfiguration _appConfiguration;
-
-    /// <summary>How long the URL has been cached since the last request, in days.</summary>
+    /// <summary>How long the URL has been cached since the last request.</summary>
     private readonly TimeSpan _lifeTimeCache;
 
     /// <summary>Repository object initialization.</summary>
@@ -29,29 +32,47 @@ public class UrlRepository : IUrlRepository
 	public UrlRepository(UrlContext urlContext,
         IDistributedCache distributedCache,
         ILogger<UrlRepository> logger,
-        IConfiguration configuration)
+        IConfiguration? configuration = null)
     {
         _urlContext = urlContext;
         _distributedCache = distributedCache;
         _logger = logger;
-        _appConfiguration = configuration;
 
-        var urlRepositoryConfiguration = new UrlRepositoryConfiguration();
-        OnConfiguring(urlRepositoryConfiguration);
+        var repositoryConfiguration = new UrlRepositoryConfiguration();
+        OnConfiguring(repositoryConfiguration, configuration);
 
-        _lifeTimeCache = urlRepositoryConfiguration.LifeTimeCache;
+        _lifeTimeCache = repositoryConfiguration.LifeTimeCache;
 	}
 
     /// <summary>Method for adding a new URL to the repository.</summary>
     /// <param name="item">URL address.</param>
-    /// <exception cref="DuplicateWaitObjectException">
-    /// Exception is thrown if the repository already contains a URL with the passed identifier.
-    /// </exception>
+    /// <exception cref="ArgumentNullException">Exception is thrown if the url is null.</exception>
+    /// <exception cref="ArgumentException">Exception is thrown if the url ID or source URI is null or whitespace.</exception>
+    /// <exception cref="DuplicateWaitObjectException">Exception is thrown if the url ID is already exists.</exception>
+    /// <exception cref="InvalidOperationException">Exception is thrown if the URL could not be stored in the database.</exception>
 	public async Task CreateAsync(Url item)
-	{
-        var itemId = item.Id;
+    {
+        _logger.LogInformation($"Create URL: Start. URL: {item}.");
 
-        _logger.LogStart("Create URL", itemId);
+        if (item is null)
+        {
+            _logger.LogError($"Create URL: URL is null.");
+            throw new ArgumentNullException(nameof(item));
+        }
+
+        if (string.IsNullOrWhiteSpace(item.Id))
+        {
+            _logger.LogError($"Create URL: URL ID is null or whitespace. URL: {item}");
+            throw new ArgumentException("URL ID is null or whitespace.", nameof(item));
+        }
+
+        if (string.IsNullOrWhiteSpace(item.SourceUri))
+        {
+            _logger.LogError($"Create URL: Source URI is null or whitespace. URL: {item}");
+            throw new ArgumentException("Source URI is null or whitespace.", nameof(item));
+        }
+
+        item.Created = DateTime.UtcNow;
 
         try
         {
@@ -60,63 +81,72 @@ public class UrlRepository : IUrlRepository
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogWarning(ex, "Create URL", "Duplicate", itemId);
-            throw new DuplicateWaitObjectException(ex.Message, ex);
+            if (await _urlContext.Urls.AnyAsync(url => url.Id == item.Id))
+            {
+                _logger.LogError(ex, $"Create URL: Duplicate. URL: {item}");
+                throw new DuplicateWaitObjectException(ex.Message, ex);
+            }
+
+            _logger.LogError(ex, $"Create URL: {ex.Message}. URL: {item}");
+            throw new InvalidOperationException(ex.Message, ex);
         }
 
-        await _distributedCache.SetStringAsync(item.Id,
-            JsonSerializer.Serialize(item),
-            new DistributedCacheEntryOptions
-            {
-                SlidingExpiration = _lifeTimeCache
-            });
+        await _distributedCache.SetStringAsync(item.Id, item.SourceUri, new DistributedCacheEntryOptions
+        {
+            SlidingExpiration = _lifeTimeCache
+        });
 
-        _logger.LogSuccessfully("Create URL", itemId);
+        _logger.LogInformation($"Create URL: Succesfully. URL: {item}.");
     }
 
-    /// <summary>Method for requesting a URL from a repository.</summary>
+    /// <summary>Method for requesting source URI from a repository.</summary>
     /// <param name="id">URL identifier.</param>
-    /// <returns>The requested URL. Returns null if URL is not found.</returns>
-    public async Task<Url?> GetAsync(string id)
+    /// <returns>Source URI. Returns null if URL is not found.</returns>
+    public async Task<string?> GetAsync(string id)
     {
-        _logger.LogStart("Get URL", id);
+        _logger.LogInformation($"Get Source URI: Start. URL ID: {id}.");
 
-        Url? url = null;
-
-        var urlString = await _distributedCache.GetStringAsync(id);
-        if (urlString != null)
-            url = JsonSerializer.Deserialize<Url>(urlString);
-
-        if (url == null)
+        if (await _distributedCache.GetStringAsync(id) is not { } sourceUri)
         {
-            url = await _urlContext.Urls.FirstOrDefaultAsync(item => item.Id.Equals(id));
-            if (url != null)
+            if (await _urlContext.Urls.FirstOrDefaultAsync(item => item.Id.Equals(id)) is { } entity)
             {
-                await _distributedCache.SetStringAsync(url.Id,
-                    JsonSerializer.Serialize(url),
-                    new DistributedCacheEntryOptions
-                    {
-                        SlidingExpiration = _lifeTimeCache
-                    });
+                sourceUri = entity.SourceUri;
+
+                await _distributedCache.SetStringAsync(id, sourceUri, new DistributedCacheEntryOptions
+                {
+                    SlidingExpiration = _lifeTimeCache
+                });
             }
             else
             {
-                _logger.LogInformation("Get URL", "URL not found", id);
+                _logger.LogInformation($"Get Source URI: Source URI not found. URL ID: {id}.");
                 return null;
             }
         }
 
-        _logger.LogSuccessfully("Get URL", id);
+        _logger.LogInformation($"Get Source URI: Succesfully. URL ID: {id}, Source URI: {sourceUri}.");
 
-        return url;
+        return sourceUri;
     }
 
+
     /// <summary>Virtual method for configuring a repository.</summary>
-    /// <param name="configuration">The repository configuration object.</param>
-    protected virtual void OnConfiguring(UrlRepositoryConfiguration configuration)
+    /// <param name="repositoryConfiguration">Repository configuration.</param>
+    /// <param name="appConfiguration">Application configuration.</param>
+    protected virtual void OnConfiguring(UrlRepositoryConfiguration repositoryConfiguration, IConfiguration? appConfiguration)
     {
-        int days = _appConfiguration.GetSection("Url").GetValue<int>("LifeTimeCacheDays");
-        configuration.LifeTimeCache = TimeSpan.FromDays(days);
+        if (appConfiguration != null)
+        {
+            var days = appConfiguration
+                .GetSection("Url")
+                .GetValue<int>("LifeTimeCacheDays");
+
+            repositoryConfiguration.LifeTimeCache = TimeSpan
+                .FromMinutes(Math.Max(DEFAULT_URL_CACHE_LIFE_TIME_DAYS, days));
+        }
+        else
+            repositoryConfiguration.LifeTimeCache = TimeSpan
+                .FromMinutes(DEFAULT_URL_CACHE_LIFE_TIME_DAYS);
     }
 }
 
