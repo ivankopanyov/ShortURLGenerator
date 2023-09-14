@@ -37,11 +37,11 @@ public class QRCodeCreationService : IQRCodeCreationService
     /// <returns>QR code data.</returns>
     public byte[] GenerateJpeg(string uri)
     {
-        _logger.LogStart("Create QR code", uri);
+        _logger.LogInformation($"Create QR code: Start. URI: {uri}.");
 
         GeneratedBarcode barcode = QRCodeWriter.CreateQrCode(uri, _sizePixels, QRCodeWriter.QrErrorCorrectionLevel.Medium);
 
-        _logger.LogSuccessfully("Create QR code", uri);
+        _logger.LogInformation($"Create QR code: Successfully. URI: {uri}.");
 
         return barcode.ToJpegBinaryData();
     }

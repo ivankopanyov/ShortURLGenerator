@@ -29,33 +29,27 @@ public class UriSentIntegrationEventHandler : IntegrationEventHandlerBase<UriSen
     /// <param name="event">URI sent event.</param>
     protected override Task HandleAsync(UriSentIntegrationEvent? @event)
     {
+        _logger.LogInformation($"Handle URI sent event: Start. Event: {@event}.");
+
         if (@event is null)
         {
-            _logger.LogError("Handle URI sent event", "Event is null.");
+            _logger.LogError("Handle URI sent event: Event is null.");
             return Task.CompletedTask;
         }
 
-        var eventId = @event.Id.ToString();
-
-        _logger.LogStart("Handle URI sent event", eventId);
-
         var qrcode = _qRCodeCreationService.GenerateJpeg(@event.Uri);
         var qrCodeCreatedEvent = new QRCodeCreatedIntegrationEvent(@event.ChatId, @event.MessageId, qrcode);
-        var qrCodeCreatedEventId = qrCodeCreatedEvent.Id.ToString();
-
-        _logger.LogStart("Send QR code created event", qrCodeCreatedEventId);
 
         try
         {
             _eventBus.Publish(qrCodeCreatedEvent);
-            _logger.LogSuccessfully("Send QR code created event", qrCodeCreatedEventId);
+            _logger.LogInformation($"Handle URI sent event: Successfully. Event: {@event}, QR code created event: {qrCodeCreatedEvent}.");
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogError(ex, "Send QR code created event", ex.Message, qrCodeCreatedEventId);
+            _logger.LogError(ex, $"Handle URI sent event: Send QR code created event failed. Event: {@event}, QR code created event: {qrCodeCreatedEvent}.");
         }
 
-        _logger.LogSuccessfully("Handle URI sent event", eventId);
         return Task.CompletedTask;
     }
 

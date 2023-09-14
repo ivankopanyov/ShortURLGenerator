@@ -16,7 +16,7 @@ public static class ConnectionFactoryExtansions
 
         IConnection? connection = null;
 
-        for (int i = 0; i < tryCount; i++)
+        do
         {
             try
             {
@@ -24,14 +24,15 @@ public static class ConnectionFactoryExtansions
             }
             catch (BrokerUnreachableException ex)
             {
-                if (i == tryCount - 1)
+                if (--tryCount == 0)
                     throw new BrokerUnreachableException(ex);
 
                 Thread.Sleep(delay);
             }
         }
+        while (connection == null);
 
-        return connection!;
+        return connection;
     }
 }
 
