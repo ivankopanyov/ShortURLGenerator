@@ -31,7 +31,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\BuildingBlocks\Logger\Logger\Logger.csproj" />
     <ProjectReference Include="..\..\..\BuildingBlocks\StringGenerator\StringGenerator\StringGenerator.csproj" />
   </ItemGroup>
 

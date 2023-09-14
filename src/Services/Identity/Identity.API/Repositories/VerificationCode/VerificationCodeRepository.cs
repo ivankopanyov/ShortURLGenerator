@@ -30,20 +30,31 @@ public class VerificationCodeRepository : IVerificationCodeRepository
 
     public async Task<Models.VerificationCode> CreateAsync(Models.VerificationCode item)
     {
+        _logger.LogInformation($"Create verification code: Start. Verification code: {item?.LogInfo()}.");
+
         if (item is null)
+        {
+            _logger.LogError($"Create verification code: Verification code is null.");
             throw new ArgumentNullException(nameof(item));
+        }
 
         if (string.IsNullOrWhiteSpace(item.Id))
+        {
+            _logger.LogError($"Create verification code: Verification code ID is null or whitespace. Verification code: {item.LogInfo()}.");
             throw new ArgumentException("Verification code ID is null or whitespace.", nameof(item));
+        }
 
         if (string.IsNullOrWhiteSpace(item.UserId))
+        {
+            _logger.LogError($"Create verification code: User ID is null or whitespace. Verification code: {item.LogInfo()}.");
             throw new ArgumentException("User ID is null or whitespace.", nameof(item));
+        }
 
         if (await ContainsAsync(item.Id))
+        {
+            _logger.LogError($"Create verification code: Verification code ID is already exists. Verification code: {item.LogInfo()}.");
             throw new InvalidOperationException("Verification code ID is already exists.");
-
-        var methodName = nameof(CreateAsync);
-        _logger.LogStart(methodName, $"Verification code: {item.LogInfo()}");
+        }
 
         item.LifeTime = _verificationCodeLifeTime;
 
@@ -55,34 +66,30 @@ public class VerificationCodeRepository : IVerificationCodeRepository
         await _distributedCache.SetStringAsync(item.Id, item.UserId, options);
         await _distributedCache.SetStringAsync($"{PREFIX}{item.UserId}", item.Id, options);
 
-        _logger.LogSuccessfully(methodName, $"Verification code: {item.LogInfo()}");
+        _logger.LogInformation($"Create verification code: Succesfully. Verification code: {item.LogInfo()}.");
 
         return item;
     }
 
     public async Task RemoveByUserIdAsync(string userId)
     {
-        var methodName = nameof(RemoveByUserIdAsync);
-        string logUserId = $"User ID: {userId}";
-
-        _logger.LogStart(methodName, logUserId);
+        _logger.LogInformation($"Remove verification code by user ID: Start. User ID: {userId}.");
 
         string prefixedUserId = $"{PREFIX}{userId}";
 
         if (await _distributedCache.GetStringAsync(prefixedUserId) is not { } verificationCode)
         {
-            _logger.LogInformation(methodName, "Verification code not found", logUserId);
+            _logger.LogInformation($"Remove verification code by user ID: Verification code not found. User ID: {userId}.");
             return;
         }
 
         await _distributedCache.RemoveAsync(prefixedUserId);
         await _distributedCache.RemoveAsync(verificationCode);
 
-        _logger.LogSuccessfully(methodName, $"{logUserId}, Verification code ID: {verificationCode}");
+        _logger.LogInformation($"Remove verification code by user ID: Succesfully. Verification code: {verificationCode}.");
     }
 
-    public async Task<bool> ContainsAsync(string id) =>
-        await _distributedCache.GetStringAsync(id) is not null;
+    public async Task<bool> ContainsAsync(string id) => await _distributedCache.GetStringAsync(id) is not null;
 
     protected virtual void OnConfiguring(
         VerificationCodeRepositoryConfiguration repositoryConfiguration,

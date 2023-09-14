@@ -37,7 +37,7 @@ public static class LoggerExtensions
 
     public static string LogInfo(this VerificationCodeResponseDto verificationCodeResponse) =>
         $"Response: {verificationCodeResponse.Response.LogInfo()}, " +
-        $"User ID: {verificationCodeResponse.VerificationCode.LogInfo()}";
+        $"Verification code: {verificationCodeResponse.VerificationCode.LogInfo()}";
 
     public static string LogInfo(this ConnectionsPageResponseDto connectionsPageResponse) =>
         $"Response: {connectionsPageResponse.Response.LogInfo()}, " +
