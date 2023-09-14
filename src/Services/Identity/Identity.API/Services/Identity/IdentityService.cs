@@ -1,17 +1,31 @@
 ﻿namespace ShortURLGenerator.Identity.API.Services.Identity;
 
+/// <summary>class describing the user identification service.
+/// Inherited from the class Grpc.Services.IdentityService.IdentityServiceBase,
+/// generated from proto file. Uses gRPC.</summary>
 public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
 {
+    /// <summary>Verification code repository.</summary>
     private readonly IVerificationCodeRepository _verificationCodeRepository;
 
+    /// <summary>Verification code generation service.</summary>
     private readonly IVerificationCodeGenerationService _verificationCodeGenerationService;
 
+    /// <summary>Connection repository.</summary>
     private readonly IConnectionRepository _connectionRepository;
 
+    /// <summary>Refresh token generation service.</summary>
     private readonly IRefreshTokenGenerationService _refreshTokenGenerationService;
 
+    /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
+    /// <summary>Initializing the user identification service object.</summary>
+    /// <param name="verificationCodeRepository">Verification code repository.</param>
+    /// <param name="verificationCodeGenerationService">Verification code generation service.</param>
+    /// <param name="connectionRepository">Connection repository.</param>
+    /// <param name="refreshTokenGenerationService">Refresh token generation service.</param>
+    /// <param name="logger">Log service.</param>
     public IdentityService(IVerificationCodeRepository verificationCodeRepository,
         IVerificationCodeGenerationService verificationCodeGenerationService,
         IConnectionRepository connectionRepository,
@@ -25,6 +39,10 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
         _logger = logger;
     }
 
+    /// <summary>Method for obtaining a verification code.</summary>
+    /// <param name="request">User ID.</param>
+    /// <param name="context">Server call context.</param>
+    /// <returns>Verification code response.</returns>
     public async override Task<VerificationCodeResponseDto> GetVerificationCode(UserIdDto request, ServerCallContext context)
     {
         _logger.LogInformation($"Get verification code: Start. User ID: {request.LogInfo()}.");
@@ -86,6 +104,10 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
         return okResponse;
     }
 
+    /// <summary>Method for obtaining a user's active connections.</summary>
+    /// <param name="request">Connections request.</param>
+    /// <param name="context">Server call context.</param>
+    /// <returns>Connections page response.</returns>
     public async override Task<ConnectionsPageResponseDto> GetConnections(ConnectionsRequestDto request, ServerCallContext context)
     {
         _logger.LogInformation($"Get user connections: Start. Connections request: {request.LogInfo()}.");
@@ -107,6 +129,10 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
         return response;
     }
 
+    /// <summary>Method for closing an active user connection.</summary>
+    /// <param name="request">Connection request.</param>
+    /// <param name="context">Server call context.</param>
+    /// <returns>Response.</returns>
     public async override Task<ResponseDto> CloseConnection(ConnectionRequestDto request, ServerCallContext context)
     {
         _logger.LogInformation($"Close connection: Start. Connection request: {request.LogInfo()}.");

@@ -1,17 +1,34 @@
 ﻿namespace ShortURLGenerator.Identity.API.Repositories.Connection;
 
+/// <summary>
+/// Class describing a connection repository.
+/// Implements the IConnectionRepository interface.
+/// IDistributedCache is used to store connections.
+/// </summary>
 public class ConnectionRepository : IConnectionRepository
 {
+    /// <summary>
+    /// The default number of days to store a connection.
+    /// Used if the connection storage period is not set or set incorrectly.
+    /// </summary>
     private const int DEFAULT_CONNECTION_LIFE_TIME_DAYS = 1;
 
+    /// <summary>User ID prefix for the key.</summary>
     private const string PREFIX = "connection_";
 
+    /// <summary>Distributed cache.</summary>
     private readonly IDistributedCache _distributedCache;
 
+    /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
+    /// <summary>Duration of connection storage.</summary>
     private readonly TimeSpan _connectionLifeTime;
 
+    /// <summary>Initializing the repository object.</summary>
+    /// <param name="distributedCache">Distributed cache.</param>
+    /// <param name="logger">Log service.</param>
+    /// <param name="configuration">Application configurationю.</param>
     public ConnectionRepository(IDistributedCache distributedCache,
         ILogger<ConnectionRepository> logger,
         IConfiguration? configuration = null)
@@ -28,6 +45,12 @@ public class ConnectionRepository : IConnectionRepository
                 : repositoryConfiguration.ConnectionLifeTime;
     }
 
+    /// <summary>Method for obtaining a connection by identifier.</summary>
+    /// <param name="id">Connection ID.</param>
+    /// <returns>
+    /// Connection with the passed identifier.
+    /// If the connection is not found, null will be returned.
+    /// </returns>
     public async Task<Models.Connection?> GetOrDefaultAsync(string id)
     {
         _logger.LogInformation($"Get connection by ID: Start. Connection ID: {id}.");
@@ -51,6 +74,11 @@ public class ConnectionRepository : IConnectionRepository
         }
     }
 
+    /// <summary>method for obtaining user connections in a given range.</summary>
+    /// <param name="userId">User ID.</param>
+    /// <param name="index">Index of the page with connections.</param>
+    /// <param name="size">Number of connections on the page.</param>
+    /// <returns>Connections page.</returns>
     public async Task<ConnectionsPageDto> GetByUserIdAsync(string userId, int index, int size)
     {
         _logger.LogInformation($"Get connection by user ID: Start. User ID: {userId}, Index: {index}, Size: {size}");
@@ -119,8 +147,12 @@ public class ConnectionRepository : IConnectionRepository
         return response;
     }
 
-    public async Task<bool> ContainsAsync(string id) => await _distributedCache.GetStringAsync(id) is not null;
-
+    /// <summary>Method for adding a new connection to the repository.</summary>
+    /// <param name="item">New connection.</param>
+    /// <returns>Created connection.</returns>
+    /// <exception cref="ArgumentNullException">Exception is thrown if the connection is null.</exception>
+    /// <exception cref="ArgumentException">Exception is thrown if the connection ID or user ID is null or whitespace.</exception>
+    /// <exception cref="InvalidOperationException">Exception is thrown if the connection ID is already exists.</exception>
     public async Task<Models.Connection> CreateAsync(Models.Connection item)
     {
         _logger.LogInformation($"Create connection: Start. Connection: {item?.LogInfo()}.");
@@ -172,6 +204,8 @@ public class ConnectionRepository : IConnectionRepository
         return item;
     }
 
+    /// <summary>Method for removing a connection from the repository.</summary>
+    /// <param name="id">Connection ID.</param>
     public async Task RemoveAsync(string id)
     {
         _logger.LogInformation($"Remove connection: Start. Connection ID: {id}.");
@@ -218,6 +252,14 @@ public class ConnectionRepository : IConnectionRepository
         _logger.LogInformation($"Remove connection: Succesfully. Connection: {connection.LogInfo()}.");
     }
 
+    /// <summary>Method for checking whether a repository is connected.</summary>
+    /// <param name="id">Connection ID.</param>
+    /// <returns>Result of checking.</returns>
+    public async Task<bool> ContainsAsync(string id) => await _distributedCache.GetStringAsync(id) is not null;
+
+    /// <summary>Method for retrieving a string with connection data from the repository.</summary>
+    /// <param name="connectionId">Connection ID.</param>
+    /// <returns>Connection string data. If the connection is not found, returns null.</returns>
     private async Task<string?> GetConnectionStringData(string connectionId)
     {
         _logger.LogInformation($"Get connection string data: Start. Connection ID: {connectionId}.");
@@ -234,6 +276,9 @@ public class ConnectionRepository : IConnectionRepository
         }
     }
 
+    /// <summary>Method for deserializing a string with connection information into a connection object.</summary>
+    /// <param name="connectionStringData">Connection string data.</param>
+    /// <returns>Deserialized connection object.</returns>
     private Models.Connection? ConnectionStringDataToConnection(string connectionStringData)
     {
         _logger.LogInformation($"Connection string data to connection: Start.");
@@ -250,6 +295,13 @@ public class ConnectionRepository : IConnectionRepository
         }
     }
 
+    /// <summary>
+    /// Virtual method for configuring a repository.
+    /// To set the connection lifetime value, use the value of the "LifeTimeDays" field
+    /// from the "Connection" section of the application configuration.
+    /// </summary>
+    /// <param name="repositoryConfiguration">Repository configuration.</param>
+    /// <param name="appConfiguration">Application configuration.</param>
     protected virtual void OnConfiguring(
         ConnectionRepositoryConfiguration repositoryConfiguration,
         IConfiguration? appConfiguration = null)

@@ -1,17 +1,34 @@
 ﻿namespace ShortURLGenerator.Identity.API.Repositories.VerificationCode;
 
+/// <summary>
+/// Class describing a verification code repository.
+/// Implements the IVerificationCodeRepository interface.
+/// IDistributedCache is used to store connections.
+/// </summary>
 public class VerificationCodeRepository : IVerificationCodeRepository
 {
+    /// <summary>
+    /// The default number of minutes to store a verification code.
+    /// Used if the verification code storage period is not set or set incorrectly.
+    /// </summary>
     private const int DEFAULT_VERIFICATION_CODE_LIFE_TIME_MINUTES = 1;
 
+    /// <summary>User ID prefix for the key.</summary>
     private const string PREFIX = "code_";
 
+    /// <summary>Distributed cache.</summary>
     private readonly IDistributedCache _distributedCache;
 
+    /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
+    /// <summary>Duration of verification code storage.</summary>
     private readonly TimeSpan _verificationCodeLifeTime;
 
+    /// <summary>Initializing the repository object.</summary>
+    /// <param name="distributedCache">Distributed cache.</param>
+    /// <param name="logger">Log service.</param>
+    /// <param name="configuration">Application configurationю.</param>
 	public VerificationCodeRepository(IDistributedCache distributedCache,
         ILogger<VerificationCodeRepository> logger,
         IConfiguration? configuration = null)
@@ -28,6 +45,12 @@ public class VerificationCodeRepository : IVerificationCodeRepository
                 : repositoryConfiguration.VerificationCodeLifeTime;
     }
 
+    /// <summary>Method for adding new verification code to the repository.</summary>
+    /// <param name="item">New verification code.</param>
+    /// <returns>Created verification code.</returns>
+    /// <exception cref="ArgumentNullException">Exception is thrown if the verification code is null.</exception>
+    /// <exception cref="ArgumentException">Exception is thrown if the verification code ID or user ID is null or whitespace.</exception>
+    /// <exception cref="InvalidOperationException">Exception is thrown if the verification code ID is already exists.</exception>
     public async Task<Models.VerificationCode> CreateAsync(Models.VerificationCode item)
     {
         _logger.LogInformation($"Create verification code: Start. Verification code: {item?.LogInfo()}.");
@@ -71,6 +94,8 @@ public class VerificationCodeRepository : IVerificationCodeRepository
         return item;
     }
 
+    /// <summary>Method for removing verification code from the repository by user ID.</summary>
+    /// <param name="userId">User ID.</param>
     public async Task RemoveByUserIdAsync(string userId)
     {
         _logger.LogInformation($"Remove verification code by user ID: Start. User ID: {userId}.");
@@ -89,8 +114,18 @@ public class VerificationCodeRepository : IVerificationCodeRepository
         _logger.LogInformation($"Remove verification code by user ID: Succesfully. Verification code: {verificationCode}.");
     }
 
+    /// <summary>Method for checking whether a repository is verification code.</summary>
+    /// <param name="id">Verification code ID.</param>
+    /// <returns>Result of checking.</returns>
     public async Task<bool> ContainsAsync(string id) => await _distributedCache.GetStringAsync(id) is not null;
 
+    /// <summary>
+    /// Virtual method for configuring a repository.
+    /// To set the connection lifetime value, use the value of the "LifeTimeMinutes" field
+    /// from the "VerificationCode" section of the application configuration.
+    /// </summary>
+    /// <param name="repositoryConfiguration">Repository configuration.</param>
+    /// <param name="appConfiguration">Application configuration.</param>
     protected virtual void OnConfiguring(
         VerificationCodeRepositoryConfiguration repositoryConfiguration,
         IConfiguration? appConfiguration = null)
