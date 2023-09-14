@@ -7,11 +7,14 @@
 /// </summary>
 public class QRCodeCreationService : IQRCodeCreationService
 {
+    /// <summary>
+    /// Default QR code size.
+    /// Set if the size is not specified or is incorrect.
+    /// </summary>
+    private const int DEFAULT_SIZE_PIXELS = 50;
+
     /// <summary>Log service.</summary>
 	private readonly ILogger _logger;
-
-    /// <summary>Application configuration.</summary>
-    private readonly IConfiguration _appConfiguration;
 
     /// <summary>The size of the side of the image with the QR code.</summary>
     private readonly int _sizePixels;
@@ -19,16 +22,14 @@ public class QRCodeCreationService : IQRCodeCreationService
     /// <summary>Initialization of the service object for creating QR codes.</summary>
     /// <param name="logger">Log service.</param>
     /// <param name="configuration">Application configuration.</param>
-	public QRCodeCreationService(ILogger<QRCodeCreationService> logger, IConfiguration configuration)
+	public QRCodeCreationService(ILogger<QRCodeCreationService> logger, IConfiguration? configuration = null)
 	{
 		_logger = logger;
-        _appConfiguration = configuration;
 
         var qRCodeCreationServiceConfiguration = new QRCodeCreationServiceConfiguration();
-        OnConfiguring(qRCodeCreationServiceConfiguration);
-        _sizePixels = Math.Max(50, qRCodeCreationServiceConfiguration.SizePixels);
+        OnConfiguring(qRCodeCreationServiceConfiguration, configuration);
 
-        _appConfiguration = configuration;
+        _sizePixels = Math.Max(DEFAULT_SIZE_PIXELS, qRCodeCreationServiceConfiguration.SizePixels);
 	}
 
     /// <summary>Method for generating a QR code in JPEG format</summary>
@@ -46,10 +47,20 @@ public class QRCodeCreationService : IQRCodeCreationService
     }
 
     /// <summary>Virtual method for configuring a service for generating QR codes.</summary>
-    /// <param name="configuration">Service configuration object.</param>
-    protected virtual void OnConfiguring(QRCodeCreationServiceConfiguration configuration)
+    /// <param name="serviceConfiguration">Service configuration object.</param>
+    /// <param name="appConfiguration">Application configuration.</param>
+    protected virtual void OnConfiguring(QRCodeCreationServiceConfiguration serviceConfiguration, IConfiguration? appConfiguration)
     {
-        configuration.SizePixels = _appConfiguration.GetSection("QRCode").GetValue<int>("SizePixels");
+        if (appConfiguration != null)
+        {
+            var sizePixels = appConfiguration
+                .GetSection("QRCode")
+                .GetValue<int>("SizePixels");
+
+            serviceConfiguration.SizePixels = Math.Max(DEFAULT_SIZE_PIXELS, sizePixels);
+        }
+        else
+            serviceConfiguration.SizePixels = DEFAULT_SIZE_PIXELS;
     }
 }
 

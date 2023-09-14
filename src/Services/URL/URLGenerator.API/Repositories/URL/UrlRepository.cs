@@ -41,8 +41,10 @@ public class UrlRepository : IUrlRepository
         var repositoryConfiguration = new UrlRepositoryConfiguration();
         OnConfiguring(repositoryConfiguration, configuration);
 
-        _lifeTimeCache = repositoryConfiguration.LifeTimeCache;
-	}
+        _lifeTimeCache = TimeSpan
+                .FromMinutes(Math.Max(DEFAULT_URL_CACHE_LIFE_TIME_DAYS,
+                    repositoryConfiguration.LifeTimeCache.Days));
+    }
 
     /// <summary>Method for adding a new URL to the repository.</summary>
     /// <param name="item">URL address.</param>

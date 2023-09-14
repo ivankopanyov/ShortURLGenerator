@@ -39,10 +39,9 @@ public class ConnectionRepository : IConnectionRepository
         var repositoryConfiguration = new ConnectionRepositoryConfiguration();
         OnConfiguring(repositoryConfiguration, configuration);
 
-        _connectionLifeTime =
-            repositoryConfiguration.ConnectionLifeTime.Days < DEFAULT_CONNECTION_LIFE_TIME_DAYS
-                ? TimeSpan.FromMinutes(DEFAULT_CONNECTION_LIFE_TIME_DAYS)
-                : repositoryConfiguration.ConnectionLifeTime;
+        _connectionLifeTime = TimeSpan
+                .FromDays(Math.Max(DEFAULT_CONNECTION_LIFE_TIME_DAYS,
+                    repositoryConfiguration.ConnectionLifeTime.Days));
     }
 
     /// <summary>Method for obtaining a connection by identifier.</summary>

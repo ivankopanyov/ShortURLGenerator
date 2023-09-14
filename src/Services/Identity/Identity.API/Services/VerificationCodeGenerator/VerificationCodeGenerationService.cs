@@ -18,16 +18,19 @@ public class VerificationCodeGenerationService : StringGenerator.StringGenerator
     /// To set the verification code source symbols value, use the value of the "SourceSymbols" field
     /// from the "VerificationCode" section of the application configuration.
     /// </summary>
-    /// <param name="stringGeneratorConfiguration">String generator configuration.</param>
-    /// <param name="configuration">Application configuration.</param>
-    protected override void OnConfiguring(StringGeneratorConfiguration stringGeneratorConfiguration,
-        IConfiguration configuration)
+    /// <param name="generatorConfiguration">String generator configuration.</param>
+    /// <param name="appConfiguration">Application configuration.</param>
+    protected override void OnConfiguring(StringGeneratorConfiguration generatorConfiguration,
+        IConfiguration? appConfiguration)
     {
-        stringGeneratorConfiguration.StringLength = configuration
+        if (appConfiguration is null)
+            return;
+
+        generatorConfiguration.StringLength = appConfiguration
             .GetSection("VerificationCode")
             .GetValue<int>("Length");
 
-        stringGeneratorConfiguration.SourceSymbols = configuration
+        generatorConfiguration.SourceSymbols = appConfiguration
             .GetSection("VerificationCode")
             .GetValue<string>("SourceSymbols")!;
     }

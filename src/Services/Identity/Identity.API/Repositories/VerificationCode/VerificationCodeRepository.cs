@@ -39,10 +39,9 @@ public class VerificationCodeRepository : IVerificationCodeRepository
         var repositoryConfiguration = new VerificationCodeRepositoryConfiguration();
         OnConfiguring(repositoryConfiguration, configuration);
 
-        _verificationCodeLifeTime = 
-            repositoryConfiguration.VerificationCodeLifeTime.Minutes < DEFAULT_VERIFICATION_CODE_LIFE_TIME_MINUTES
-                ? TimeSpan.FromMinutes(DEFAULT_VERIFICATION_CODE_LIFE_TIME_MINUTES)
-                : repositoryConfiguration.VerificationCodeLifeTime;
+        _verificationCodeLifeTime = TimeSpan
+                .FromMinutes(Math.Max(DEFAULT_VERIFICATION_CODE_LIFE_TIME_MINUTES,
+                    repositoryConfiguration.VerificationCodeLifeTime.Minutes));
     }
 
     /// <summary>Method for adding new verification code to the repository.</summary>

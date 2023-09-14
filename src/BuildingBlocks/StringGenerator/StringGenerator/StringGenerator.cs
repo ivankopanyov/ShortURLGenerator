@@ -25,13 +25,10 @@ public class StringGenerator : IGeneratable
         var stringGeneratorConfiguration = new StringGeneratorConfiguration();
         OnConfiguring(stringGeneratorConfiguration, configuration);
 
-        _sourceSymbols = !string.IsNullOrEmpty(stringGeneratorConfiguration.SourceSymbols)
-            ? stringGeneratorConfiguration.SourceSymbols
-            : DEFAULT_SOURCE_SYMBOLS;
-
-        _stringLength = stringGeneratorConfiguration.StringLength > 0
-            ? stringGeneratorConfiguration.StringLength
-            : DEFAULT_STRING_LENGTH;
+        _stringLength = Math.Max(DEFAULT_STRING_LENGTH, stringGeneratorConfiguration.StringLength);
+        _sourceSymbols = string.IsNullOrEmpty(stringGeneratorConfiguration.SourceSymbols)
+                ? DEFAULT_SOURCE_SYMBOLS
+                : stringGeneratorConfiguration.SourceSymbols;
     }
 
     /// <summary>Method for generating a random string.</summary>
@@ -64,15 +61,15 @@ public class StringGenerator : IGeneratable
                 .GetSection("StringGenerator")
                 .GetValue<int>("Length");
 
-            var stringLength = appConfiguration
+            var sourceSymbols = appConfiguration
                 .GetSection("StringGenerator")
                 .GetValue<string>("SourceSymbols");
 
             generatorConfiguration.StringLength = Math.Max(DEFAULT_STRING_LENGTH, length);
 
-            generatorConfiguration.SourceSymbols = string.IsNullOrEmpty(stringLength)
+            generatorConfiguration.SourceSymbols = string.IsNullOrEmpty(sourceSymbols)
                 ? DEFAULT_SOURCE_SYMBOLS
-                : stringLength;
+                : sourceSymbols;
         }
         else
         {
