@@ -33,14 +33,12 @@ public class IdentityService : IIdentityService
     /// </exception>
     public async Task<VerificationCodeDto> GetVerificationCodeAsync(long userId)
     {
+        _logger.LogInformation($"Get verification code: Start. User ID: {userId}.");
+
         var request = new UserIdDto()
         {
             UserId = userId
         };
-
-        var requestId = request.UserId.ToString();
-
-        _logger.LogStart("Get verification code", requestId);
 
         try
         {
@@ -50,17 +48,17 @@ public class IdentityService : IIdentityService
 
             if (response.Response.ResponseStatus == ResponseStatus.Ok)
             {
-                _logger.LogSuccessfully("Get verification code", requestId);
+                _logger.LogInformation($"Get verification code: Successfully. Request: {request.LogInfo()}, Response: {response.LogInfo()}.");
                 return response.VerificationCode;
             }
 
-            _logger.LogError("Get verification code", response.Response.Error, requestId);
+            _logger.LogError($"Get verification code: Error. Request: {request.LogInfo()}, Response: {response.LogInfo()}.");
 
             throw new InvalidOperationException(response.Response.Error);
         }
         catch (RpcException ex)
         {
-            _logger.LogError(ex, "Get verification code", ex.Message, requestId);
+            _logger.LogError(ex, $"Get verification code: {ex.Message}. Request: {request.LogInfo()}.");
             throw new InvalidOperationException("Нет связи с сервисом идентификации пользователей.");
         }
     }
@@ -75,6 +73,8 @@ public class IdentityService : IIdentityService
     /// </exception>
     public async Task<ConnectionsPageDto> GetConnectionsAsync(long userId, int index, int size)
     {
+        _logger.LogInformation($"Get connections: Start. User ID: {userId}, Index: {index}, Size: {size}.");
+
         var request = new ConnectionsRequestDto()
         {
             UserId = userId,
@@ -85,10 +85,6 @@ public class IdentityService : IIdentityService
             }
         };
 
-        var requestId = request.UserId.ToString();
-
-        _logger.LogStart("Get connections", requestId);
-
         try
         {
             using var channel = GrpcChannel.ForAddress(_identityServiceHost);
@@ -97,17 +93,17 @@ public class IdentityService : IIdentityService
 
             if (response.Response.ResponseStatus == ResponseStatus.Ok)
             {
-                _logger.LogSuccessfully("Get connections", requestId);
+                _logger.LogInformation($"Get connections: Successfully. Request: {request.LogInfo()}, Response: {response.LogInfo()}.");
                 return response.ConnectionsPage;
             }
 
-            _logger.LogError("Get connections", response.Response.Error, requestId);
+            _logger.LogError($"Get connections: Error. Request: {request.LogInfo()}, Response: {response.LogInfo()}.");
 
             throw new InvalidOperationException(response.Response.Error);
         }
         catch (RpcException ex)
         {
-            _logger.LogError(ex, "Get connections", ex.Message, requestId);
+            _logger.LogError(ex, $"Get connections: Error. Request: {request.LogInfo()}.");
             throw new InvalidOperationException("Нет связи с сервисом идентификации пользователей.");
         }
     }
@@ -121,9 +117,11 @@ public class IdentityService : IIdentityService
     /// </exception>
     public async Task CloseConnectionAsync(long userId, string connectionId)
     {
+        _logger.LogInformation($"Close connection: Start. User ID: {userId}, Connection ID: {connectionId}.");
+
         if (connectionId is null)
         {
-            _logger.LogError("Close connection", "Connection ID is null");
+            _logger.LogError($"Close connection: Connection ID is null. User ID: {userId}, Connection ID: {connectionId}.");
             throw new ArgumentNullException(nameof(connectionId));
         }
 
@@ -133,10 +131,6 @@ public class IdentityService : IIdentityService
             ConnectionId = connectionId
         };
 
-        var requestId = request.UserId.ToString();
-
-        _logger.LogStart("Close connection", requestId);
-
         try
         {
             using var channel = GrpcChannel.ForAddress(_identityServiceHost);
@@ -145,17 +139,17 @@ public class IdentityService : IIdentityService
 
             if (response.ResponseStatus == ResponseStatus.Ok)
             {
-                _logger.LogSuccessfully("Close connection", requestId);
+                _logger.LogInformation($"Close connection: Successfully. Request: {request.LogInfo()}, Response: {response.LogInfo()}.");
                 return;
             }
 
-            _logger.LogError("Close connection", response.Error, requestId);
+            _logger.LogInformation($"Close connection: Error. Request: {request.LogInfo()}, Response: {response.LogInfo()}.");
 
             throw new InvalidOperationException(response.Error);
         }
         catch (RpcException ex)
         {
-            _logger.LogError(ex, "Close connection", ex.Message, requestId);
+            _logger.LogInformation(ex, $"Close connection: {ex.Message}. Request: {request.LogInfo()}.");
             throw new InvalidOperationException("Нет связи с сервисом идентификации пользователей.");
         }
     }

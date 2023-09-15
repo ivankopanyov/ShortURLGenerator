@@ -31,24 +31,22 @@ public class UpdateHandler : UpdateHandlerBase
     /// <param name="update">Telegram bot update.</param>
     protected override async Task NotFoundCommandHandleAsync(Update update)
     {
-        Logger.LogStart("Handle update not found command");
+        Logger.LogInformation($"Handle update not found command: Start. Update: {update?.LogInfo()}");
 
         if (update is null)
         {
-            Logger.LogError("Handle update not found command", "Update is null");
+            Logger.LogError($"Handle update not found command: Update is null.");
             return;
         }
-
-        var updteId = update.Id.ToString();
 
         if (update.Message is { } message && message.From is { } user && !user.IsBot)
         {
             long chatId = message.Chat.Id;
             await TelegramBot.SendErrorMessageAsync(chatId, "Ссылка некорректна.");
-            Logger.LogSuccessfully("Handle update not found command", updteId);
+            Logger.LogInformation($"Handle update not found command: Successfully. Update: {update.LogInfo()}");
         }
         else
-            Logger.LogWarning("Handle update not found command", "Invalid update type", updteId);
+            Logger.LogError($"Handle update not found command: Invalid update type. Update: {update.LogInfo()}");
     }
 }
 

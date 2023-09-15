@@ -34,9 +34,11 @@ public class UrlService : IUrlService
     /// </exception>
     public async Task<string> GenerateUrlAsync(string sourceUri)
     {
+        _logger.LogInformation($"Generate URL: Start. Source URI: {sourceUri}");
+
         if (sourceUri is null)
         {
-            _logger.LogError("Generate URL", "Source URI is null");
+            _logger.LogError($"Generate URL: Source URI is null.");
             throw new ArgumentNullException(nameof(sourceUri));
         }
 
@@ -44,10 +46,6 @@ public class UrlService : IUrlService
         {
             Value = sourceUri
         };
-
-        var requestId = sourceUri;
-
-        _logger.LogStart("Generate URL", requestId);
 
         try
         {
@@ -57,20 +55,20 @@ public class UrlService : IUrlService
 
             if (response.Response.ResponseStatus == ResponseStatus.Ok)
             {
-                _logger.LogSuccessfully("Generate URL", requestId);
+                _logger.LogInformation($"Generate URL: Successfully. Request: {request.LogInfo()}, Response: {response.LogInfo()}");
                 return response.Url;
             }
 
             if (response.Response.ResponseStatus == ResponseStatus.BadRequest)
-                _logger.LogWarning("Generate URL", "Bad request", requestId);
+                _logger.LogInformation($"Generate URL: Bad request. Request: {request.LogInfo()}, Response: {response.LogInfo()}");
             else
-                _logger.LogError("Generate URL", response.Response.Error, requestId);
+                _logger.LogError($"Generate URL: Error. Request: {request.LogInfo()}, Response: {response.LogInfo()}");
 
             throw new InvalidOperationException(response.Response.Error);
         }
         catch (RpcException ex)
         {
-            _logger.LogError(ex, "Generate URL", ex.Message, requestId);
+            _logger.LogError(ex, $"Generate URL: {ex.Message}. Request: {request.LogInfo()}");
             throw new InvalidOperationException("Нет связи с сервисом генерации ссылок.");
         }
     }

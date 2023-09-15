@@ -2,7 +2,7 @@
 
 /// <summary>
 /// Class that describes a service for creating QR codes.
-/// Uses the BarCode library.
+/// Uses the QRCoder library.
 /// Implements the IQRCodeCreationService interface.
 /// </summary>
 public class QRCodeCreationService : IQRCodeCreationService
@@ -39,11 +39,13 @@ public class QRCodeCreationService : IQRCodeCreationService
     {
         _logger.LogInformation($"Create QR code: Start. URI: {uri}.");
 
-        GeneratedBarcode barcode = QRCodeWriter.CreateQrCode(uri, _sizePixels, QRCodeWriter.QrErrorCorrectionLevel.Medium);
+        QRCodeGenerator qrGenerator = new QRCodeGenerator();
+        QRCodeData qrCodeData = qrGenerator.CreateQrCode(uri, QRCodeGenerator.ECCLevel.Q);
+        BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
 
         _logger.LogInformation($"Create QR code: Successfully. URI: {uri}.");
 
-        return barcode.ToJpegBinaryData();
+        return qrCode.GetGraphic(_sizePixels);
     }
 
     /// <summary>Virtual method for configuring a service for generating QR codes.</summary>

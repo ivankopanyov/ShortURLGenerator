@@ -44,23 +44,21 @@ public class CloseConnectionCommand : IUpdateCommand
         if (chatId != callbackQuery.From.Id)
             return false;
 
+        _logger.LogInformation($"Execute close connection command: Start. Update: {update.LogInfo()}");
+
         int messageId = message.MessageId;
         var connectionId = text.Split('_', StringSplitOptions.RemoveEmptyEntries)[1];
-
-        string updateId = update.Id.ToString();
-
-        _logger.LogStart("Execute close connection command", updateId);
 
         try
         {
             await _identityService.CloseConnectionAsync(chatId, connectionId);
             await _telegramBot.SendCloseConnectionAsync(chatId, messageId);
-            _logger.LogSuccessfully("Execute close connection command", updateId);
+            _logger.LogInformation($"Execute close connection command: Successfully. Update: {update.LogInfo()}");
         }
         catch (InvalidOperationException ex)
         {
             await _telegramBot.SendErrorMessageAsync(chatId, ex.Message);
-            _logger.LogError(ex, "Execute close connection command", ex.Message, updateId);
+            _logger.LogError(ex, $"Execute close connection command: {ex.Message}. Update: {update.LogInfo()}");
         }
 
         return true;

@@ -3,6 +3,9 @@
 /// <summary>Abstract class that describes a command that displays a list of active connections.</summary>
 public abstract class ConnectionsCommandBase : IUpdateCommand
 {
+    /// <summary>The number of connections on the page by default.</summary>
+    private const int DEFAULT_PAGE_SIZE = 1;
+
     /// <summary>User identification service.</summary>
     private readonly IIdentityService _identityService;
 
@@ -11,9 +14,6 @@ public abstract class ConnectionsCommandBase : IUpdateCommand
 
     /// <summary>Log service.</summary>
     private readonly ILogger _logger;
-
-    /// <summary>Application configuration.</summary>
-    private readonly IConfiguration _appConfiguration;
 
     /// <summary>The number of active connections on the page.</summary>
     private readonly int _pageSize;
@@ -34,12 +34,11 @@ public abstract class ConnectionsCommandBase : IUpdateCommand
         _identityService = identityService;
         _telegramBot = telegramBot;
         _logger = logger;
-        _appConfiguration = configuration;
 
         var connectionsCommandConfiguration = new ConnectionsCommandConfiguration();
-        OnConfiguring(connectionsCommandConfiguration);
+        OnConfiguring(connectionsCommandConfiguration, configuration);
 
-        _pageSize = Math.Max(1, connectionsCommandConfiguration.PageSize);
+        _pageSize = Math.Max(DEFAULT_PAGE_SIZE, connectionsCommandConfiguration.PageSize);
     }
 
     /// <summary>The method that executes the command if the update is valid.</summary>
@@ -49,20 +48,18 @@ public abstract class ConnectionsCommandBase : IUpdateCommand
         if (!IsValid(update, out long chatId, out int index))
             return false;
 
-        string updateId = update.Id.ToString();
-
-        _logger.LogStart($"Execute {CommandName} command", updateId);
+        _logger.LogInformation($"Execute {CommandName} command: Start. Update: {update.LogInfo()}");
 
         try
         {
             var connectionsPage = await _identityService.GetConnectionsAsync(chatId, index, _pageSize);
             await _telegramBot.SendConnectionsAsync(chatId, connectionsPage);
-            _logger.LogSuccessfully($"Execute {CommandName} command", updateId);
+            _logger.LogInformation($"Execute {CommandName} command: Successfully. Update: {update.LogInfo()}");
         }
         catch (InvalidOperationException ex)
         {
             await _telegramBot.SendErrorMessageAsync(chatId, ex.Message);
-            _logger.LogError(ex, $"Execute {CommandName} command", ex.Message, updateId);
+            _logger.LogError(ex, $"Execute {CommandName} command: {ex.Message}. Update: {update.LogInfo()}");
         }
 
         return true;
@@ -76,10 +73,16 @@ public abstract class ConnectionsCommandBase : IUpdateCommand
     protected abstract bool IsValid(Update update, out long chatId, out int index);
 
     /// <summary>Virtual method for configuring a connection command.</summary>
-    /// <param name="configuration">Connections command configuration.</param>
-    protected virtual void OnConfiguring(ConnectionsCommandConfiguration configuration)
+    /// <param name="commandConfiguration">Connections command configuration.</param>
+    /// <param name="appConfiguration">Application configuration.</param>
+    protected virtual void OnConfiguring(ConnectionsCommandConfiguration commandConfiguration, IConfiguration? appConfiguration)
     {
-        configuration.PageSize = _appConfiguration.GetSection("Telegram").GetValue<int>("ConnectionsPageSize");
+        if (appConfiguration is null)
+            return;
+
+        commandConfiguration.PageSize = appConfiguration
+            .GetSection("Telegram")
+            .GetValue<int>("ConnectionsPageSize");
     }
 }
 

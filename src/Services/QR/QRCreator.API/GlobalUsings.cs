@@ -1,5 +1,5 @@
 ﻿global using RabbitMQ.Client;
-global using IronBarCode;
+global using QRCoder;
 global using ShortURLGenerator.EventBus;
 global using ShortURLGenerator.EventBus.Abstraction;
 global using ShortURLGenerator.EventBus.Events;
