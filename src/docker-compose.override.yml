@@ -82,6 +82,19 @@ services:
     networks:
       - app-network
 
+  gateway.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - URL_SERVICE_HOST=urlgenerator.api
+      - URL_SERVICE_PORT=80
+      - IDENTITY_SERVICE_HOST=identity.api
+      - IDENTITY_SERVICE_PORT=80
+      - EVENT_BUS_HOST_NAME=rabbitmq
+    ports:
+      - "5004:80"
+    networks:
+      - app-network
+
 volumes:
   urlgenerator-sql-data:
     driver: local
@@ -92,6 +105,7 @@ volumes:
 
 networks:
    app-network:
+
 
 
 

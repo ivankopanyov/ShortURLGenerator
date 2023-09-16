@@ -7,7 +7,8 @@
         "identity.api": "StartDebugging",
         "qrcreator.api": "StartDebugging",
         "telegrambot": "StartDebugging",
-        "urlgenerator.api": "StartDebugging"
+        "urlgenerator.api": "StartDebugging",
+        "web.bff.urlgenerator": "StartDebugging"
       }
     }
   }

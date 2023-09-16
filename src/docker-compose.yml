@@ -41,6 +41,8 @@ services:
     restart: always
     depends_on:
       - rabbitmq
+      - urlgenerator.api
+      - identity.api
 
   qrcreator.api:
     image: ${DOCKER_REGISTRY-}qrcreator
@@ -61,4 +63,16 @@ services:
     restart: always
     depends_on:
       - identity.nosql-data
+
+  gateway.api:
+    image: ${DOCKER_REGISTRY-}apigateway
+    container_name: gateway.api
+    build:
+      context: .
+      dockerfile: ApiGateways/ApiGateway/Web.Bff.UrlGenerator/Dockerfile
+    restart: always
+    depends_on:
+      - rabbitmq
+      - urlgenerator.api
+      - identity.api
 
