@@ -1,7 +1,11 @@
 ﻿global using System.Net;
+global using System.Text;
 global using System.Text.Json;
+global using System.IdentityModel.Tokens.Jwt;
+global using System.Security.Claims;
 global using Microsoft.AspNetCore.Server.Kestrel.Core;
 global using Microsoft.Extensions.Caching.Distributed;
+global using Microsoft.IdentityModel.Tokens;
 global using Grpc.Core;
 global using Grpc.Dto;
 global using ShortURLGenerator.StringGenerator;
@@ -12,4 +16,5 @@ global using ShortURLGenerator.Identity.API.Services.VerificationCodeGenerator;
 global using ShortURLGenerator.Identity.API.Services.RefreshTokenGenerator;
 global using ShortURLGenerator.Identity.API.Repositories.Connection;
 global using ShortURLGenerator.Identity.API.Repositories.VerificationCode;
+global using ShortURLGenerator.Identity.API.Services.AccessTokenGenerator;
 

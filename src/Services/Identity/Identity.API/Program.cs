@@ -9,6 +9,7 @@ builder.Services.AddRedis();
 builder.Services
     .AddScoped<IVerificationCodeGenerationService, VerificationCodeGenerationService>()
     .AddScoped<IRefreshTokenGenerationService, RefreshTokenGenerationService>()
+    .AddScoped<IAccessTokenGenerationService, JwtGenerationService>()
     .AddScoped<IVerificationCodeRepository, VerificationCodeRepository>()
     .AddScoped<IConnectionRepository, ConnectionRepository>();
 
