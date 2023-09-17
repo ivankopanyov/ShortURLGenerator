@@ -1,11 +1,10 @@
-﻿namespace ShortURLGenerator.TelegramBot.Services.Identity;
+﻿namespace ShortURLGenerator.GrpcHelper.Services.Identity;
 
 /// <summary>
 /// Class that describes a Telegram user identification service.
-/// Implements the IIdentityService interface.
 /// The connection is made using gRPC.
 /// </summary>
-public class IdentityService : IIdentityService
+public class IdentityService : IConnectionService
 {
     /// <summary>Log service.</summary>
     private readonly ILogger _logger;
@@ -31,14 +30,14 @@ public class IdentityService : IIdentityService
     /// <exception cref="InvalidOperationException">
     /// Failed to complete the request to the service or the request is invalid.
     /// </exception>
-    public async Task<VerificationCodeDto> GetVerificationCodeAsync(long userId)
+    public async Task<VerificationCode> GetVerificationCodeAsync(long userId)
     {
-        _logger.LogInformation($"Get verification code: Start. User ID: {userId}.");
-
-        var request = new UserIdDto()
+        var request = new UserId()
         {
-            UserId = userId
+            Value = userId
         };
+
+        _logger.LogInformation($"Get verification code: Start. {request}.");
 
         try
         {
@@ -48,17 +47,17 @@ public class IdentityService : IIdentityService
 
             if (response.Response.ResponseStatus == ResponseStatus.Ok)
             {
-                _logger.LogInformation($"Get verification code: Successfully. Request: {request.LogInfo()}, Response: {response.LogInfo()}.");
+                _logger.LogInformation($"Get verification code: Successfully. {response.LogInfo()}.");
                 return response.VerificationCode;
             }
 
-            _logger.LogError($"Get verification code: Error. Request: {request.LogInfo()}, Response: {response.LogInfo()}.");
+            _logger.LogError($"Get verification code: {response.Response.Error}. {response.LogInfo()}.");
 
             throw new InvalidOperationException(response.Response.Error);
         }
         catch (RpcException ex)
         {
-            _logger.LogError(ex, $"Get verification code: {ex.Message}. Request: {request.LogInfo()}.");
+            _logger.LogError(ex, $"Get verification code: {ex.Message}.");
             throw new InvalidOperationException("Нет связи с сервисом идентификации пользователей.");
         }
     }
@@ -71,19 +70,19 @@ public class IdentityService : IIdentityService
     /// <exception cref="InvalidOperationException">
     /// Failed to complete the request to the service or the request is invalid.
     /// </exception>
-    public async Task<ConnectionsPageDto> GetConnectionsAsync(long userId, int index, int size)
+    public async Task<ConnectionsPage> GetConnectionsAsync(long userId, int index, int size)
     {
-        _logger.LogInformation($"Get connections: Start. User ID: {userId}, Index: {index}, Size: {size}.");
-
-        var request = new ConnectionsRequestDto()
+        var request = new ConnectionsRequest()
         {
             UserId = userId,
-            PageInfo = new PageInfoDto()
+            PageInfo = new PageInfo()
             {
                 Index = index,
                 Count = size
             }
         };
+
+        _logger.LogInformation($"Get connections: Start. {request.LogInfo()}.");
 
         try
         {
@@ -93,17 +92,17 @@ public class IdentityService : IIdentityService
 
             if (response.Response.ResponseStatus == ResponseStatus.Ok)
             {
-                _logger.LogInformation($"Get connections: Successfully. Request: {request.LogInfo()}, Response: {response.LogInfo()}.");
+                _logger.LogInformation($"Get connections: Successfully. {response.LogInfo()}.");
                 return response.ConnectionsPage;
             }
 
-            _logger.LogError($"Get connections: Error. Request: {request.LogInfo()}, Response: {response.LogInfo()}.");
+            _logger.LogError($"Get connections: {response.Response.Error}. {response.LogInfo()}.");
 
             throw new InvalidOperationException(response.Response.Error);
         }
         catch (RpcException ex)
         {
-            _logger.LogError(ex, $"Get connections: Error. Request: {request.LogInfo()}.");
+            _logger.LogError(ex, $"Get connections: {ex.Message}.");
             throw new InvalidOperationException("Нет связи с сервисом идентификации пользователей.");
         }
     }
@@ -117,19 +116,19 @@ public class IdentityService : IIdentityService
     /// </exception>
     public async Task CloseConnectionAsync(long userId, string connectionId)
     {
-        _logger.LogInformation($"Close connection: Start. User ID: {userId}, Connection ID: {connectionId}.");
-
         if (connectionId is null)
         {
-            _logger.LogError($"Close connection: Connection ID is null. User ID: {userId}, Connection ID: {connectionId}.");
+            _logger.LogError($"Close connection: Connection ID is null. User ID: {userId}");
             throw new ArgumentNullException(nameof(connectionId));
         }
 
-        var request = new ConnectionRequestDto()
+        var request = new ConnectionRequest()
         {
             UserId = userId,
             ConnectionId = connectionId
         };
+
+        _logger.LogInformation($"Close connection: Start. {request.LogInfo()}.");
 
         try
         {
@@ -139,17 +138,17 @@ public class IdentityService : IIdentityService
 
             if (response.ResponseStatus == ResponseStatus.Ok)
             {
-                _logger.LogInformation($"Close connection: Successfully. Request: {request.LogInfo()}, Response: {response.LogInfo()}.");
+                _logger.LogInformation($"Close connection: Successfully. {response.LogInfo()}.");
                 return;
             }
 
-            _logger.LogInformation($"Close connection: Error. Request: {request.LogInfo()}, Response: {response.LogInfo()}.");
+            _logger.LogInformation($"Close connection: {response.Error}. {response.LogInfo()}.");
 
             throw new InvalidOperationException(response.Error);
         }
         catch (RpcException ex)
         {
-            _logger.LogInformation(ex, $"Close connection: {ex.Message}. Request: {request.LogInfo()}.");
+            _logger.LogInformation(ex, $"Close connection: {ex.Message}.");
             throw new InvalidOperationException("Нет связи с сервисом идентификации пользователей.");
         }
     }

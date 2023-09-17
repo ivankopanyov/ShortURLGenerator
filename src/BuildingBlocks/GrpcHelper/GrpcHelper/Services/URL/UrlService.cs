@@ -1,8 +1,7 @@
-﻿namespace ShortURLGenerator.TelegramBot.Services.Url;
+﻿namespace ShortURLGenerator.GrpcHelper.Services.URL;
 
 /// <summary>
 /// Class that describes a service for generating short URLs.
-/// Implements the IUrlService interface.
 /// The connection is made using gRPC.
 /// </summary>
 public class UrlService : IUrlService
@@ -34,18 +33,18 @@ public class UrlService : IUrlService
     /// </exception>
     public async Task<string> GenerateUrlAsync(string sourceUri)
     {
-        _logger.LogInformation($"Generate URL: Start. Source URI: {sourceUri}");
-
         if (sourceUri is null)
         {
             _logger.LogError($"Generate URL: Source URI is null.");
             throw new ArgumentNullException(nameof(sourceUri));
         }
 
-        var request = new SourceUriDto()
+        var request = new SourceUri()
         {
             Value = sourceUri
         };
+
+        _logger.LogInformation($"Generate URL: Start. {request.LogInfo()}");
 
         try
         {
@@ -55,20 +54,68 @@ public class UrlService : IUrlService
 
             if (response.Response.ResponseStatus == ResponseStatus.Ok)
             {
-                _logger.LogInformation($"Generate URL: Successfully. Request: {request.LogInfo()}, Response: {response.LogInfo()}");
+                _logger.LogInformation($"Generate URL: Successfully. {response.LogInfo()}");
                 return response.Url;
             }
 
             if (response.Response.ResponseStatus == ResponseStatus.BadRequest)
-                _logger.LogInformation($"Generate URL: Bad request. Request: {request.LogInfo()}, Response: {response.LogInfo()}");
+                _logger.LogInformation($"Generate URL: {response.Response.Error}. {response.LogInfo()}");
             else
-                _logger.LogError($"Generate URL: Error. Request: {request.LogInfo()}, Response: {response.LogInfo()}");
+                _logger.LogError($"Generate URL: {response.Response.Error}. {response.LogInfo()}");
 
             throw new InvalidOperationException(response.Response.Error);
         }
         catch (RpcException ex)
         {
             _logger.LogError(ex, $"Generate URL: {ex.Message}. Request: {request.LogInfo()}");
+            throw new InvalidOperationException("Нет связи с сервисом генерации ссылок.");
+        }
+    }
+
+    /// <summary>method to obtain the original URI of an address. The connection is made using gRPC.</summary>
+    /// <param name="url">The generated short URL.</param>
+    /// <returns>Source URI.</returns>
+    /// <exception cref="ArgumentNullException">The generated short URL is null.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// Failed to complete the request to the service or the request is invalid.
+    /// </exception>
+    public async Task<string> GetSourceUriAsync(string url)
+    {
+        if (url is null)
+        {
+            _logger.LogError($"Get source URI: URL is null.");
+            throw new ArgumentNullException(nameof(url));
+        }
+
+        var request = new Url()
+        {
+            Value = url
+        };
+
+        _logger.LogInformation($"Get source URI: Start. {request.LogInfo()}");
+
+        try
+        {
+            using var channel = GrpcChannel.ForAddress(_urlServiceHost);
+            var client = new Grpc.Services.UrlService.UrlServiceClient(channel);
+            var response = await client.GetAsync(request);
+
+            if (response.Response.ResponseStatus == ResponseStatus.Ok)
+            {
+                _logger.LogInformation($"Get source URI: Successfully. {response.LogInfo()}");
+                return response.Uri;
+            }
+
+            if (response.Response.ResponseStatus == ResponseStatus.NotFound)
+                _logger.LogInformation($"Get source URI: {response.Response.Error}. {response.LogInfo()}");
+            else
+                _logger.LogError($"Get source URI: {response.Response.Error}. {response.LogInfo()}");
+
+            throw new InvalidOperationException(response.Response.Error);
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogError(ex, $"Get source URI: {ex.Message}.");
             throw new InvalidOperationException("Нет связи с сервисом генерации ссылок.");
         }
     }
@@ -82,4 +129,3 @@ public class UrlService : IUrlService
         configuration.UrlServiceHost = $"http://{host}:{port}";
     }
 }
-

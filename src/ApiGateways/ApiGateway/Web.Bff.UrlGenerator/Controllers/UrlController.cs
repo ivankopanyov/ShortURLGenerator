@@ -22,12 +22,12 @@ public class UrlController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<CreateUrlResponseDto>> CreateAsync([FromBody] CreateUrlDto createUrl)
     {
-        _logger.LogInformation($"Create URL: Start. Create URL: {createUrl}.");
+        _logger.LogInformation($"Create URL: Start. {createUrl}.");
 
         if (!Uri.TryCreate(createUrl.SourceUri, UriKind.Absolute, out Uri? uri) || uri is null ||
             (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
         {
-            _logger.LogInformation($"Create URL: Source URI is not valid. Create URL: {createUrl}.");
+            _logger.LogInformation($"Create URL: Source URI is not valid. {createUrl}.");
             return BadRequest("Некорректная ссылка.");
         }
 
@@ -39,13 +39,13 @@ public class UrlController : ControllerBase
                 Url = url
             };
 
-            _logger.LogInformation($"Create URL: Successfully. Create URL: {createUrl}, Response: {response}.");
+            _logger.LogInformation($"Create URL: Successfully. {response}.");
 
             return Ok(response);
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogError(ex, $"Create URL: {ex.Message}. Create URL: {createUrl}.");
+            _logger.LogError(ex, $"Create URL: {ex.Message}. {createUrl}.");
             return BadRequest(ex.Message);
         }
     }
@@ -57,12 +57,12 @@ public class UrlController : ControllerBase
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<ActionResult<CreateUrlResponseDto>> CreateAndSendAsync([FromBody] CreateUrlDto createUrl)
     {
-        _logger.LogInformation($"Create and send URL: Start. Create URL: {createUrl}.");
+        _logger.LogInformation($"Create and send URL: Start. {createUrl}.");
 
         if (!Uri.TryCreate(createUrl.SourceUri, UriKind.Absolute, out Uri? uri) || uri is null ||
             (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
         {
-            _logger.LogInformation($"Create and send URL: Source URI is not valid. Create URL: {createUrl}.");
+            _logger.LogInformation($"Create and send URL: Source URI is not valid. {createUrl}.");
             return BadRequest("Некорректная ссылка.");
         }
 
@@ -75,22 +75,22 @@ public class UrlController : ControllerBase
                 Url = url
             };
 
-            _logger.LogInformation($"Create and send URL: Successfully. Create URL: {createUrl}, Response: {response}.");
+            _logger.LogInformation($"Create and send URL: Successfully. {response}.");
 
             return Ok(response);
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogError(ex, $"Create and send URL: {ex.Message}. Create URL: {createUrl}.");
+            _logger.LogError(ex, $"Create and send URL: {ex.Message}. {createUrl}.");
             return BadRequest(ex.Message);
         }
     }
 
     [HttpPost("get/{url}")]
-    [ProducesResponseType(typeof(Dto.SourceUriDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SourceUriDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Dto.SourceUriDto>> GetAsync([FromRoute] string url)
+    public async Task<ActionResult<SourceUriDto>> GetAsync([FromRoute] string url)
     {
         _logger.LogInformation($"Get source URI: Start. URL: {url}.");
 
@@ -103,12 +103,12 @@ public class UrlController : ControllerBase
         try
         {
             var sourceUri = await _urlService.GetSourceUriAsync(url);
-            var response = new Dto.SourceUriDto()
+            var response = new SourceUriDto()
             {
                 SourceUri = sourceUri
             };
 
-            _logger.LogInformation($"Get source URI: Successfully. URL: {url}, Response: {response}.");
+            _logger.LogInformation($"Get source URI: Successfully. {response}.");
 
             return Ok(response);
         }
@@ -118,7 +118,6 @@ public class UrlController : ControllerBase
             return NotFound(ex.Message);
         }
     }
-
 
     private void SendUrl(string url, string sourceUri)
     {
@@ -131,11 +130,11 @@ public class UrlController : ControllerBase
             try
             {
                 _eventBus.Publish(@event);
-                _logger.LogInformation($"Send URL: Succesfully. Event: {@event}.");
+                _logger.LogInformation($"Send URL: Succesfully. {@event}.");
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"Send URL: {ex.Message}. Event: {@event}.");
+                _logger.LogError(ex, $"Send URL: {ex.Message}. {@event}.");
             }
         }
         else

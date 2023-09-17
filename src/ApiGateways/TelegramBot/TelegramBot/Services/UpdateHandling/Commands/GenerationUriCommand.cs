@@ -11,7 +11,7 @@ public class GenerationUrlCommand : IUpdateCommand
     private readonly IEventBus _eventBus;
 
     /// <summary>Service for generating short URLs.</summary>
-    private readonly IUrlService _urlService;
+    private readonly IUrlGenerator _urlGenerator;
 
     /// <summary>Service for sending Telegram messages to a bot.</summary>
     private readonly ITelegramBot _telegramBot;
@@ -23,18 +23,18 @@ public class GenerationUrlCommand : IUpdateCommand
     private readonly string _frontend;
 
     /// <summary>Command object initialization.</summary>
-    /// <param name="urlService">Service for generating short URLs.</param>
+    /// <param name="urlGenerator">Service for generating short URLs.</param>
     /// <param name="telegramBot">Service for sending Telegram messages to a bot.</param>
     /// <param name="logger">Log service.</param>
     /// <param name="frontend">Frontend address.</param>
     public GenerationUrlCommand(IEventBus eventBus,
-        IUrlService urlService,
+        IUrlGenerator urlGenerator,
         ITelegramBot telegramBot,
         ILogger<IUpdateCommand> logger,
         string frontend)
     {
         _eventBus = eventBus;
-        _urlService = urlService;
+        _urlGenerator = urlGenerator;
         _telegramBot = telegramBot;
         _logger = logger;
         _frontend = frontend;
@@ -50,13 +50,13 @@ public class GenerationUrlCommand : IUpdateCommand
             (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
             return false;
 
-        _logger.LogInformation($"Execute generation uri command: Start. Update: {update.LogInfo()}.");
+        _logger.LogInformation($"Execute generation uri command: Start. {update.LogInfo()}.");
 
         long chatId = message.Chat.Id;
 
         try
         {
-            var url = await _urlService.GenerateUrlAsync(text);
+            var url = await _urlGenerator.GenerateUrlAsync(text);
             var result = $"https://{_frontend}/{url}";
             var messageId = await _telegramBot.SendUriAsync(chatId, result, message.MessageId);
 
@@ -68,15 +68,15 @@ public class GenerationUrlCommand : IUpdateCommand
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogError(ex, $"Execute generation uri command: Send URI sent event failed. Event: {@event}");
+                _logger.LogError(ex, $"Execute generation uri command: Send URI sent event failed. {@event}");
             }
 
-            _logger.LogInformation($"Execute generation uri command: Successfully. Update: {update.LogInfo()}.");
+            _logger.LogInformation($"Execute generation uri command: Successfully. {update.LogInfo()}.");
         }
         catch (InvalidOperationException ex)
         {
             await _telegramBot.SendErrorMessageAsync(chatId, ex.Message);
-            _logger.LogError(ex, $"Execute generation uri command: {ex.Message}. Update: {update.LogInfo()}.");
+            _logger.LogError(ex, $"Execute generation uri command: {ex.Message}. {update.LogInfo()}.");
         }
 
         return true;

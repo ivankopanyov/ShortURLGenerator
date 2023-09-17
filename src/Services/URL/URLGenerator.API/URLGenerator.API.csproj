@@ -22,18 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\..\..\Protos\V1\response.proto" GrpcServices="None">
-      <Link>Protos\V1\response.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\..\..\Protos\V1\urldto.proto" GrpcServices="None" ProtoRoot="..\..\..\Protos\V1">
-      <Link>Protos\V1\urldto.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\..\..\Protos\V1\urlservice.proto" GrpcServices="Server" ProtoRoot="..\..\..\Protos\V1">
-      <Link>Protos\V1\urlservice.proto</Link>
-    </Protobuf>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Services\" />
     <None Remove="Services\URL\" />
     <None Remove="Repositories\" />
@@ -55,6 +43,9 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\StringGenerator\StringGenerator\StringGenerator.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\BuildingBlocks\GrpcHelper\GrpcHelper\GrpcHelper.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
   </ItemGroup>

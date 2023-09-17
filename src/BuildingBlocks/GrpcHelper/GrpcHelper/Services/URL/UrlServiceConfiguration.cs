@@ -1,4 +1,4 @@
-﻿namespace ShortURLGenerator.TelegramBot.Services.Url;
+﻿namespace ShortURLGenerator.GrpcHelper.Services.URL;
 
 /// <summary>Сlass that describes the configuration of the service for generating short URLs.</summary>
 public class UrlServiceConfiguration
@@ -6,4 +6,3 @@ public class UrlServiceConfiguration
     /// <summary>Connection address to the URL service.</summary>
     public string UrlServiceHost { get; set; }
 }
-

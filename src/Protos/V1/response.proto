@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "Grpc.Dto";
+option csharp_namespace = "ShortURLGenerator.Grpc.Services";
 
 enum ResponseStatus {
     OK = 0;
@@ -10,12 +10,12 @@ enum ResponseStatus {
     CONFLICT = 4;
 }
 
-message ResponseDto {
+message Response {
     ResponseStatus ResponseStatus = 1;
     optional string Error = 2;
 }
 
-message PageInfoDto {
+message PageInfo {
     int32 index = 1;
     int32 count = 2;
 }

@@ -21,10 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TelegramBot", "TelegramBot"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "V1", "V1", "{376D3438-9AB6-43D3-A3EA-022BD7FA19DC}"
 	ProjectSection(SolutionItems) = preProject
-		Protos\V1\identitydto.proto = Protos\V1\identitydto.proto
 		Protos\V1\identityservice.proto = Protos\V1\identityservice.proto
 		Protos\V1\response.proto = Protos\V1\response.proto
-		Protos\V1\urldto.proto = Protos\V1\urldto.proto
 		Protos\V1\urlservice.proto = Protos\V1\urlservice.proto
 	EndProjectSection
 EndProject
@@ -40,13 +38,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QRCreator.API", "Services\Q
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "URL", "URL", "{06ABE9F9-1844-4235-8168-19D61A145C35}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "URLGenerator.API", "Services\URL\URLGenerator.API\URLGenerator.API.csproj", "{EFC2722B-4004-4834-BBDE-CE23C7914D17}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "URLGenerator.API", "Services\URL\URLGenerator.API\URLGenerator.API.csproj", "{EFC2722B-4004-4834-BBDE-CE23C7914D17}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBot", "ApiGateways\TelegramBot\TelegramBot\TelegramBot.csproj", "{9138B16E-AD65-465A-AEE0-550EFF32F674}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TelegramBot", "ApiGateways\TelegramBot\TelegramBot\TelegramBot.csproj", "{9138B16E-AD65-465A-AEE0-550EFF32F674}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Identity", "Identity", "{982F04DC-9EDB-49E9-957A-0900ED18992A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Identity.API", "Services\Identity\Identity.API\Identity.API.csproj", "{566B8993-A107-45F2-876A-108AB6A76EA2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Identity.API", "Services\Identity\Identity.API\Identity.API.csproj", "{566B8993-A107-45F2-876A-108AB6A76EA2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StringGenerator", "StringGenerator", "{CDAD46C0-13A7-43EC-AE17-74065189DCF5}"
 EndProject
@@ -55,6 +53,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateway", "ApiGateway", "{7CF34D22-05B2-4DD8-8FE3-710792B62E13}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.Bff.UrlGenerator", "ApiGateways\ApiGateway\Web.Bff.UrlGenerator\Web.Bff.UrlGenerator.csproj", "{4E49D8CA-124B-4264-8012-5BD27B64D389}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GrpcHelper", "GrpcHelper", "{E9EF700C-9578-4882-8AA6-CA2AD6B88CD5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcHelper", "BuildingBlocks\GrpcHelper\GrpcHelper\GrpcHelper.csproj", "{55629FE1-5D2B-49D0-AC91-EAADB5A31201}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -94,6 +96,10 @@ Global
 		{4E49D8CA-124B-4264-8012-5BD27B64D389}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E49D8CA-124B-4264-8012-5BD27B64D389}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E49D8CA-124B-4264-8012-5BD27B64D389}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55629FE1-5D2B-49D0-AC91-EAADB5A31201}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55629FE1-5D2B-49D0-AC91-EAADB5A31201}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55629FE1-5D2B-49D0-AC91-EAADB5A31201}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55629FE1-5D2B-49D0-AC91-EAADB5A31201}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,6 +124,8 @@ Global
 		{F1F72F3D-0F74-4F1C-9C31-077744B37A8D} = {CDAD46C0-13A7-43EC-AE17-74065189DCF5}
 		{7CF34D22-05B2-4DD8-8FE3-710792B62E13} = {B6D858DE-C936-4BAD-B2BB-1382AE52403B}
 		{4E49D8CA-124B-4264-8012-5BD27B64D389} = {7CF34D22-05B2-4DD8-8FE3-710792B62E13}
+		{E9EF700C-9578-4882-8AA6-CA2AD6B88CD5} = {0E8E7527-1537-474E-8529-A2EFCD5AC7A8}
+		{55629FE1-5D2B-49D0-AC91-EAADB5A31201} = {E9EF700C-9578-4882-8AA6-CA2AD6B88CD5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2AF3D96E-2B84-4F72-846E-9F3E7BD0200B}

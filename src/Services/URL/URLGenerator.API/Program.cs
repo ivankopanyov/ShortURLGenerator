@@ -13,7 +13,7 @@ builder.Services
 
 var app = builder.Build();
 
-app.MapGrpcService<UrlService>();
+app.MapGrpcService<ShortURLGenerator.URLGenerator.API.Services.URL.UrlService>();
 
 using (var client = new UrlContext())
 {

@@ -6,11 +6,11 @@ public abstract class UpdateHandlerBase : IUpdateHandler, ICommandSetBuilder
     /// <summary>Service for sending integration events.</summary>
     protected IEventBus EventBus { get; private init; }
 
-    /// <summary>User identification service.</summary>
-    protected IIdentityService IdentityService { get; private init; }
+    /// <summary>User connection service.</summary>
+    protected IConnectionService ConnectionService { get; private init; }
 
     /// <summary>Service for generating short URLs.</summary>
-    protected IUrlService UrlService { get; private init; }
+    protected IUrlGenerator UrlGenerator { get; private init; }
 
     /// <summary>Service for sending Telegram messages to a bot.</summary>
     protected ITelegramBot TelegramBot { get; private init; }
@@ -26,21 +26,21 @@ public abstract class UpdateHandlerBase : IUpdateHandler, ICommandSetBuilder
 
     /// <summary>Update handler initialization.</summary>
     /// <param name="eventBus">Service for sending integration events.</param>
-    /// <param name="identityService">User identification service.</param>
-    /// <param name="urlService">Service for generating short URLs.</param>
+    /// <param name="connectionService">User connection service.</param>
+    /// <param name="urlGenerator">Service for generating short URLs.</param>
     /// <param name="telegramBot">Service for sending Telegram messages to a bot.</param>
     /// <param name="logger">Log service.</param>
     /// <param name="configuration">Application configuration.</param>
     public UpdateHandlerBase(IEventBus eventBus,
-        IIdentityService identityService,
-        IUrlService urlService,
+        IConnectionService connectionService,
+        IUrlGenerator urlGenerator,
         ITelegramBot telegramBot,
         ILogger<IUpdateCommand> logger,
         IConfiguration configuration)
     {
         EventBus = eventBus;
-        IdentityService = identityService;
-        UrlService = urlService;
+        ConnectionService = connectionService;
+        UrlGenerator = urlGenerator;
         TelegramBot = telegramBot;
         Logger = logger;
         Configuration = configuration;

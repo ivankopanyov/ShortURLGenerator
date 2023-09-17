@@ -1,12 +1,61 @@
 syntax = "proto3";
 
-option csharp_namespace = "Grpc.Services";
+option csharp_namespace = "ShortURLGenerator.Grpc.Services";
 
 import "response.proto";
-import "identitydto.proto";
+
+message UserId {
+    int64 value = 1;
+}
+
+message VerificationCode {
+    string id = 1;
+    string userId = 2;
+    int32 lifeTimeMinutes = 3;
+}
+
+message VerificationCodeResponse {
+    Response response = 1;
+    VerificationCode verificationCode = 2;
+}
+
+message ConnectionsRequest {
+    int64 userId = 1;
+    PageInfo pageInfo = 2;
+}
+
+message ConnectionInfo {
+    optional string os = 1;
+    optional string browser = 2;
+    optional string ip = 3;
+    optional string location = 4;
+}
+
+message Connection {
+    string id = 1;
+    int64 userId = 2;
+    int64 lastActivity = 3;
+    ConnectionInfo connectionInfo = 4;
+}
+
+message ConnectionsPage {
+    repeated Connection connections = 1;
+    PageInfo pageInfo = 2;
+}
+
+message ConnectionsPageResponse {
+    Response response = 1;
+    ConnectionsPage connectionsPage = 2;
+}
+
+message ConnectionRequest {
+    int64 userId = 1;
+    string connectionId = 2;
+}
 
 service IdentityService {
-    rpc GetVerificationCode(UserIdDto) returns (VerificationCodeResponseDto);
-    rpc GetConnections(ConnectionsRequestDto) returns (ConnectionsPageResponseDto);
-    rpc CloseConnection(ConnectionRequestDto) returns (ResponseDto);
+    rpc GetVerificationCode(UserId) returns (VerificationCodeResponse);
+    rpc GetConnections(ConnectionsRequest) returns (ConnectionsPageResponse);
+    rpc CloseConnection(ConnectionRequest) returns (Response);
 }
+

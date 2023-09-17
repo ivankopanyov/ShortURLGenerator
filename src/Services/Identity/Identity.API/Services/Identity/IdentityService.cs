@@ -43,11 +43,11 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
     /// <param name="request">User ID.</param>
     /// <param name="context">Server call context.</param>
     /// <returns>Verification code response.</returns>
-    public async override Task<VerificationCodeResponseDto> GetVerificationCode(UserIdDto request, ServerCallContext context)
+    public async override Task<VerificationCodeResponse> GetVerificationCode(UserId request, ServerCallContext context)
     {
-        _logger.LogInformation($"Get verification code: Start. User ID: {request.LogInfo()}.");
+        _logger.LogInformation($"Get verification code: Start. {request.LogInfo()}.");
 
-        var userId = request.UserId.ToString();
+        var userId = request.Value.ToString();
 
         await _verificationCodeRepository.RemoveByUserIdAsync(userId);
 
@@ -66,40 +66,36 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
             }
             catch (InvalidOperationException ex)
             {
-                _logger.LogInformation(ex, $"Get verification code: {ex.Message}. User ID: {request.LogInfo()}.");
+                _logger.LogInformation(ex, $"Get verification code: {ex.Message}. {request.LogInfo()}.");
             }
             catch (Exception ex)
             {
-                var errorResponse = new VerificationCodeResponseDto()
+                var errorResponse = new VerificationCodeResponse()
                 {
-                    Response = new ResponseDto()
+                    Response = new Response()
                     {
                         ResponseStatus = ResponseStatus.BadRequest,
                         Error = "Не удалось получить проверочный код."
                     }
                 };
 
-                _logger.LogError(ex, $"Get verification code: {ex.Message}. Verification code response: {errorResponse.LogInfo()}.");
+                _logger.LogError(ex, $"Get verification code: {ex.Message}. {errorResponse.LogInfo()}.");
 
                 return errorResponse;
             }
         }
         while (verificationCode is null);
 
-        var okResponse = new VerificationCodeResponseDto()
+        var okResponse = new VerificationCodeResponse()
         {
-            Response = new ResponseDto()
+            Response = new Response()
             {
                 ResponseStatus = ResponseStatus.Ok
             },
-            VerificationCode = new VerificationCodeDto()
-            {
-                Code = verificationCode.Id,
-                LifeTimeMinutes = verificationCode.LifeTime.Minutes
-            }
+            VerificationCode = verificationCode
         };
 
-        _logger.LogInformation($"Get verification code: Successfully. Verification code response: {okResponse.LogInfo()}.");
+        _logger.LogInformation($"Get verification code: Successfully. {okResponse.LogInfo()}.");
 
         return okResponse;
     }
@@ -108,23 +104,22 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
     /// <param name="request">Connections request.</param>
     /// <param name="context">Server call context.</param>
     /// <returns>Connections page response.</returns>
-    public async override Task<ConnectionsPageResponseDto> GetConnections(ConnectionsRequestDto request, ServerCallContext context)
+    public async override Task<ConnectionsPageResponse> GetConnections(ConnectionsRequest request, ServerCallContext context)
     {
-        _logger.LogInformation($"Get user connections: Start. Connections request: {request.LogInfo()}.");
+        _logger.LogInformation($"Get user connections: Start. {request.LogInfo()}.");
 
-        var userId = request.UserId.ToString();
+        var connectionsPage = await _connectionRepository.GetByUserIdAsync(request.UserId, request.PageInfo.Index, request.PageInfo.Count);
 
-        var connectionsPage = await _connectionRepository.GetByUserIdAsync(userId, request.PageInfo.Index, request.PageInfo.Count);
-        var response = new ConnectionsPageResponseDto()
+        var response = new ConnectionsPageResponse()
         {
-            Response = new ResponseDto()
+            Response = new Response()
             {
                 ResponseStatus = ResponseStatus.Ok
             },
             ConnectionsPage = connectionsPage
         };
 
-        _logger.LogInformation($"Get user connections: Succesfully. Connections page response: {response.LogInfo()}.");
+        _logger.LogInformation($"Get user connections: Succesfully. {response.LogInfo()}.");
 
         return response;
     }
@@ -133,34 +128,33 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
     /// <param name="request">Connection request.</param>
     /// <param name="context">Server call context.</param>
     /// <returns>Response.</returns>
-    public async override Task<ResponseDto> CloseConnection(ConnectionRequestDto request, ServerCallContext context)
+    public async override Task<Response> CloseConnection(ConnectionRequest request, ServerCallContext context)
     {
-        _logger.LogInformation($"Close connection: Start. Connection request: {request.LogInfo()}.");
+        _logger.LogInformation($"Close connection: Start. {request.LogInfo()}.");
 
-        var userId = request.UserId.ToString();
         var connectionId = request.ConnectionId;
 
-        if (await _connectionRepository.GetOrDefaultAsync(connectionId) is not { } connection || connection.UserId != userId)
+        if (await _connectionRepository.GetOrDefaultAsync(connectionId) is not { } connection || connection.UserId != request.UserId)
         {
-            var errorResponse = new ResponseDto()
+            var errorResponse = new Response()
             {
                 ResponseStatus = ResponseStatus.NotFound,
                 Error = "Подключение не найдено."
             };
 
-            _logger.LogError($"Close connection: Connection not found. Response: {errorResponse.LogInfo()}.");
+            _logger.LogError($"Close connection: Connection not found. {errorResponse.LogInfo()}.");
 
             return errorResponse;
         }
 
         await _connectionRepository.RemoveAsync(connection.Id);
 
-        var okResponse = new ResponseDto()
+        var okResponse = new Response()
         {
             ResponseStatus = ResponseStatus.Ok
         };
 
-        _logger.LogInformation($"Close connection: Successfully. Response: {okResponse.LogInfo()}.");
+        _logger.LogInformation($"Close connection: Successfully. {okResponse.LogInfo()}.");
 
         return okResponse;
     }

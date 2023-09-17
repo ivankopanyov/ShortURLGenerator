@@ -5,33 +5,33 @@ public class UpdateHandler : UpdateHandlerBase
 {
     /// <summary>Update handler initialization.</summary>
     /// <param name="eventBus">Service for sending integration events.</param>
-    /// <param name="identityService">User identification service.</param>
-    /// <param name="urlService">Service for generating short URLs.</param>
+    /// <param name="connectionService">User connection service.</param>
+    /// <param name="urlGenerator">Service for generating short URLs.</param>
     /// <param name="telegramBot">Service for sending Telegram messages to a bot.</param>
     /// <param name="logger">Log service.</param>
     /// <param name="configuration">Application configuration.</param>
     public UpdateHandler(IEventBus eventBus,
-        IIdentityService identityService,
-        IUrlService urlService,
+        IConnectionService connectionService,
+        IUrlGenerator urlGenerator,
         ITelegramBot telegramBot,
         ILogger<IUpdateCommand> logger,
-        IConfiguration configuration) : base(eventBus, identityService, urlService, telegramBot, logger, configuration) { }
+        IConfiguration configuration) : base(eventBus, connectionService, urlGenerator, telegramBot, logger, configuration) { }
 
     /// <summary>Overriding the method for adding commands to the handler.</summary>
     /// <param name="commandSetBuilder">Command set builder.</param>
     protected override void OnCommandSetConfiguring(ICommandSetBuilder commandSetBuilder) => commandSetBuilder
         .AddCommand(new StartCommand(TelegramBot, Logger))
-        .AddCommand(new GenerationUrlCommand(EventBus, UrlService, TelegramBot, Logger, Environment.GetEnvironmentVariable("FRONTEND")!))
-        .AddCommand(new VerificationCommand(IdentityService, TelegramBot, Logger))
-        .AddCommand(new FirstPageConnectionsCommand(IdentityService, TelegramBot, Logger, Configuration))
-        .AddCommand(new ChangePageConnectionsCommand(IdentityService, TelegramBot, Logger, Configuration))
-        .AddCommand(new CloseConnectionCommand(IdentityService, TelegramBot, Logger));
+        .AddCommand(new GenerationUrlCommand(EventBus, UrlGenerator, TelegramBot, Logger, Environment.GetEnvironmentVariable("FRONTEND")!))
+        .AddCommand(new VerificationCommand(ConnectionService, TelegramBot, Logger))
+        .AddCommand(new FirstPageConnectionsCommand(ConnectionService, TelegramBot, Logger, Configuration))
+        .AddCommand(new ChangePageConnectionsCommand(ConnectionService, TelegramBot, Logger, Configuration))
+        .AddCommand(new CloseConnectionCommand(ConnectionService, TelegramBot, Logger));
 
     /// <summary>Override the method to be called if no matching command is found.</summary>
     /// <param name="update">Telegram bot update.</param>
     protected override async Task NotFoundCommandHandleAsync(Update update)
     {
-        Logger.LogInformation($"Handle update not found command: Start. Update: {update?.LogInfo()}");
+        Logger.LogInformation($"Handle update not found command: Start. {update?.LogInfo()}");
 
         if (update is null)
         {
@@ -43,10 +43,10 @@ public class UpdateHandler : UpdateHandlerBase
         {
             long chatId = message.Chat.Id;
             await TelegramBot.SendErrorMessageAsync(chatId, "Ссылка некорректна.");
-            Logger.LogInformation($"Handle update not found command: Successfully. Update: {update.LogInfo()}");
+            Logger.LogInformation($"Handle update not found command: Successfully. {update.LogInfo()}");
         }
         else
-            Logger.LogError($"Handle update not found command: Invalid update type. Update: {update.LogInfo()}");
+            Logger.LogError($"Handle update not found command: Invalid update type. {update.LogInfo()}");
     }
 }
 

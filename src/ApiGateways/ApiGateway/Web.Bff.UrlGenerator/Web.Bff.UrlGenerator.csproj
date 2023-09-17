@@ -15,34 +15,13 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.9" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.24.2" />
-    <PackageReference Include="Grpc.Net.Client" Version="2.56.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.57.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\BuildingBlocks\EventBus\EventBus\EventBus.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include="..\..\..\Protos\V1\response.proto" GrpcServices="None">
-      <Link>Protos\V1\response.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\..\..\Protos\V1\urldto.proto" GrpcServices="None" ProtoRoot="..\..\..\Protos\V1">
-      <Link>Protos\V1\urldto.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\..\..\Protos\V1\urlservice.proto" GrpcServices="Client" ProtoRoot="..\..\..\Protos\V1">
-      <Link>Protos\V1\urlservice.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\..\..\Protos\V1\identitydto.proto" GrpcServices="None" ProtoRoot="..\..\..\Protos\V1">
-      <Link>Protos\V1\identitydto.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\..\..\Protos\V1\identityservice.proto" GrpcServices="Client" ProtoRoot="..\..\..\Protos\V1">
-      <Link>Protos\V1\identityservice.proto</Link>
-    </Protobuf>
+    <ProjectReference Include="..\..\..\BuildingBlocks\GrpcHelper\GrpcHelper\GrpcHelper.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>

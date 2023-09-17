@@ -6,8 +6,8 @@ public abstract class ConnectionsCommandBase : IUpdateCommand
     /// <summary>The number of connections on the page by default.</summary>
     private const int DEFAULT_PAGE_SIZE = 1;
 
-    /// <summary>User identification service.</summary>
-    private readonly IIdentityService _identityService;
+    /// <summary>User connection service.</summary>
+    private readonly IConnectionService _connectionService;
 
     /// <summary>Service for sending Telegram messages to a bot.</summary>
     private readonly ITelegramBot _telegramBot;
@@ -22,16 +22,16 @@ public abstract class ConnectionsCommandBase : IUpdateCommand
     protected abstract string CommandName { get; }
 
     /// <summary>Command object initialization.</summary>
-    /// <param name="identityService">User identification service.</param>
+    /// <param name="connectionService">User connection service.</param>
     /// <param name="telegramBot">Service for sending Telegram messages to a bot.</param>
     /// <param name="logger">Log service.</param>
     /// <param name="configuration">Application configuration.</param>
-    public ConnectionsCommandBase(IIdentityService identityService,
+    public ConnectionsCommandBase(IConnectionService connectionService,
         ITelegramBot telegramBot,
         ILogger<IUpdateCommand> logger,
         IConfiguration configuration)
     {
-        _identityService = identityService;
+        _connectionService = connectionService;
         _telegramBot = telegramBot;
         _logger = logger;
 
@@ -48,18 +48,18 @@ public abstract class ConnectionsCommandBase : IUpdateCommand
         if (!IsValid(update, out long chatId, out int index))
             return false;
 
-        _logger.LogInformation($"Execute {CommandName} command: Start. Update: {update.LogInfo()}");
+        _logger.LogInformation($"Execute {CommandName} command: Start. {update.LogInfo()}");
 
         try
         {
-            var connectionsPage = await _identityService.GetConnectionsAsync(chatId, index, _pageSize);
+            var connectionsPage = await _connectionService.GetConnectionsAsync(chatId, index, _pageSize);
             await _telegramBot.SendConnectionsAsync(chatId, connectionsPage);
-            _logger.LogInformation($"Execute {CommandName} command: Successfully. Update: {update.LogInfo()}");
+            _logger.LogInformation($"Execute {CommandName} command: Successfully. {update.LogInfo()}");
         }
         catch (InvalidOperationException ex)
         {
             await _telegramBot.SendErrorMessageAsync(chatId, ex.Message);
-            _logger.LogError(ex, $"Execute {CommandName} command: {ex.Message}. Update: {update.LogInfo()}");
+            _logger.LogError(ex, $"Execute {CommandName} command: {ex.Message}. {update.LogInfo()}");
         }
 
         return true;

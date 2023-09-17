@@ -50,24 +50,24 @@ public class ConnectionRepository : IConnectionRepository
     /// Connection with the passed identifier.
     /// If the connection is not found, null will be returned.
     /// </returns>
-    public async Task<Models.Connection?> GetOrDefaultAsync(string id)
+    public async Task<Grpc.Services.Connection?> GetOrDefaultAsync(string id)
     {
         _logger.LogInformation($"Get connection by ID: Start. Connection ID: {id}.");
 
         if (await _distributedCache.GetStringAsync(id) is not { } connectionData)
         {
-            _logger.LogWarning($"Get connection by ID: Connection not found. Connection ID: {id}.");
+            _logger.LogError($"Get connection by ID: Connection not found. Connection ID: {id}.");
             return null;
         }
 
-        if (JsonSerializer.Deserialize<Models.Connection>(connectionData) is { } connection)
+        if (JsonSerializer.Deserialize<Grpc.Services.Connection>(connectionData) is { } connection)
         {
-            _logger.LogInformation($"Get connection by ID: Succesfully. Connection: {connection.LogInfo()}.");
+            _logger.LogInformation($"Get connection by ID: Succesfully. Connection: {connection}.");
             return connection;
         }
         else
         {
-            _logger.LogWarning($"Get connection by ID: Connection not serialized. Connection ID: {id}.");
+            _logger.LogError($"Get connection by ID: Connection not serialized. Connection ID: {id}.");
             await RemoveAsync(id);
             return null;
         }
@@ -78,13 +78,13 @@ public class ConnectionRepository : IConnectionRepository
     /// <param name="index">Index of the page with connections.</param>
     /// <param name="size">Number of connections on the page.</param>
     /// <returns>Connections page.</returns>
-    public async Task<ConnectionsPageDto> GetByUserIdAsync(string userId, int index, int size)
+    public async Task<ConnectionsPage> GetByUserIdAsync(long userId, int index, int size)
     {
         _logger.LogInformation($"Get connection by user ID: Start. User ID: {userId}, Index: {index}, Size: {size}");
 
-        var response = new ConnectionsPageDto()
+        var response = new ConnectionsPage()
         {
-            PageInfo = new PageInfoDto()
+            PageInfo = new PageInfo()
             {
                 Index = index,
                 Count = 0
@@ -128,10 +128,10 @@ public class ConnectionRepository : IConnectionRepository
                     continue;
                 }
 
-                response.Connections.Add(new ConnectionDto()
+                response.Connections.Add(new Grpc.Services.Connection()
                 {
-                    ConnectionId = connectionId,
-                    ActiveSecondsAgo = (DateTime.Now - connection.Created).Seconds,
+                    Id = connectionId,
+                    LastActivity = connection.LastActivity,
                     ConnectionInfo = connection.ConnectionInfo
                 });
             }
@@ -141,7 +141,7 @@ public class ConnectionRepository : IConnectionRepository
 
         response.PageInfo.Count = (int)Math.Ceiling((double)userConnections.Count / size);
 
-        _logger.LogInformation($"Get connection by user ID: Succesfully. Connections page: {response.LogInfo()}.");
+        _logger.LogInformation($"Get connection by user ID: Succesfully. {response.LogInfo()}.");
 
         return response;
     }
@@ -152,37 +152,31 @@ public class ConnectionRepository : IConnectionRepository
     /// <exception cref="ArgumentNullException">Exception is thrown if the connection is null.</exception>
     /// <exception cref="ArgumentException">Exception is thrown if the connection ID or user ID is null or whitespace.</exception>
     /// <exception cref="InvalidOperationException">Exception is thrown if the connection ID is already exists.</exception>
-    public async Task<Models.Connection> CreateAsync(Models.Connection item)
+    public async Task<Grpc.Services.Connection> CreateAsync(Grpc.Services.Connection item)
     {
-        _logger.LogInformation($"Create connection: Start. Connection: {item?.LogInfo()}.");
-
         if (item is null)
         {
             _logger.LogError($"Create connection: Connection is null.");
             throw new ArgumentNullException(nameof(item));
         }
 
+        _logger.LogInformation($"Create connection: Start. {item.LogInfo()}.");
+
         if (string.IsNullOrWhiteSpace(item.Id))
         {
-            _logger.LogError($"Create connection: Connection ID is null or whitespace. Connection: {item.LogInfo()}.");
+            _logger.LogError($"Create connection: Connection ID is null or whitespace. {item.LogInfo()}.");
             throw new ArgumentException("Connection ID is null or whitespace.", nameof(item));
-        }
-
-        if (string.IsNullOrWhiteSpace(item.UserId))
-        {
-            _logger.LogError($"Create connection: User ID is null or whitespace. Connection: {item.LogInfo()}.");
-            throw new ArgumentException("User ID is null or whitespace.", nameof(item));
         }
 
         if (await ContainsAsync(item.Id))
         {
-            _logger.LogError($"Create connection: Connection ID is already exists. Connection: {item.LogInfo()}.");
+            _logger.LogError($"Create connection: Connection ID is already exists. {item.LogInfo()}.");
             throw new InvalidOperationException("Connection ID is already exists.");
         }
 
-        item.Created = DateTime.UtcNow;
+        item.LastActivity = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         if (item.ConnectionInfo is null)
-            item.ConnectionInfo = new ConnectionInfoDto();
+            item.ConnectionInfo = new Grpc.Services.ConnectionInfo();
 
         var prefixedUserId = $"{PREFIX}{item.UserId}";
 
@@ -198,7 +192,7 @@ public class ConnectionRepository : IConnectionRepository
             AbsoluteExpirationRelativeToNow = _connectionLifeTime
         });
 
-        _logger.LogInformation($"Create connection: Succesfully. Connection: {item.LogInfo()}.");
+        _logger.LogInformation($"Create connection: Succesfully. {item.LogInfo()}.");
 
         return item;
     }
@@ -207,13 +201,13 @@ public class ConnectionRepository : IConnectionRepository
     /// <param name="id">Connection ID.</param>
     public async Task RemoveAsync(string id)
     {
-        _logger.LogInformation($"Remove connection: Start. Connection ID: {id}.");
-
         if (string.IsNullOrWhiteSpace(id))
         {
-            _logger.LogError($"Remove connection: Connection ID is null or whitespace. Connection ID: {id}");
+            _logger.LogError($"Remove connection: Connection ID is null or whitespace.");
             return;
         }
+
+        _logger.LogInformation($"Remove connection: Start. Connection ID: {id}.");
 
         if (await _distributedCache.GetAsync(id) is not { } connectionData)
         {
@@ -221,7 +215,7 @@ public class ConnectionRepository : IConnectionRepository
             return;
         }
 
-        if (JsonSerializer.Deserialize<Models.Connection>(connectionData) is not { } connection)
+        if (JsonSerializer.Deserialize<Grpc.Services.Connection>(connectionData) is not { } connection)
         {
             _logger.LogError($"Remove connection: Connection not deserialized. Connection ID: {id}.");
             await _distributedCache.RemoveAsync(id);
@@ -233,7 +227,7 @@ public class ConnectionRepository : IConnectionRepository
 
         if (await _distributedCache.GetStringAsync(prefixedUserId) is not { } connectionsData)
         {
-            _logger.LogWarning($"Remove connection: User connections not found. UserID: {userId}.");
+            _logger.LogError($"Remove connection: User connections not found. UserID: {userId}.");
         }
         else if (JsonSerializer.Deserialize<ISet<string>>(connectionsData) is not { } connections)
         {
@@ -248,7 +242,7 @@ public class ConnectionRepository : IConnectionRepository
 
         await _distributedCache.RemoveAsync(id);
 
-        _logger.LogInformation($"Remove connection: Succesfully. Connection: {connection.LogInfo()}.");
+        _logger.LogInformation($"Remove connection: Succesfully. {connection.LogInfo()}.");
     }
 
     /// <summary>Method for checking whether a repository is connected.</summary>
@@ -278,13 +272,13 @@ public class ConnectionRepository : IConnectionRepository
     /// <summary>Method for deserializing a string with connection information into a connection object.</summary>
     /// <param name="connectionStringData">Connection string data.</param>
     /// <returns>Deserialized connection object.</returns>
-    private Models.Connection? ConnectionStringDataToConnection(string connectionStringData)
+    private Grpc.Services.Connection? ConnectionStringDataToConnection(string connectionStringData)
     {
         _logger.LogInformation($"Connection string data to connection: Start.");
 
-        if (JsonSerializer.Deserialize<Models.Connection>(connectionStringData) is { } connection)
+        if (JsonSerializer.Deserialize<Grpc.Services.Connection>(connectionStringData) is { } connection)
         {
-            _logger.LogInformation($"Connection string data to connection: Succesfully. Connection: {connection.LogInfo()}.");
+            _logger.LogInformation($"Connection string data to connection: Succesfully. {connection.LogInfo()}.");
             return connection;
         }
         else

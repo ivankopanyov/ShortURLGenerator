@@ -5,7 +5,7 @@ public interface IUrlRepository
 {
     /// <summary>Method for adding a new URL to the repository.</summary>
     /// <param name="item">URL address.</param>
-	Task CreateAsync(Url item);
+	Task CreateAsync(Models.Url item);
 
     /// <summary>Method for requesting source URI from a repository.</summary>
     /// <param name="id">URL identifier.</param>

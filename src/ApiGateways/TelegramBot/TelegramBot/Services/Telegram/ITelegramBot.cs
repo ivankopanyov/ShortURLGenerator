@@ -31,7 +31,7 @@ public interface ITelegramBot : ITelegramBotClient
     /// <summary>Method for sending a list of active connections to a chat.</summary>
     /// <param name="chatId">Chat ID.</param>
     /// <param name="connectionsPage">Page with a list of active connections.</param>
-    Task SendConnectionsAsync(long chatId, ConnectionsPageDto connectionsPage);
+    Task SendConnectionsAsync(long chatId, ConnectionsPage connectionsPage);
 
     /// <summary>The method for sending a message to close the connection to a chat.</summary>
     /// <param name="chatId">Chat ID.</param>

@@ -12,8 +12,8 @@ builder.Services
 
 builder.Services
     .AddScoped<IUpdateHandler, UpdateHandler>()
-    .AddScoped<IIdentityService, IdentityService>()
-    .AddScoped<IUrlService, UrlService>();
+    .AddScoped<IConnectionService, ShortURLGenerator.GrpcHelper.Services.Identity.IdentityService>()
+    .AddScoped<IUrlGenerator, ShortURLGenerator.GrpcHelper.Services.URL.UrlService>();
 
 builder.Services
     .AddHostedService<UriGeneratedIntegrationEventHandler>()

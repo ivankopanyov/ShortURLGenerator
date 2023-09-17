@@ -24,7 +24,7 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         string message = $"{head}тправьте сообщение со ссылкой для генерирования короткого адреса.";
         var sentMessage = await this.SendTextMessageAsync(chatId: chatId, text: message);
 
-        _logger.LogInformation($"Send hello message: Successfully. Message: {sentMessage.LogInfo()}");
+        _logger.LogInformation($"Send hello message: Successfully. {sentMessage.LogInfo()}");
     }
 
     /// <summary>Method for sending the generated link to the chat.</summary>
@@ -41,7 +41,7 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
 
         var message = await this.SendTextMessageAsync(chatId: chatId, text: uri);
 
-        _logger.LogInformation($"Send URI message: Successfully. Message: {message.LogInfo()}");
+        _logger.LogInformation($"Send URI message: Successfully. {message.LogInfo()}");
 
         return message.MessageId;
     }
@@ -57,7 +57,7 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
 
         var message = await this.SendTextMessageAsync(chatId: chatId, text: uri, replyToMessageId: sourceMessageId);
 
-        _logger.LogInformation($"Send URI message: Successfully. Message: {message.LogInfo()}.");
+        _logger.LogInformation($"Send URI message: Successfully. {message.LogInfo()}.");
 
         return message.MessageId;
     }
@@ -76,15 +76,15 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
             "после авторизации или после создания нового кода.";
         var sentMessage = await this.SendTextMessageAsync(chatId: chatId, text: message);
 
-        _logger.LogInformation($"Send verification code message. Message: {sentMessage.LogInfo()}");
+        _logger.LogInformation($"Send verification code message. {sentMessage.LogInfo()}");
     }
 
     /// <summary>Method for sending a list of active connections to a chat.</summary>
     /// <param name="chatId">Chat ID.</param>
     /// <param name="connectionsPage">Page with a list of active connections.</param>
-    public async Task SendConnectionsAsync(long chatId, ConnectionsPageDto connectionsPage)
+    public async Task SendConnectionsAsync(long chatId, ConnectionsPage connectionsPage)
     {
-        _logger.LogInformation($"Send connections message: Start. Chat ID: {chatId}, Connections page: {connectionsPage?.LogInfo()}.");
+        _logger.LogInformation($"Send connections message: Start. Chat ID: {chatId}, {connectionsPage.LogInfo()}.");
 
         if (connectionsPage is null)
         {
@@ -96,7 +96,7 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         if (connectionsPage.PageInfo.Count == 0)
         {
             var sentMessage = await this.SendTextMessageAsync(chatId: chatId, text: "У Вас нет активных подключений.");
-            _logger.LogInformation($"Send connections message: Successfully. Message: {sentMessage.LogInfo()}");
+            _logger.LogInformation($"Send connections message: Successfully. {sentMessage.LogInfo()}");
             return;
         }
 
@@ -123,7 +123,7 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
                     "Подключение завершено.",
                     replyMarkup: new InlineKeyboardMarkup(new InlineKeyboardButton[0]));
 
-            _logger.LogInformation($"Send close connection message: Start. Message: {message.LogInfo()}.");
+            _logger.LogInformation($"Send close connection message: Start. {message.LogInfo()}.");
         }
         catch (ApiRequestException ex)
         {
@@ -150,7 +150,7 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         using var stream = new MemoryStream(data);
         var message = await this.SendPhotoAsync(chatId, InputFile.FromStream(stream), replyToMessageId: messageId);
 
-        _logger.LogInformation($"Send QR code message: Successfully. Message: {message.LogInfo()}.");
+        _logger.LogInformation($"Send QR code message: Successfully. {message.LogInfo()}.");
     }
 
     /// <summary>Method for sending an error message to the chat.</summary>
@@ -163,27 +163,26 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         string message = $"Ошибка: {errorMessage ?? "Неизвестная ошибка."} Попробуйте снова.";
         var sentMessage = await this.SendTextMessageAsync(chatId: chatId, text: message);
 
-        _logger.LogInformation($"Send error message: Succesfully. Message: {sentMessage.LogInfo()}");
+        _logger.LogInformation($"Send error message: Succesfully. {sentMessage.LogInfo()}");
     }
 
     /// <summary>Method for sending information about an active connection.</summary>
     /// <param name="chatId">Chat ID.</param>
     /// <param name="connection">Connection.</param>
-    private async Task SendConnectionAsync(long chatId, ConnectionDto connection)
+    private async Task SendConnectionAsync(long chatId, Connection connection)
     {
-        _logger.LogInformation($"Send connections message: Start. Chat ID: {chatId}, Connection: {connection.LogInfo()}.");
+        _logger.LogInformation($"Send connections message: Start. Chat ID: {chatId}, {connection.LogInfo()}.");
 
-        var lastActive = DateTime.UtcNow - TimeSpan.FromSeconds(connection.ActiveSecondsAgo);
-        var message = $"Последняя активность: {lastActive.ToString("dd.MM.yyyy HH:mm:ss")}\n"
+        var message = $"Последняя активность: {DateTimeOffset.FromUnixTimeSeconds(connection.LastActivity).ToString("dd.MM.yyyy HH:mm:ss")}\n"
             + $"ОС: {connection.ConnectionInfo.Os ?? "Неизвестно"}\n"
             + $"Браузер: {connection.ConnectionInfo.Browser ?? "Неизвестно"}\n"
             + $"Локация: {connection.ConnectionInfo.Location ?? "Неизвестно"}\n"
             + $"IP: {connection.ConnectionInfo.Ip ?? "Неизвестно"}";
 
-        var key = new InlineKeyboardMarkup(InlineKeyboardButton.WithCallbackData(text: "Завершить", callbackData: $"close_{connection.ConnectionId}"));
+        var key = new InlineKeyboardMarkup(InlineKeyboardButton.WithCallbackData(text: "Завершить", callbackData: $"close_{connection.Id}"));
         var sentMessage = await this.SendTextMessageAsync(chatId: chatId, text: message, replyMarkup: key);
 
-        _logger.LogInformation($"Send connections message: Successfully. Message: {sentMessage.LogInfo()}");
+        _logger.LogInformation($"Send connections message: Successfully. {sentMessage.LogInfo()}");
     }
 
     /// <summary>The method to send a page switcher with active connections.</summary>
@@ -207,7 +206,7 @@ public class TelegramBot : TelegramBotClient, ITelegramBot
         string message = $"Страница {index + 1} из {count}";
         var sentMessage = await this.SendTextMessageAsync(chatId: chatId, text: message, replyMarkup: keyboard);
 
-        _logger.LogInformation($"Send switch page message: Successfully. Message: {sentMessage.LogInfo()}.");
+        _logger.LogInformation($"Send switch page message: Successfully. {sentMessage.LogInfo()}.");
     }
 }
 

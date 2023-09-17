@@ -5,15 +5,12 @@ global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.IdentityModel.Tokens;
 global using Microsoft.OpenApi.Models;
-global using Grpc.Core;
-global using Grpc.Dto;
-global using Grpc.Net.Client;
 global using RabbitMQ.Client;
+global using ShortURLGenerator.GrpcHelper.Abstraction;
+global using ShortURLGenerator.GrpcHelper.Services.URL;
 global using ShortURLGenerator.EventBus;
 global using ShortURLGenerator.EventBus.Abstraction;
 global using ShortURLGenerator.EventBus.Events;
-global using ShortURLGenerator.Web.Bff.UrlGenerator.Extensions;
 global using ShortURLGenerator.Web.Bff.UrlGenerator.Dto;
-global using ShortURLGenerator.Web.Bff.UrlGenerator.Services.URL;
 global using ShortURLGenerator.Web.Bff.UrlGenerator.Services.EventBus;
 

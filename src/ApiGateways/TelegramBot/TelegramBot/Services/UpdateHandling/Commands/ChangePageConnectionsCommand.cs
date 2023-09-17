@@ -14,14 +14,14 @@ public class ChangePageConnectionsCommand : ConnectionsCommandBase
     protected override sealed string CommandName => "change page connections";
 
     /// <summary>Command object initialization.</summary>
-    /// <param name="identityService">User identification service.</param>
+    /// <param name="connectionService">User connection service.</param>
     /// <param name="telegramBot">Service for sending Telegram messages to a bot.</param>
     /// <param name="logger">Log service.</param>
     /// <param name="configuration">Application configuration.</param>
-    public ChangePageConnectionsCommand(IIdentityService identityService,
+    public ChangePageConnectionsCommand(IConnectionService connectionService,
         ITelegramBot telegramBot,
         ILogger<IUpdateCommand> logger,
-        IConfiguration configuration) : base(identityService, telegramBot, logger, configuration) { }
+        IConfiguration configuration) : base(connectionService, telegramBot, logger, configuration) { }
 
     /// <summary>Method override for checking the validity of an update.</summary>
     /// <param name="update">Telegram bot ID.</param>

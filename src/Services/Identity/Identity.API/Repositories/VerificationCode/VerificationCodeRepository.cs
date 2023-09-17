@@ -50,10 +50,8 @@ public class VerificationCodeRepository : IVerificationCodeRepository
     /// <exception cref="ArgumentNullException">Exception is thrown if the verification code is null.</exception>
     /// <exception cref="ArgumentException">Exception is thrown if the verification code ID or user ID is null or whitespace.</exception>
     /// <exception cref="InvalidOperationException">Exception is thrown if the verification code ID is already exists.</exception>
-    public async Task<Models.VerificationCode> CreateAsync(Models.VerificationCode item)
+    public async Task<Grpc.Services.VerificationCode> CreateAsync(Grpc.Services.VerificationCode item)
     {
-        _logger.LogInformation($"Create verification code: Start. Verification code: {item?.LogInfo()}.");
-
         if (item is null)
         {
             _logger.LogError($"Create verification code: Verification code is null.");
@@ -62,23 +60,25 @@ public class VerificationCodeRepository : IVerificationCodeRepository
 
         if (string.IsNullOrWhiteSpace(item.Id))
         {
-            _logger.LogError($"Create verification code: Verification code ID is null or whitespace. Verification code: {item.LogInfo()}.");
+            _logger.LogError($"Create verification code: Verification code ID is null or whitespace. {item.LogInfo()}.");
             throw new ArgumentException("Verification code ID is null or whitespace.", nameof(item));
         }
 
         if (string.IsNullOrWhiteSpace(item.UserId))
         {
-            _logger.LogError($"Create verification code: User ID is null or whitespace. Verification code: {item.LogInfo()}.");
+            _logger.LogError($"Create verification code: User ID is null or whitespace. {item.LogInfo()}.");
             throw new ArgumentException("User ID is null or whitespace.", nameof(item));
         }
 
         if (await ContainsAsync(item.Id))
         {
-            _logger.LogError($"Create verification code: Verification code ID is already exists. Verification code: {item.LogInfo()}.");
+            _logger.LogError($"Create verification code: Verification code ID is already exists. {item.LogInfo()}.");
             throw new InvalidOperationException("Verification code ID is already exists.");
         }
 
-        item.LifeTime = _verificationCodeLifeTime;
+        _logger.LogInformation($"Create verification code: Start. {item.LogInfo()}.");
+
+        item.LifeTimeMinutes = _verificationCodeLifeTime.Minutes;
 
         var options = new DistributedCacheEntryOptions
         {
@@ -88,7 +88,7 @@ public class VerificationCodeRepository : IVerificationCodeRepository
         await _distributedCache.SetStringAsync(item.Id, item.UserId, options);
         await _distributedCache.SetStringAsync($"{PREFIX}{item.UserId}", item.Id, options);
 
-        _logger.LogInformation($"Create verification code: Succesfully. Verification code: {item.LogInfo()}.");
+        _logger.LogInformation($"Create verification code: Succesfully. {item.LogInfo()}.");
 
         return item;
     }
@@ -103,7 +103,7 @@ public class VerificationCodeRepository : IVerificationCodeRepository
 
         if (await _distributedCache.GetStringAsync(prefixedUserId) is not { } verificationCode)
         {
-            _logger.LogInformation($"Remove verification code by user ID: Verification code not found. User ID: {userId}.");
+            _logger.LogError($"Remove verification code by user ID: Verification code not found. User ID: {userId}.");
             return;
         }
 

@@ -1,10 +1,29 @@
 syntax = "proto3";
 
-option csharp_namespace = "Grpc.Services";
+option csharp_namespace = "ShortURLGenerator.Grpc.Services";
 
-import "urldto.proto";
+import "response.proto";
+
+message SourceUri {
+    string value = 1;
+}
+
+message UrlResponse {
+    Response response = 1;
+    optional string url = 2;
+}
+
+message Url {
+    string value = 1;
+}
+
+message UriResponse {
+    Response response = 1;
+    optional string uri = 2;
+}
 
 service UrlService {
-    rpc Generate (SourceUriDto) returns (UrlResponseDto);
-    rpc Get (UrlDto) returns (UriResponseDto);
+    rpc Generate (SourceUri) returns (UrlResponse);
+    rpc Get (Url) returns (UriResponse);
 }
+

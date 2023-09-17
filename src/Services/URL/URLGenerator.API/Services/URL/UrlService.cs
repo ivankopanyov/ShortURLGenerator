@@ -31,11 +31,11 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase
     /// <param name="request">The request object for generating a short URL.</param>
     /// <param name="context">Server call context.</param>
     /// <returns>Response object containing the response status and data.</returns>
-    public override async Task<UrlResponseDto> Generate(SourceUriDto request, ServerCallContext context)
+    public override async Task<UrlResponse> Generate(SourceUri request, ServerCallContext context)
     {
-        _logger.LogInformation($"Generate URL: Start. Source URI: {request.LogInfo()}.");
+        _logger.LogInformation($"Generate URL: Start. {request.LogInfo()}.");
 
-        UrlResponseDto? response = null;
+        UrlResponse? response = null;
 
         while (response is null)
         {
@@ -43,39 +43,39 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase
 
             try
             {
-                await _repository.CreateAsync(new Url()
+                await _repository.CreateAsync(new Models.Url()
                 {
                     Id = url,
                     SourceUri = request.Value
                 });
 
-                response = new UrlResponseDto()
+                response = new UrlResponse()
                 {
-                    Response = new ResponseDto()
+                    Response = new Response()
                     {
                         ResponseStatus = ResponseStatus.Ok
                     },
                     Url = url
                 };
 
-                _logger.LogInformation($"Generate URL: Succesfully. URL response: {response.LogInfo()}.");
+                _logger.LogInformation($"Generate URL: Succesfully. {response.LogInfo()}.");
             }
             catch (DuplicateWaitObjectException ex)
             {
-                _logger.LogWarning(ex, $"Generate URL: {ex.Message}. Source URI: {request.LogInfo()}");
+                _logger.LogWarning(ex, $"Generate URL: {ex.Message}. {request.LogInfo()}");
             }
             catch (Exception ex)
             {
-                response = new UrlResponseDto()
+                response = new UrlResponse()
                 {
-                    Response = new ResponseDto()
+                    Response = new Response()
                     {
                         ResponseStatus = ResponseStatus.BadRequest,
                         Error = "Не удалось сгенерировать URL."
                     }
                 };
 
-                _logger.LogError(ex, $"Generate URL: {ex.Message}. URL response: {response.LogInfo()}.");
+                _logger.LogError(ex, $"Generate URL: {ex.Message}. {response.LogInfo()}.");
             }
         }
 
@@ -86,37 +86,37 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase
     /// <param name="request">Source URI request object.</param>
     /// <param name="context">Server call context.</param>
     /// <returns>Response object containing the response status and data.</returns>
-    public override async Task<UriResponseDto> Get(UrlDto request, ServerCallContext context)
+    public override async Task<UriResponse> Get(Grpc.Services.Url request, ServerCallContext context)
     {
-        _logger.LogInformation($"Get URI: Start. URL: {request.LogInfo()}.");
+        _logger.LogInformation($"Get URI: Start. {request.LogInfo()}.");
 
         if (await _repository.GetAsync(request.Value) is not { } uri)
         {
-            var response = new UriResponseDto()
+            var response = new UriResponse()
             {
-                Response = new ResponseDto()
+                Response = new Response()
                 {
                     ResponseStatus = ResponseStatus.NotFound,
                     Error = "Страница не найдена."
                 }
             };
 
-            _logger.LogInformation($"Get URI: URL not found. URI response: {response.LogInfo()}.");
+            _logger.LogInformation($"Get URI: URL not found. {response.LogInfo()}.");
 
             return response;
         }
         else
         {
-            var response = new UriResponseDto()
+            var response = new UriResponse()
             {
-                Response = new ResponseDto()
+                Response = new Response()
                 {
                     ResponseStatus = ResponseStatus.Ok
                 },
                 Uri = uri
             };
 
-            _logger.LogInformation($"Get URI: Succesfully. URI response: {response.LogInfo()}.");
+            _logger.LogInformation($"Get URI: Succesfully. {response.LogInfo()}.");
 
             return response;
         }

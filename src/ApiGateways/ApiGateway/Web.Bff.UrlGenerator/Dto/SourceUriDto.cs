@@ -4,5 +4,5 @@ public class SourceUriDto
 {
     public string SourceUri { get; set; }
 
-    public override string ToString() => $"Source URI: {SourceUri}";
+    public override string ToString() => "Source URI DTO: { Source URI: " + SourceUri + " }";
 }

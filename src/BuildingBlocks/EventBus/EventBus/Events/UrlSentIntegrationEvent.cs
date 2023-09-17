@@ -25,5 +25,7 @@ public sealed class UriSentIntegrationEvent : IntegrationEventBase
 
     /// <summary>Overriding the method of casting an object to a string type.</summary>
     /// <returns>Object cast to a string type.</returns>
-    public override string ToString() => $"{base.ToString()}, Chat ID: {ChatId}, Message ID: {MessageId}, URI: {Uri}";
+    public override string ToString() => "QR code created integration event: { " +
+        base.ToString() + ", Chat ID: " + ChatId + ", Message ID: " + MessageId +
+        ", URI" + Uri + " }";
 }

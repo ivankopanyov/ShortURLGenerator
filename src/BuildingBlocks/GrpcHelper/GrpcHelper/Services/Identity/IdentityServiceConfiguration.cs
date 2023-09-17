@@ -1,4 +1,4 @@
-﻿namespace ShortURLGenerator.TelegramBot.Services.Identity;
+﻿namespace ShortURLGenerator.GrpcHelper.Services.Identity;
 
 /// <summary>Сlass that describes the configuration of the Telegram user identification service.</summary>
 public class IdentityServiceConfiguration

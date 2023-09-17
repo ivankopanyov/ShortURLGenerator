@@ -52,7 +52,7 @@ public class UrlRepository : IUrlRepository
     /// <exception cref="ArgumentException">Exception is thrown if the url ID or source URI is null or whitespace.</exception>
     /// <exception cref="DuplicateWaitObjectException">Exception is thrown if the url ID is already exists.</exception>
     /// <exception cref="InvalidOperationException">Exception is thrown if the URL could not be stored in the database.</exception>
-	public async Task CreateAsync(Url item)
+	public async Task CreateAsync(Models.Url item)
     {
         _logger.LogInformation($"Create URL: Start. URL: {item}.");
 
