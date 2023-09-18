@@ -40,7 +40,7 @@ public static class LogInfoExtensions
     /// <param name="update">Object of the Update class.</param>
     /// <returns>Information about an object of the Update class.</returns>
     public static string LogInfo(this Update update) =>
-        "Update { ID: " + update.Id +
+        "Update: { ID: " + update.Id +
         ", " + update.CallbackQuery?.LogInfo() +
         ", " + update.Message?.LogInfo() + " }";
 }

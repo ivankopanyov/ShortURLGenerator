@@ -25,16 +25,16 @@ public class BotController : ControllerBase
     [HttpPost]
     public async void HandleUpdateAsync(Update update)
     {
-        _logger.LogInformation($"Find command: Start. Update: {update.LogInfo()}.");
+        _logger.LogInformation($"Find command: Start. {update.LogInfo()}.");
 
         try
         {
             await _updateHandler.HandleAsync(update);
-            _logger.LogInformation($"Find command: Successfully. Update: {update.LogInfo()}.");
+            _logger.LogInformation($"Find command: Successfully. {update.LogInfo()}.");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Find command: {ex.Message}. Update: {update.LogInfo()}.");
+            _logger.LogError(ex, $"Find command: {ex.Message}. {update.LogInfo()}.");
         }
     }
 }
