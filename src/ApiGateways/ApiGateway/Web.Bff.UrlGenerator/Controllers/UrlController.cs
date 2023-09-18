@@ -1,15 +1,23 @@
 ﻿namespace ShortURLGenerator.Web.Bff.UrlGenerator.Controllers;
 
+/// <summary>Сlass that describes a URL controller.</summary>
 [ApiController]
 [Route("url")]
 public class UrlController : ControllerBase
 {
+    /// <summary>URL service.</summary>
     private readonly IUrlService _urlService;
 
+    /// <summary>The sender of integration events.</summary>
     private readonly IEventBus _eventBus;
 
+    /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
+    /// <summary>Initializing the controller object.</summary>
+    /// <param name="urlService">URL service.</param>
+    /// <param name="eventBus">The sender of integration events.</param>
+    /// <param name="logger">Log service.</param>
     public UrlController(IUrlService urlService, IEventBus eventBus, ILogger<UrlController> logger)
     {
         _urlService = urlService;
@@ -17,6 +25,9 @@ public class UrlController : ControllerBase
         _logger = logger;
     }
 
+    /// <summary>Endpoint for creating a short URL.</summary>
+    /// <param name="createUrl">The request object to create the short URL.</param>
+    /// <returns>The result of creating a short URL.</returns>
     [HttpPost("create")]
     [ProducesResponseType(typeof(CreateUrlResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -50,6 +61,9 @@ public class UrlController : ControllerBase
         }
     }
 
+    /// <summary>Endpoint for creating a short URL and sending it to a telegram bot.</summary>
+    /// <param name="createUrl">The request object to create the short URL.</param>
+    /// <returns>The result of creating a short URL.</returns>
     [HttpPost("createAndSend")]
     [ProducesResponseType(typeof(CreateUrlResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -86,7 +100,10 @@ public class UrlController : ControllerBase
         }
     }
 
-    [HttpPost("get/{url}")]
+    /// <summary>Endpoint to get the original URI from a short generated URL.</summary>
+    /// <param name="url">Generated URL.</param>
+    /// <returns>Result of the request.</returns>
+    [HttpGet("get/{url}")]
     [ProducesResponseType(typeof(SourceUriDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -119,6 +136,9 @@ public class UrlController : ControllerBase
         }
     }
 
+    /// <summary>Method for sending a short generated URL to a Telegram bot. </summary>
+    /// <param name="url">Generated URL.</param>
+    /// <param name="sourceUri">Source URI.</param>
     private void SendUrl(string url, string sourceUri)
     {
         _logger.LogInformation($"Send URL: Start. URL: {url}, Source URI: {sourceUri}");

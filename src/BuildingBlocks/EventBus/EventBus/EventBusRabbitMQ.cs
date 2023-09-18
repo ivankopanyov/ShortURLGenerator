@@ -1,13 +1,13 @@
 ﻿namespace ShortURLGenerator.EventBus;
 
 /// <summary>Class that describes the sender of integration events in RabbitMQ.</summary>
-public abstract class EventBusRabbitMQBase : IEventBus
+public class EventBusRabbitMQ : IEventBus
 {
     /// <summary>Factory for creating connections to RabbitMQ.</summary>
     private readonly ConnectionFactory _connectionFactory;
 
     /// <summary>Initializing the EventBus object.</summary>
-    public EventBusRabbitMQBase()
+    public EventBusRabbitMQ()
     {
         _connectionFactory = new ConnectionFactory();
         OnConfigureConnection(_connectionFactory);
@@ -46,8 +46,11 @@ public abstract class EventBusRabbitMQBase : IEventBus
         }
     }
 
-    /// <summary>Abstract method for configuring a connection to RabbitMQ.</summary>
+    /// <summary>Virtual method for configuring a connection to RabbitMQ.</summary>
     /// <param name="connectionFactory">Factory for creating connections to RabbitMQ.</param>
-    protected abstract void OnConfigureConnection(ConnectionFactory connectionFactory);
+    protected virtual void OnConfigureConnection(ConnectionFactory connectionFactory)
+    {
+        connectionFactory.HostName = Environment.GetEnvironmentVariable("EVENT_BUS_HOST_NAME");
+    }
 }
 

@@ -26,7 +26,6 @@
     <Folder Include="Services\UpdateHandling\Base\" />
     <Folder Include="Services\UpdateHandling\Commands\Base\" />
     <Folder Include="IntegrationEventHandling\" />
-    <Folder Include="Services\EventBus\" />
     <Folder Include="Extensions\" />
   </ItemGroup>
   <ItemGroup>

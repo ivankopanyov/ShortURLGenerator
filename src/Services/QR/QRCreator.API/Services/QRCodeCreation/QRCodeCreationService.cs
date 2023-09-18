@@ -11,7 +11,7 @@ public class QRCodeCreationService : IQRCodeCreationService
     /// Default QR code size.
     /// Set if the size is not specified or is incorrect.
     /// </summary>
-    private const int DEFAULT_SIZE_PIXELS = 50;
+    private const int DEFAULT_SIZE_PIXELS = 1;
 
     /// <summary>Log service.</summary>
 	private readonly ILogger _logger;

@@ -32,7 +32,7 @@ public static class LogInfoExtensions
     public static string LogInfo(this Message message) =>
         "Message: { Message ID: " + message.MessageId +
         ", Text: " + message.Text +
-        ", Reply to message: " + message.ReplyToMessage +
+        ", Reply to message: " + message.ReplyToMessage?.MessageId +
         ", " + message.Chat.LogInfo() +
         ", " + message.From?.LogInfo() + " }";
 
@@ -40,7 +40,7 @@ public static class LogInfoExtensions
     /// <param name="update">Object of the Update class.</param>
     /// <returns>Information about an object of the Update class.</returns>
     public static string LogInfo(this Update update) =>
-        "Uodate { ID: " + update.Id +
+        "Update { ID: " + update.Id +
         ", " + update.CallbackQuery?.LogInfo() +
         ", " + update.Message?.LogInfo() + " }";
 }

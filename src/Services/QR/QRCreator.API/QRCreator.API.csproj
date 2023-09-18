@@ -23,7 +23,6 @@
   <ItemGroup>
     <Folder Include="Services\" />
     <Folder Include="IntegrationEventHandling\" />
-    <Folder Include="Services\EventBus\" />
     <Folder Include="Services\QRCodeCreation\" />
   </ItemGroup>
   <ItemGroup>

@@ -15,6 +15,6 @@ builder.Services
 
 var app = builder.Build();
 
-app.MapGrpcService<ShortURLGenerator.GrpcHelper.Services.Identity.IdentityService>();
+app.MapGrpcService<ShortURLGenerator.Identity.API.Services.Identity.IdentityService>();
 
 app.Run();

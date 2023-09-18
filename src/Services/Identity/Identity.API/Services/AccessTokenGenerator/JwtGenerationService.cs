@@ -1,15 +1,24 @@
 ﻿namespace ShortURLGenerator.Identity.API.Services.AccessTokenGenerator;
 
+/// <summary>Class describing the service for generating JWT tokens.</summary>
 public class JwtGenerationService : IAccessTokenGenerationService
 {
+    /// <summary>The default expiration date of the token is in minutes.</summary>
     private const int DEFAULT_EXPIRATION_MINUTES = 1;
 
+    /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
+    /// <summary>The expiration date of the token is in minutes.</summary>
     private readonly int _expirationMinutes;
 
+    /// <summary>Secret key for creating a JWT token.</summary>
     private readonly string _jwtKey;
 
+    /// <summary>Initializing a service object.</summary>
+    /// <param name="logger">Log service.</param>
+    /// <param name="configuration">Application configuration.</param>
+    /// <exception cref="ArgumentException">Exception is thrown if the secret key is null or whitespace.</exception>
     public JwtGenerationService(ILogger<JwtGenerationService> logger, IConfiguration? configuration = null)
     {
         _logger = logger;
@@ -24,6 +33,9 @@ public class JwtGenerationService : IAccessTokenGenerationService
         _jwtKey = serviceConfiguration.JwtKey;
     }
 
+    /// <summary>Access token generation method.</summary>
+    /// <param name="userId">User ID.</param>
+    /// <returns>Access token.</returns>
     public string CreateToken(long userId)
     {
         _logger.LogInformation($"Create token: Start. User ID: {userId}.");
@@ -39,6 +51,9 @@ public class JwtGenerationService : IAccessTokenGenerationService
         return token;
     }
 
+    /// <summary>Virtual method for configuring a service.</summary>
+    /// <param name="serviceConfiguration">JWT generation service configuration.</param>
+    /// <param name="appConfiguration">Application configuration.</param>
     protected virtual void OnConfiguring(JwtGenerationServiceConfiguration serviceConfiguration, IConfiguration? appConfiguration)
     {
         serviceConfiguration.JwtKey = Environment.GetEnvironmentVariable("JWT_KEY")!;
