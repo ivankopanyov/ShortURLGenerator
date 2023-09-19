@@ -63,15 +63,22 @@ message Token {
     string refreshToken = 2;
 }
 
-message SignInResponse {
+message TokenResponse {
     Response response = 1;
     optional Token token = 2;
+}
+
+message RefreshTokenRequest {
+    int64 userId = 1;
+    string refreshToken = 2;
+    ConnectionInfo connectionInfo = 3;
 }
 
 service IdentityService {
     rpc GetVerificationCode(UserId) returns (VerificationCodeResponse);
     rpc GetConnections(ConnectionsRequest) returns (ConnectionsPageResponse);
     rpc CloseConnection(ConnectionRequest) returns (Response);
-    rpc SignIn(SignInRequest) returns (SignInResponse);
+    rpc SignIn(SignInRequest) returns (TokenResponse);
+    rpc RefreshToken(RefreshTokenRequest) returns (TokenResponse);
 }
 

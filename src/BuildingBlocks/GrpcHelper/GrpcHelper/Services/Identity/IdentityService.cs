@@ -1,4 +1,6 @@
-﻿namespace ShortURLGenerator.GrpcHelper.Services.Identity;
+﻿using ShortURLGenerator.Grpc.Services;
+
+namespace ShortURLGenerator.GrpcHelper.Services.Identity;
 
 /// <summary>
 /// Class that describes a Telegram user identification service.
@@ -196,6 +198,55 @@ public class IdentityService : IConnectionService, IIdentityService
         catch (RpcException ex)
         {
             _logger.LogInformation(ex, $"Sign in: {ex.Message}.");
+            throw new InvalidOperationException("Нет связи с сервисом идентификации пользователей.");
+        }
+    }
+
+    /// <summary>Method for creating a new connection and deleting an old connection.</summary>
+    /// <param name="userId">User ID.</param>
+    /// <param name="refreshToken">Refresh token or connection ID.</param>
+    /// <param name="connectionInfo">Connection info.</param>
+    /// <returns>Access tokens.</returns>
+    /// <exception cref="ArgumentNullException">Refresh token is null.</exception>
+    /// <exception cref="InvalidOperationException">
+    /// Failed to complete the request to the service or the request is invalid.
+    /// </exception>
+    public async Task<Token> RefreshTokenAsync(long userId, string refreshToken, ConnectionInfo connectionInfo)
+    {
+        if (refreshToken is null)
+        {
+            _logger.LogError($"Sign in: Refresh token is null. Refresh token: {refreshToken}");
+            throw new ArgumentNullException(nameof(refreshToken));
+        }
+
+        var request = new RefreshTokenRequest()
+        {
+            UserId = userId,
+            RefreshToken = refreshToken,
+            ConnectionInfo = connectionInfo ?? new ConnectionInfo()
+        };
+
+        _logger.LogInformation($"Refresh token: Start. {request.LogInfo()}.");
+
+        try
+        {
+            using var channel = GrpcChannel.ForAddress(_identityServiceHost);
+            var client = new Grpc.Services.IdentityService.IdentityServiceClient(channel);
+            var response = await client.RefreshTokenAsync(request);
+
+            if (response.Response.ResponseStatus == ResponseStatus.Ok)
+            {
+                _logger.LogInformation($"Refresh token: Successfully. {response.LogInfo()}.");
+                return response.Token;
+            }
+
+            _logger.LogError($"Refresh token: {response.Response.Error}. {response.LogInfo()}.");
+
+            throw new InvalidOperationException(response.Response.Error);
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogInformation(ex, $"Refresh token: {ex.Message}.");
             throw new InvalidOperationException("Нет связи с сервисом идентификации пользователей.");
         }
     }

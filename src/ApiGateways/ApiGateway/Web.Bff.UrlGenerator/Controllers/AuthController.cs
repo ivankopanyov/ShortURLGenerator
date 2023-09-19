@@ -1,4 +1,7 @@
-﻿using ShortURLGenerator.Grpc.Services;
+﻿using Microsoft.AspNetCore.Identity;
+using ShortURLGenerator.Web.Bff.UrlGenerator.Dto;
+using System;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace ShortURLGenerator.Web.Bff.UrlGenerator.Controllers;
 
@@ -89,17 +92,98 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>Access token refresh endpoint.</summary>
-    /// <param name="refreshToken">Connection ID or refresh token.</param>
+    /// <param name="refreshTokenDto">Connection ID or refresh token.</param>
     /// <returns>New access tokens.</returns>
     [HttpPost("refreshToken")]
     [ProducesResponseType(typeof(Token), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Token>> RefreshTokenAsync(RefreshTokenDto refreshToken)
+    public async Task<ActionResult<Token>> RefreshTokenAsync(RefreshTokenDto refreshTokenDto)
     {
-        _logger.LogInformation($"Refresh token: Start. {refreshToken}.");
+        _logger.LogInformation($"Refresh token: Start. {refreshTokenDto}.");
 
-        throw new NotImplementedException();
+        if (refreshTokenDto?.Token?.AccessToken is not { } accessToken || string.IsNullOrWhiteSpace(accessToken))
+        {
+            _logger.LogError("Refresh token: Access token is null or whitespace.");
+            return BadRequest("Access token is null or whitespace.");
+        }
+
+        if (refreshTokenDto?.Token?.RefreshToken is not { } refreshToken || string.IsNullOrWhiteSpace(refreshToken))
+        {
+            _logger.LogError("Refresh token: Refresh token is null or whitespace.");
+            return BadRequest("Refresh token is null or whitespace.");
+        }
+
+        if (GetUserId(accessToken) is not { } userId)
+        {
+            _logger.LogError("Refresh token: Access token is not valid.");
+            return BadRequest("Access token is not valid.");
+        }
+
+        try
+        {
+            var token = await _identityService.RefreshTokenAsync(userId, refreshToken, refreshTokenDto.ConnectionInfo);
+            _logger.LogInformation($"Refresh token: Successfully. {token.LogInfo()}.");
+
+            return Ok(token);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogError($"Refresh token: {ex.Message}.");
+            return NotFound(ex.Message);
+        }
+    }
+
+    /// <summary>Method for obtaining user ID from access token.</summary>
+    /// <param name="token">Access token.</param>
+    /// <returns>User ID.</returns>
+    private long? GetUserId(string token)
+    {
+        _logger.LogInformation($"Get user id: Start. Access token: {token}.");
+
+        if (!string.IsNullOrWhiteSpace(token))
+        {
+            _logger.LogError("Get user id: Access token is null or whitespace.");
+            return null;
+        }
+
+        var tokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = false,
+            ValidateIssuer = false,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY")!)),
+            ValidateLifetime = false
+        };
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+
+        if (securityToken is not JwtSecurityToken jwtSecurityToken)
+        {
+            _logger.LogError("Get user id: Security token is not JwtSecurityToken.");
+            return null;
+        }
+
+        if (!jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+        {
+            _logger.LogError("Get user id: Security token algoritm is not HmacSha256.");
+            return null;
+        }
+
+        if (principal.FindFirst(c => c.Type == ClaimTypes.NameIdentifier) is not { } idClaim)
+        {
+            _logger.LogError("Get user id: Name identifier claim not found.");
+            return null;
+        }
+
+        if (!long.TryParse(idClaim.Value, out long userId))
+        {
+            _logger.LogError($"Get user id: User Id is not valid. User ID: {idClaim.Value}");
+            return null;
+        }
+
+        return userId;
     }
 }

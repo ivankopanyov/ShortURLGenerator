@@ -124,10 +124,18 @@ public static class LogInfoExtensions
         "Token: { Access token: " + token.AccessToken +
         ", Refresh token: " + token.RefreshToken + " }";
 
-    /// <summary>Method for obtaining information about an object of the SignInResponse class.</summary>
-    /// <param name="signInResponse">Object of the SignInResponse class.</param>
-    /// <returns>Information about an object of the SignInResponse class.</returns>
-    public static string LogInfo(this SignInResponse signInResponse) =>
-        "Sign in response: { " + signInResponse.Response +
-        ", " + signInResponse.Token?.LogInfo() + " }";
+    /// <summary>Method for obtaining information about an object of the TokenResponse class.</summary>
+    /// <param name="tokenResponse">Object of the TokenResponse class.</param>
+    /// <returns>Information about an object of the TokenResponse class.</returns>
+    public static string LogInfo(this TokenResponse tokenResponse) =>
+        "Sign in response: { " + tokenResponse.Response +
+        ", " + tokenResponse.Token?.LogInfo() + " }";
+
+    /// <summary>Method for obtaining information about an object of the RefreshTokenRequest class.</summary>
+    /// <param name="refreshTokenRequest">Object of the RefreshTokenRequest class.</param>
+    /// <returns>Information about an object of the RefreshTokenRequest class.</returns>
+    public static string LogInfo(this RefreshTokenRequest refreshTokenRequest) =>
+        "Refresh token request: { User ID: " + refreshTokenRequest.UserId +
+        ", Refresh token: " + refreshTokenRequest.RefreshToken +
+        ", " + refreshTokenRequest.ConnectionInfo.LogInfo() + " }";
 }

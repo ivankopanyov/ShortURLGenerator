@@ -1,4 +1,5 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using ShortURLGenerator.Grpc.Services;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ShortURLGenerator.Identity.API.Services.Identity;
 
@@ -171,11 +172,11 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
     /// <param name="request">Request to connect.</param>
     /// <param name="context">Server call context.</param>
     /// <returns>Access tokens.</returns>
-    public override async Task<SignInResponse> SignIn(SignInRequest request, ServerCallContext context)
+    public override async Task<TokenResponse> SignIn(SignInRequest request, ServerCallContext context)
     {
-        _logger.LogInformation($"Sign in: Start. {request.LogInfo()}");
+        _logger.LogInformation($"Sign in: Start. {request.LogInfo()}.");
 
-        var response = new SignInResponse()
+        var response = new TokenResponse()
         {
             Response = new Response()
             {
@@ -187,7 +188,7 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
         {
 
             response.Response.Error = "Проверочный код не действителен.";
-            _logger.LogError($"Sign in: Verification code not found. {response.LogInfo()}");
+            _logger.LogError($"Sign in: Verification code not found. {response.LogInfo()}.");
             return response;
         }
 
@@ -196,14 +197,99 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
         if (!long.TryParse(userIdString, out long userId))
         {
             response.Response.Error = "Проверочный код не действителен.";
-            _logger.LogError($"Sign in: Verification code not found. {response.LogInfo()}");
+            _logger.LogError($"Sign in: Verification code not found. {response.LogInfo()}.");
             return response;
         }
+
+        try
+        {
+            var token = await CreateConnection(userId, request.ConnectionInfo);
+            response.Response.ResponseStatus = ResponseStatus.Ok;
+            response.Token = token;
+
+            _logger.LogInformation($"Sign in: Successfully. {response.LogInfo()}.");
+
+            return response;
+        }
+        catch (InvalidOperationException ex)
+        {
+            response.Response.ResponseStatus = ResponseStatus.Conflict;
+            response.Response.Error = ex.Message;
+
+            _logger.LogError(ex, $"Sign in: {ex.Message}. {response.LogInfo()}");
+
+            return response;
+        }
+    }
+
+    /// <summary>Method for creating a new connection and deleting an old connection.</summary>
+    /// <param name="request">Request to connect.</param>
+    /// <param name="context">Server call context.</param>
+    /// <returns>Access tokens.</returns>
+    public override async Task<TokenResponse> RefreshToken(RefreshTokenRequest request, ServerCallContext context)
+    {
+        _logger.LogInformation($"Refresh token: Start. {request.LogInfo()}");
+
+        var response = new TokenResponse()
+        {
+            Response = new Response()
+            {
+                ResponseStatus = ResponseStatus.NotFound
+            }
+        };
+
+        if (await _connectionRepository.GetOrDefaultAsync(request.RefreshToken) is not { } connection)
+        {
+            response.Response.Error = "Подключение не найдено.";
+            _logger.LogError($"Refresh token: Connection not found. {request.LogInfo()}");
+            return response;
+        }
+
+        if (connection.UserId != request.UserId)
+        {
+            response.Response.Error = "Подключение не найдено.";
+            _logger.LogError($"Refresh token: The connection belongs to another user. {connection.LogInfo()}, {request.LogInfo()}");
+            return response;
+        }
+
+        await _connectionRepository.RemoveAsync(request.RefreshToken);
+
+        try
+        {
+            var token = await CreateConnection(request.UserId, request.ConnectionInfo);
+            response.Response.ResponseStatus = ResponseStatus.Ok;
+            response.Token = token;
+
+            _logger.LogInformation($"Refresh token: Successfully. {response.LogInfo()}.");
+
+            return response;
+        }
+        catch (InvalidOperationException ex)
+        {
+            response.Response.ResponseStatus = ResponseStatus.Conflict;
+            response.Response.Error = ex.Message;
+
+            _logger.LogError(ex, $"Refresh token: {ex.Message}. {response.LogInfo()}");
+
+            return response;
+        }
+    }
+
+    /// <summary>Method for creating a connection to a site.</summary>
+    /// <param name="userId">User ID.</param>
+    /// <param name="connectionInfo">Connection info.</param>
+    /// <returns>Access token.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// Exception throw if the maximum number of connections has been reached.
+    /// </exception>
+    private async Task<Token> CreateConnection(long userId, Grpc.Services.ConnectionInfo connectionInfo)
+    {
+        _logger.LogInformation($"Create connection: Start. User ID: {userId}, {connectionInfo.LogInfo()}");
 
         var connection = new Connection()
         {
             UserId = userId,
-            ConnectionInfo = request.ConnectionInfo
+            ConnectionInfo = connectionInfo
         };
 
         string? refreshToken = null;
@@ -220,29 +306,23 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
             catch (InvalidOperationException ex)
             {
                 refreshToken = null;
-                _logger.LogInformation(ex, $"Sign in: {ex.Message}. {connection.LogInfo()}");
+                _logger.LogInformation(ex, $"Create connection: {ex.Message}. {connection.LogInfo()}");
             }
             catch (ArgumentOutOfRangeException ex)
-            { 
-                response.Response.ResponseStatus = ResponseStatus.BadRequest;
-                response.Response.Error = "Достигнуто максимальное колличество подключений.";
-
-                _logger.LogError(ex, $"Sign in: {ex.Message}. {response.LogInfo()}");
-
-                return response;
+            {
+                _logger.LogError(ex, $"Create connection: {ex.Message}.");
+                throw new InvalidOperationException("Достигнуто максимальное колличество подключений.");
             }
         }
 
-        response.Response.ResponseStatus = ResponseStatus.Ok;
-
-        response.Token = new Token()
+        var token = new Token()
         {
             AccessToken = _accessTokenGenerationService.CreateToken(userId),
             RefreshToken = refreshToken
         };
 
-        _logger.LogInformation($"Sign in: Successfully. {response.LogInfo()}");
+        _logger.LogInformation($"Create connection: Successfully. {token.LogInfo()}");
 
-        return response;
+        return token;
     }
 }
