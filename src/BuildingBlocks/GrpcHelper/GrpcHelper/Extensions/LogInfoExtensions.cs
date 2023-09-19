@@ -109,4 +109,25 @@ public static class LogInfoExtensions
     public static string LogInfo(this UriResponse uriResponse) =>
         "URI response: {" + uriResponse.Response.LogInfo() +
         "URI: " + uriResponse.Uri + " }";
+
+    /// <summary>Method for obtaining information about an object of the SignInRequest class.</summary>
+    /// <param name="signInRequest">Object of the SignInRequest class.</param>
+    /// <returns>Information about an object of the SignInRequest class.</returns>
+    public static string LogInfo(this SignInRequest signInRequest) =>
+        "Sign in request: { Verification code: " + signInRequest.VerificationCode +
+        ", " + signInRequest.ConnectionInfo.LogInfo() + " }";
+
+    /// <summary>Method for obtaining information about an object of the Token class.</summary>
+    /// <param name="token">Object of the Token class.</param>
+    /// <returns>Information about an object of the Token class.</returns>
+    public static string LogInfo(this Token token) =>
+        "Token: { Access token: " + token.AccessToken +
+        ", Refresh token: " + token.RefreshToken + " }";
+
+    /// <summary>Method for obtaining information about an object of the SignInResponse class.</summary>
+    /// <param name="signInResponse">Object of the SignInResponse class.</param>
+    /// <returns>Information about an object of the SignInResponse class.</returns>
+    public static string LogInfo(this SignInResponse signInResponse) =>
+        "Sign in response: { " + signInResponse.Response +
+        ", " + signInResponse.Token?.LogInfo() + " }";
 }

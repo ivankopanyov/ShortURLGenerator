@@ -13,6 +13,9 @@ public sealed class QRCodeCreatedIntegrationEvent : IntegrationEventBase
     public byte[] Data { get; set; }
 
     /// <summary>Integration event initialization.</summary>
+    public QRCodeCreatedIntegrationEvent() { }
+
+    /// <summary>Integration event initialization.</summary>
     /// <param name="chatId">Chat ID.</param>
     /// <param name="messageId">Source message ID.</param>
     /// <param name="data">QR code data.</param>

@@ -7,6 +7,8 @@ global using Microsoft.IdentityModel.Tokens;
 global using Microsoft.OpenApi.Models;
 global using ShortURLGenerator.GrpcHelper.Abstraction;
 global using ShortURLGenerator.GrpcHelper.Services.URL;
+global using ShortURLGenerator.Grpc.Services;
+global using ShortURLGenerator.GrpcHelper.Extensions;
 global using ShortURLGenerator.EventBus;
 global using ShortURLGenerator.EventBus.Abstraction;
 global using ShortURLGenerator.EventBus.Events;

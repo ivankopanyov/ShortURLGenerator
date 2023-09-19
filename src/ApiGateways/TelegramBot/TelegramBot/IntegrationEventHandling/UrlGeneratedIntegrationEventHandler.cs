@@ -9,19 +9,25 @@ public class UriGeneratedIntegrationEventHandler : IntegrationEventHandlerBase<U
     /// <summary>Service for sending Telegram messages to a bot.</summary>
     private readonly ITelegramBot _telegramBot;
 
+    /// <summary>Service for fixing URL.</summary>
+    private readonly IFixUrlService _fixUrlService;
+
     /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
     /// <summary>Handler initialization.</summary>
     /// <param name="eventBus">The sender of integration events.</param>
     /// <param name="telegramBot">Service for sending Telegram messages to a bot.</param>
+    /// <param name="fixUrlService">Service for fixing URL.</param>
     /// <param name="logger">Log service.</param>
     public UriGeneratedIntegrationEventHandler(IEventBus eventBus,
         ITelegramBot telegramBot,
+        IFixUrlService fixUrlService,
         ILogger<UriGeneratedIntegrationEventHandler> logger)
     {
         _eventBus = eventBus;
         _telegramBot = telegramBot;
+        _fixUrlService = fixUrlService;
         _logger = logger;
     }
 
@@ -36,9 +42,9 @@ public class UriGeneratedIntegrationEventHandler : IntegrationEventHandlerBase<U
             _logger.LogError($"Handle URL generated event: Event is null.");
             return;
         }
-
-        var messageId = await _telegramBot.SendUriAsync(@event.ChatId, @event.Uri, @event.SourceUri);
-        var uriSentEvent = new UriSentIntegrationEvent(@event.ChatId, messageId, @event.Uri);
+        var uri = _fixUrlService.FixUrl(@event.Uri);
+        var messageId = await _telegramBot.SendUriAsync(@event.ChatId, uri, @event.SourceUri);
+        var uriSentEvent = new UriSentIntegrationEvent(@event.ChatId, messageId, uri);
 
         try
         {

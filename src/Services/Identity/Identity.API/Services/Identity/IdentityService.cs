@@ -1,4 +1,6 @@
-﻿namespace ShortURLGenerator.Identity.API.Services.Identity;
+﻿using static System.Runtime.InteropServices.JavaScript.JSType;
+
+namespace ShortURLGenerator.Identity.API.Services.Identity;
 
 /// <summary>class describing the user identification service.
 /// Inherited from the class Grpc.Services.IdentityService.IdentityServiceBase,
@@ -17,6 +19,9 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
     /// <summary>Refresh token generation service.</summary>
     private readonly IRefreshTokenGenerationService _refreshTokenGenerationService;
 
+    /// <summary>Access token generation service.</summary>
+    private readonly IAccessTokenGenerationService _accessTokenGenerationService;
+
     /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
@@ -25,17 +30,20 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
     /// <param name="verificationCodeGenerationService">Verification code generation service.</param>
     /// <param name="connectionRepository">Connection repository.</param>
     /// <param name="refreshTokenGenerationService">Refresh token generation service.</param>
+    /// <param name="accessTokenGenerationService">Access token generation service.</param>
     /// <param name="logger">Log service.</param>
     public IdentityService(IVerificationCodeRepository verificationCodeRepository,
         IVerificationCodeGenerationService verificationCodeGenerationService,
         IConnectionRepository connectionRepository,
         IRefreshTokenGenerationService refreshTokenGenerationService,
+        IAccessTokenGenerationService accessTokenGenerationService,
         ILogger<IdentityService> logger)
     {
         _verificationCodeRepository = verificationCodeRepository;
         _verificationCodeGenerationService = verificationCodeGenerationService;
         _connectionRepository = connectionRepository;
         _refreshTokenGenerationService = refreshTokenGenerationService;
+        _accessTokenGenerationService = accessTokenGenerationService;
         _logger = logger;
     }
 
@@ -43,7 +51,7 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
     /// <param name="request">User ID.</param>
     /// <param name="context">Server call context.</param>
     /// <returns>Verification code response.</returns>
-    public async override Task<VerificationCodeResponse> GetVerificationCode(UserId request, ServerCallContext context)
+    public override async Task<VerificationCodeResponse> GetVerificationCode(UserId request, ServerCallContext context)
     {
         _logger.LogInformation($"Get verification code: Start. {request.LogInfo()}.");
 
@@ -104,7 +112,7 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
     /// <param name="request">Connections request.</param>
     /// <param name="context">Server call context.</param>
     /// <returns>Connections page response.</returns>
-    public async override Task<ConnectionsPageResponse> GetConnections(ConnectionsRequest request, ServerCallContext context)
+    public override async Task<ConnectionsPageResponse> GetConnections(ConnectionsRequest request, ServerCallContext context)
     {
         _logger.LogInformation($"Get user connections: Start. {request.LogInfo()}.");
 
@@ -128,7 +136,7 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
     /// <param name="request">Connection request.</param>
     /// <param name="context">Server call context.</param>
     /// <returns>Response.</returns>
-    public async override Task<Response> CloseConnection(ConnectionRequest request, ServerCallContext context)
+    public override async Task<Response> CloseConnection(ConnectionRequest request, ServerCallContext context)
     {
         _logger.LogInformation($"Close connection: Start. {request.LogInfo()}.");
 
@@ -157,5 +165,84 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
         _logger.LogInformation($"Close connection: Successfully. {okResponse.LogInfo()}.");
 
         return okResponse;
+    }
+
+    /// <summary>Method for creating a connection to a site.</summary>
+    /// <param name="request">Request to connect.</param>
+    /// <param name="context">Server call context.</param>
+    /// <returns>Access tokens.</returns>
+    public override async Task<SignInResponse> SignIn(SignInRequest request, ServerCallContext context)
+    {
+        _logger.LogInformation($"Sign in: Start. {request.LogInfo()}");
+
+        var response = new SignInResponse()
+        {
+            Response = new Response()
+            {
+                ResponseStatus = ResponseStatus.NotFound
+            }
+        };
+
+        if (await _verificationCodeRepository.GetUserIdAsync(request.VerificationCode) is not { } userIdString)
+        {
+
+            response.Response.Error = "Проверочный код не действителен.";
+            _logger.LogError($"Sign in: Verification code not found. {response.LogInfo()}");
+            return response;
+        }
+
+        await _verificationCodeRepository.RemoveByUserIdAsync(userIdString);
+
+        if (!long.TryParse(userIdString, out long userId))
+        {
+            response.Response.Error = "Проверочный код не действителен.";
+            _logger.LogError($"Sign in: Verification code not found. {response.LogInfo()}");
+            return response;
+        }
+
+        var connection = new Connection()
+        {
+            UserId = userId,
+            ConnectionInfo = request.ConnectionInfo
+        };
+
+        string? refreshToken = null;
+
+        while (refreshToken is null)
+        {
+            refreshToken = _refreshTokenGenerationService.GenerateString();
+
+            try
+            {
+                connection.Id = refreshToken;
+                await _connectionRepository.CreateAsync(connection);
+            }
+            catch (InvalidOperationException ex)
+            {
+                refreshToken = null;
+                _logger.LogInformation(ex, $"Sign in: {ex.Message}. {connection.LogInfo()}");
+            }
+            catch (ArgumentOutOfRangeException ex)
+            { 
+                response.Response.ResponseStatus = ResponseStatus.BadRequest;
+                response.Response.Error = "Достигнуто максимальное колличество подключений.";
+
+                _logger.LogError(ex, $"Sign in: {ex.Message}. {response.LogInfo()}");
+
+                return response;
+            }
+        }
+
+        response.Response.ResponseStatus = ResponseStatus.Ok;
+
+        response.Token = new Token()
+        {
+            AccessToken = _accessTokenGenerationService.CreateToken(userId),
+            RefreshToken = refreshToken
+        };
+
+        _logger.LogInformation($"Sign in: Successfully. {response.LogInfo()}");
+
+        return response;
     }
 }

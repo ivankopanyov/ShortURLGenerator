@@ -5,7 +5,7 @@
 public abstract class IntegrationEventHandlerBase<T> : BackgroundService where T : IntegrationEventBase
 {
     /// <summary>The name of the integration event type is used as the queue name.</summary>
-    private string _queueName = typeof(T).Name;
+    private readonly string _queueName = typeof(T).Name;
 
     /// <summary>Connecting to a message broker.</summary>
     private IConnection _connection;

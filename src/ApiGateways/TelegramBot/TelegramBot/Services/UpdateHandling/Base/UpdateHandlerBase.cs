@@ -15,6 +15,9 @@ public abstract class UpdateHandlerBase : IUpdateHandler, ICommandSetBuilder
     /// <summary>Service for sending Telegram messages to a bot.</summary>
     protected ITelegramBot TelegramBot { get; private init; }
 
+    /// <summary>Service for fixing URL.</summary>
+    protected IFixUrlService FixUrlService { get; private init; }
+
     /// <summary>Log service.</summary>
     protected ILogger<IUpdateCommand> Logger { get; private init; }
 
@@ -35,6 +38,7 @@ public abstract class UpdateHandlerBase : IUpdateHandler, ICommandSetBuilder
         IConnectionService connectionService,
         IUrlGenerator urlGenerator,
         ITelegramBot telegramBot,
+        IFixUrlService fixUrlService,
         ILogger<IUpdateCommand> logger,
         IConfiguration configuration)
     {
@@ -42,6 +46,7 @@ public abstract class UpdateHandlerBase : IUpdateHandler, ICommandSetBuilder
         ConnectionService = connectionService;
         UrlGenerator = urlGenerator;
         TelegramBot = telegramBot;
+        FixUrlService = fixUrlService;
         Logger = logger;
         Configuration = configuration;
 

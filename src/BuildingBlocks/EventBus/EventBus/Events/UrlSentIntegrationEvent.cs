@@ -13,6 +13,9 @@ public sealed class UriSentIntegrationEvent : IntegrationEventBase
     public string Uri { get; set; }
 
     /// <summary>Integration event initialization.</summary>
+    public UriSentIntegrationEvent() { }
+
+    /// <summary>Integration event initialization.</summary>
     /// <param name="chatId">Chat ID.</param>
     /// <param name="messageId">Source message ID.</param>
     /// <param name="uri">Generated URI.</param>

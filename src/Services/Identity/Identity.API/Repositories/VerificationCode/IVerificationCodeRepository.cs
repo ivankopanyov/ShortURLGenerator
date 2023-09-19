@@ -12,6 +12,11 @@ public interface IVerificationCodeRepository
     /// <param name="userId">User ID.</param>
     Task RemoveByUserIdAsync(string userId);
 
+    /// <summary>Method that returns user ID by verification code.</summary>
+    /// <param name="verificationCode">Verification code.</param>
+    /// <returns>User ID.</returns>
+    Task<string?> GetUserIdAsync(string verificationCode);
+
     /// <summary>Method for checking whether a repository is verification code.</summary>
     /// <param name="id">Verification code ID.</param>
     /// <returns>Result of checking.</returns>

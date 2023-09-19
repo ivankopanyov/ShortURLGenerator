@@ -53,9 +53,25 @@ message ConnectionRequest {
     string connectionId = 2;
 }
 
+message SignInRequest {
+    string verificationCode = 1;
+    ConnectionInfo connectionInfo = 2;
+}
+
+message Token {
+    string accessToken = 1;
+    string refreshToken = 2;
+}
+
+message SignInResponse {
+    Response response = 1;
+    optional Token token = 2;
+}
+
 service IdentityService {
     rpc GetVerificationCode(UserId) returns (VerificationCodeResponse);
     rpc GetConnections(ConnectionsRequest) returns (ConnectionsPageResponse);
     rpc CloseConnection(ConnectionRequest) returns (Response);
+    rpc SignIn(SignInRequest) returns (SignInResponse);
 }
 

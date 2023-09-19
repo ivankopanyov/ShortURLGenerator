@@ -16,28 +16,28 @@ public class GenerationUrlCommand : IUpdateCommand
     /// <summary>Service for sending Telegram messages to a bot.</summary>
     private readonly ITelegramBot _telegramBot;
 
+    /// <summary>Service for fixing URL.</summary>
+    private readonly IFixUrlService _fixUrlService;
+
     /// <summary>Log service.</summary>
     private readonly ILogger _logger;
-
-    /// <summary>The domain name of the site to generate short URLs.</summary>
-    private readonly string _frontend;
 
     /// <summary>Command object initialization.</summary>
     /// <param name="urlGenerator">Service for generating short URLs.</param>
     /// <param name="telegramBot">Service for sending Telegram messages to a bot.</param>
+    /// <param name="fixUrlService">Service for fixing URL.</param>
     /// <param name="logger">Log service.</param>
-    /// <param name="frontend">Frontend address.</param>
     public GenerationUrlCommand(IEventBus eventBus,
         IUrlGenerator urlGenerator,
         ITelegramBot telegramBot,
-        ILogger<IUpdateCommand> logger,
-        string frontend)
+        IFixUrlService fixUrlService,
+        ILogger<IUpdateCommand> logger)
     {
         _eventBus = eventBus;
         _urlGenerator = urlGenerator;
         _telegramBot = telegramBot;
+        _fixUrlService = fixUrlService;
         _logger = logger;
-        _frontend = frontend;
     }
 
     /// <summary>The method that executes the command if the update is valid.</summary>
@@ -57,7 +57,7 @@ public class GenerationUrlCommand : IUpdateCommand
         try
         {
             var url = await _urlGenerator.GenerateUrlAsync(text);
-            var result = $"https://{_frontend}/{url}";
+            var result = _fixUrlService.FixUrl(url);
             var messageId = await _telegramBot.SendUriAsync(chatId, result, message.MessageId);
 
             var @event = new UriSentIntegrationEvent(chatId, messageId, result);

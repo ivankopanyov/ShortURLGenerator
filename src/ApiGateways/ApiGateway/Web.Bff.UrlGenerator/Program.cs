@@ -34,21 +34,21 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services
     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+    .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters()
     {
-        options.TokenValidationParameters = new TokenValidationParameters()
-        {
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY")!)
-            )
-        };
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY")!)
+        ),
+        ValidateIssuer = false,
+        ValidateAudience = false
     });
 
 builder.Services
     .AddSingleton<IEventBus, EventBusRabbitMQ>();
 
 builder.Services
-    .AddScoped<IUrlService, UrlService>();
+    .AddScoped<IUrlService, ShortURLGenerator.GrpcHelper.Services.URL.UrlService>()
+    .AddScoped<IIdentityService, ShortURLGenerator.GrpcHelper.Services.Identity.IdentityService>();
 
 var app = builder.Build();
 

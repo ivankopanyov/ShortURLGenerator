@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
-    <Folder Include="Services\" />
     <Folder Include="Services\Telegram\" />
     <Folder Include="Services\UpdateHandling\" />
     <Folder Include="Services\UpdateHandling\Commands\" />

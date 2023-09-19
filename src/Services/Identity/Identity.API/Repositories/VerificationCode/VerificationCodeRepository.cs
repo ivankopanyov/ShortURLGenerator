@@ -113,6 +113,26 @@ public class VerificationCodeRepository : IVerificationCodeRepository
         _logger.LogInformation($"Remove verification code by user ID: Succesfully. Verification code: {verificationCode}.");
     }
 
+    /// <summary>Method that returns user ID by verification code.</summary>
+    /// <param name="verificationCode">Verification code.</param>
+    /// <returns>User ID.</returns>
+    public async Task<string?> GetUserIdAsync(string verificationCode)
+    {
+        _logger.LogInformation($"Get user ID: Start. Verification code: {verificationCode}.");
+
+        if (string.IsNullOrWhiteSpace(verificationCode))
+        {
+            _logger.LogError($"Get user ID: Verification code is null or whitespace. Verification code: {verificationCode}.");
+            return null;
+        }
+
+        var userId = await _distributedCache.GetStringAsync(verificationCode);
+
+        _logger.LogInformation($"Get user ID: Succesfully. User ID: {userId}.");
+
+        return userId;
+    }
+
     /// <summary>Method for checking whether a repository is verification code.</summary>
     /// <param name="id">Verification code ID.</param>
     /// <returns>Result of checking.</returns>

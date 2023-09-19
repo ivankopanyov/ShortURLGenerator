@@ -8,20 +8,22 @@ public class UpdateHandler : UpdateHandlerBase
     /// <param name="connectionService">User connection service.</param>
     /// <param name="urlGenerator">Service for generating short URLs.</param>
     /// <param name="telegramBot">Service for sending Telegram messages to a bot.</param>
+    /// <param name="fixUrlService">Service for fixing URL.</param>
     /// <param name="logger">Log service.</param>
     /// <param name="configuration">Application configuration.</param>
     public UpdateHandler(IEventBus eventBus,
         IConnectionService connectionService,
         IUrlGenerator urlGenerator,
         ITelegramBot telegramBot,
+        IFixUrlService fixUrlService,
         ILogger<IUpdateCommand> logger,
-        IConfiguration configuration) : base(eventBus, connectionService, urlGenerator, telegramBot, logger, configuration) { }
+        IConfiguration configuration) : base(eventBus, connectionService, urlGenerator, telegramBot, fixUrlService, logger, configuration) { }
 
     /// <summary>Overriding the method for adding commands to the handler.</summary>
     /// <param name="commandSetBuilder">Command set builder.</param>
     protected override void OnCommandSetConfiguring(ICommandSetBuilder commandSetBuilder) => commandSetBuilder
         .AddCommand(new StartCommand(TelegramBot, Logger))
-        .AddCommand(new GenerationUrlCommand(EventBus, UrlGenerator, TelegramBot, Logger, Environment.GetEnvironmentVariable("FRONTEND")!))
+        .AddCommand(new GenerationUrlCommand(EventBus, UrlGenerator, TelegramBot, FixUrlService, Logger))
         .AddCommand(new VerificationCommand(ConnectionService, TelegramBot, Logger))
         .AddCommand(new FirstPageConnectionsCommand(ConnectionService, TelegramBot, Logger, Configuration))
         .AddCommand(new ChangePageConnectionsCommand(ConnectionService, TelegramBot, Logger, Configuration))

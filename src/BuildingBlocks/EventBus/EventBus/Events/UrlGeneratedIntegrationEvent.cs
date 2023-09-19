@@ -13,9 +13,12 @@ public sealed class UriGeneratedIntegrationEvent : IntegrationEventBase
     public string SourceUri { get; set; }
 
     /// <summary>Integration event initialization.</summary>
+    public UriGeneratedIntegrationEvent() { }
+
+    /// <summary>Integration event initialization.</summary>
     /// <param name="chatId">Chat ID.</param>
     /// <param name="url">Generated URL.</param>
-    /// <param name="sourceUri">he original URI submitted by the user.</param>
+    /// <param name="sourceUri">The original URI submitted by the user.</param>
     public UriGeneratedIntegrationEvent(long chatId, string url, string sourceUri)
     {
         ChatId = chatId;

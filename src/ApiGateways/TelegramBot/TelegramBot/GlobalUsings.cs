@@ -12,6 +12,7 @@ global using ShortURLGenerator.EventBus.Events;
 global using ShortURLGenerator.EventBus.Handling;
 global using ShortURLGenerator.GrpcHelper.Abstraction;
 global using ShortURLGenerator.GrpcHelper.Extensions;
+global using ShortURLGenerator.TelegramBot.Services.FixURL;
 global using ShortURLGenerator.TelegramBot.Services.UpdateHandling;
 global using ShortURLGenerator.TelegramBot.Services.UpdateHandling.Commands.Abstract;
 global using ShortURLGenerator.TelegramBot.Services.UpdateHandling.Commands.Base;

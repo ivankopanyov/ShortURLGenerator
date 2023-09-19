@@ -8,6 +8,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services
     .AddSingleton<IEventBus, EventBusRabbitMQ>()
+    .AddSingleton<IFixUrlService, FixUrlService>()
     .AddSingleton<ITelegramBot, TelegramBot>();
 
 builder.Services
