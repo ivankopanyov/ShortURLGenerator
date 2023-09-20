@@ -1,9 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using ShortURLGenerator.Web.Bff.UrlGenerator.Dto;
-using System;
-using System.IdentityModel.Tokens.Jwt;
-
-namespace ShortURLGenerator.Web.Bff.UrlGenerator.Controllers;
+﻿namespace ShortURLGenerator.Web.Bff.UrlGenerator.Controllers;
 
 /// <summary>Сlass that describes a authentication controller.</summary>
 [ApiController]
@@ -115,7 +110,7 @@ public class AuthController : ControllerBase
             return BadRequest("Refresh token is null or whitespace.");
         }
 
-        if (GetUserId(accessToken) is not { } userId)
+        if (GetUserId(accessToken) is not long userId)
         {
             _logger.LogError("Refresh token: Access token is not valid.");
             return BadRequest("Access token is not valid.");
@@ -142,7 +137,7 @@ public class AuthController : ControllerBase
     {
         _logger.LogInformation($"Get user id: Start. Access token: {token}.");
 
-        if (!string.IsNullOrWhiteSpace(token))
+        if (string.IsNullOrWhiteSpace(token))
         {
             _logger.LogError("Get user id: Access token is null or whitespace.");
             return null;

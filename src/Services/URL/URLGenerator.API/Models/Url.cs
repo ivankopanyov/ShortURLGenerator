@@ -15,6 +15,8 @@ public class Url
     /// <summary>Overriding the method of casting an object to a string type.</summary>
     /// <returns>Object cast to a string type.</returns>
     public override string ToString() =>
-        $"URL ID: {Id}, Source URI: {SourceUri}, Created: {Created.ToString("dd.MM.yyyy HH:mm:ss.ffff")}";
+        "URL: { ID: " + Id +
+        ", Source URI: " +SourceUri +
+        ", Created: " + Created.ToString("dd.MM.yyyy HH:mm:ss.ffff") + " }";
 }
 

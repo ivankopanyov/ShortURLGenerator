@@ -1,7 +1,4 @@
-﻿using ShortURLGenerator.Grpc.Services;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace ShortURLGenerator.Identity.API.Services.Identity;
+﻿namespace ShortURLGenerator.Identity.API.Services.Identity;
 
 /// <summary>class describing the user identification service.
 /// Inherited from the class Grpc.Services.IdentityService.IdentityServiceBase,
@@ -186,7 +183,6 @@ public class IdentityService : Grpc.Services.IdentityService.IdentityServiceBase
 
         if (await _verificationCodeRepository.GetUserIdAsync(request.VerificationCode) is not { } userIdString)
         {
-
             response.Response.Error = "Проверочный код не действителен.";
             _logger.LogError($"Sign in: Verification code not found. {response.LogInfo()}.");
             return response;

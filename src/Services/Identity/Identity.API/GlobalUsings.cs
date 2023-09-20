@@ -10,7 +10,6 @@ global using Grpc.Core;
 global using ShortURLGenerator.Grpc.Services;
 global using ShortURLGenerator.GrpcHelper.Extensions;
 global using ShortURLGenerator.StringGenerator;
-global using ShortURLGenerator.Identity.API.Services.Identity;
 global using ShortURLGenerator.Identity.API.Extensions;
 global using ShortURLGenerator.Identity.API.Services.VerificationCodeGenerator;
 global using ShortURLGenerator.Identity.API.Services.RefreshTokenGenerator;

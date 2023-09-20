@@ -1,6 +1,4 @@
-﻿using ShortURLGenerator.Grpc.Services;
-
-namespace ShortURLGenerator.GrpcHelper.Services.Identity;
+﻿namespace ShortURLGenerator.GrpcHelper.Services.Identity;
 
 /// <summary>
 /// Class that describes a Telegram user identification service.
