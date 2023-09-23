@@ -37,6 +37,12 @@ public class UriSentIntegrationEventHandler : IntegrationEventHandlerBase<UriSen
             return Task.CompletedTask;
         }
 
+        if (@event.Uri is null)
+        {
+            _logger.LogError($"Handle URI sent event: Uri is null. Event: {@event}.");
+            return Task.CompletedTask;
+        }
+
         var qrcode = _qRCodeCreationService.GenerateJpeg(@event.Uri);
         var qrCodeCreatedEvent = new QRCodeCreatedIntegrationEvent(@event.ChatId, @event.MessageId, qrcode);
 

@@ -39,6 +39,12 @@ public class QRCodeCreationService : IQRCodeCreationService
     {
         _logger.LogInformation($"Create QR code: Start. URI: {uri}.");
 
+        if (uri is null)
+        {
+            _logger.LogError("Create QR code: URI is null.");
+            throw new ArgumentNullException(nameof(uri));
+        }
+
         QRCodeGenerator qrGenerator = new QRCodeGenerator();
         QRCodeData qrCodeData = qrGenerator.CreateQrCode(uri, QRCodeGenerator.ECCLevel.Q);
         BitmapByteQRCode qrCode = new BitmapByteQRCode(qrCodeData);
