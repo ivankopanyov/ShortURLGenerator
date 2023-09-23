@@ -66,6 +66,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{49B7B598
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QRCreator.UnitTests", "Services\QR\QRCreator.UnitTests\QRCreator.UnitTests.csproj", "{651C80AD-7A89-4199-B55F-9AB1AE7C27FD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{05B78E54-26BA-4091-A0D6-4C639BD00449}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StringGenerator.UnitTests", "BuildingBlocks\StringGenerator\StringGenerator.UnitTests\StringGenerator.UnitTests.csproj", "{2F853647-C091-4892-B205-A0958BCE374B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -116,6 +120,10 @@ Global
 		{651C80AD-7A89-4199-B55F-9AB1AE7C27FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{651C80AD-7A89-4199-B55F-9AB1AE7C27FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{651C80AD-7A89-4199-B55F-9AB1AE7C27FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F853647-C091-4892-B205-A0958BCE374B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F853647-C091-4892-B205-A0958BCE374B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F853647-C091-4892-B205-A0958BCE374B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F853647-C091-4892-B205-A0958BCE374B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -146,6 +154,8 @@ Global
 		{BD7970DD-4CDE-4983-A34C-AE9A654C2BC0} = {CED36A38-3EE4-45CE-A707-EA67D4AE80F6}
 		{49B7B598-BB01-4BB9-8CE4-DBCF090F282A} = {2DD19ABE-6569-4DE5-B4ED-46C59251077B}
 		{651C80AD-7A89-4199-B55F-9AB1AE7C27FD} = {49B7B598-BB01-4BB9-8CE4-DBCF090F282A}
+		{05B78E54-26BA-4091-A0D6-4C639BD00449} = {CDAD46C0-13A7-43EC-AE17-74065189DCF5}
+		{2F853647-C091-4892-B205-A0958BCE374B} = {05B78E54-26BA-4091-A0D6-4C639BD00449}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2AF3D96E-2B84-4F72-846E-9F3E7BD0200B}

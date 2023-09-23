@@ -19,6 +19,21 @@ public class StringGenerator : IGeneratable
     private readonly string _sourceSymbols;
 
     /// <summary>Initialization of the random string generator object.</summary>
+    /// <param name="configuration">Random string generator configuration object.</param>
+    public StringGenerator(StringGeneratorConfiguration configuration)
+    {
+        if (configuration is null)
+            configuration = new StringGeneratorConfiguration();
+
+        OnConfiguring(configuration, null);
+
+        _stringLength = Math.Max(DEFAULT_STRING_LENGTH, configuration.StringLength);
+        _sourceSymbols = string.IsNullOrEmpty(configuration.SourceSymbols)
+                ? DEFAULT_SOURCE_SYMBOLS
+                : configuration.SourceSymbols;
+    }
+
+    /// <summary>Initialization of the random string generator object.</summary>
     /// <param name="configuration">Application configuration.</param>
     public StringGenerator(IConfiguration? configuration = null)
     {
