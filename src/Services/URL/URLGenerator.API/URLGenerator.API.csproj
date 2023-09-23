@@ -42,10 +42,10 @@
     <Folder Include="Extensions\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\BuildingBlocks\StringGenerator\StringGenerator\StringGenerator.csproj">
+    <ProjectReference Include="..\..\..\BuildingBlocks\GrpcHelper\GrpcHelper\GrpcHelper.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\BuildingBlocks\GrpcHelper\GrpcHelper\GrpcHelper.csproj">
+    <ProjectReference Include="..\..\..\BuildingBlocks\StringGenerator\StringGenerator\StringGenerator.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
   </ItemGroup>

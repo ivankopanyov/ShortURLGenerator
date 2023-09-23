@@ -86,7 +86,7 @@ public class UrlService : Grpc.Services.UrlService.UrlServiceBase
     /// <param name="request">Source URI request object.</param>
     /// <param name="context">Server call context.</param>
     /// <returns>Response object containing the response status and data.</returns>
-    public override async Task<UriResponse> Get(Grpc.Services.Url request, ServerCallContext context)
+    public override async Task<UriResponse> Get(Url request, ServerCallContext context)
     {
         _logger.LogInformation($"Get URI: Start. {request.LogInfo()}.");
 

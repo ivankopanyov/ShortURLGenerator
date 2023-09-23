@@ -81,14 +81,13 @@ public class UrlRepository : IUrlRepository
             await _urlContext.Urls.AddAsync(item);
             await _urlContext.SaveChangesAsync();
         }
-        catch (InvalidOperationException ex)
+        catch (ArgumentException ex)
         {
-            if (await _urlContext.Urls.AnyAsync(url => url.Id == item.Id))
-            {
-                _logger.LogError(ex, $"Create URL: Duplicate. URL: {item}");
-                throw new DuplicateWaitObjectException(ex.Message, ex);
-            }
-
+            _logger.LogError(ex, $"Create URL: Duplicate. URL: {item}");
+            throw new DuplicateWaitObjectException(ex.Message, ex);
+        }
+        catch (Exception ex)
+        {
             _logger.LogError(ex, $"Create URL: {ex.Message}. URL: {item}");
             throw new InvalidOperationException(ex.Message, ex);
         }
@@ -108,9 +107,11 @@ public class UrlRepository : IUrlRepository
     {
         _logger.LogInformation($"Get Source URI: Start. URL ID: {id}.");
 
-        if (await _distributedCache.GetStringAsync(id) is not { } sourceUri)
+        var sourceUri = await _distributedCache.GetStringAsync(id);
+
+        if (string.IsNullOrEmpty(sourceUri))
         {
-            if (await _urlContext.Urls.FirstOrDefaultAsync(item => item.Id.Equals(id)) is { } entity)
+            if (await _urlContext.Urls.FirstOrDefaultAsync(item => item.Id == id) is { } entity)
             {
                 sourceUri = entity.SourceUri;
 

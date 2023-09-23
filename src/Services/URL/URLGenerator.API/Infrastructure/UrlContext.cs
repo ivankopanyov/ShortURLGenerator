@@ -4,7 +4,7 @@
 public class UrlContext : DbContext
 {
     /// <summary>Set of generated short URLs.</summary>
-    public DbSet<Models.Url> Urls { get; set; }
+    public virtual DbSet<Models.Url> Urls { get; set; }
 
     /// <summary>Overriding the method for creating entity models.</summary>
     /// <param name="builder">Model builder.</param>
