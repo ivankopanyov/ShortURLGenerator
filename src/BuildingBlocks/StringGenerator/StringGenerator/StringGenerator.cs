@@ -7,10 +7,10 @@
 public class StringGenerator : IGeneratable
 {
     /// <summary>The value of the string with default source characters.</summary>
-    private const string DEFAULT_SOURCE_SYMBOLS = "0123456789";
+    public const string DEFAULT_SOURCE_SYMBOLS = "0123456789";
 
     /// <summary>Default length of generated string.</summary>
-    private const int DEFAULT_STRING_LENGTH = 1;
+    public const int DEFAULT_STRING_LENGTH = 1;
 
     /// <summary>The length of the generated string.</summary>
     private readonly int _stringLength;

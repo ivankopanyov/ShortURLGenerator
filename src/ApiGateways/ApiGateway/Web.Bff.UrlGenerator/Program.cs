@@ -47,6 +47,9 @@ builder.Services
     .AddSingleton<IEventBus, EventBusRabbitMQ>();
 
 builder.Services
+    .AddScoped<IGrpcChannelFactory, GrpcChannelFactory>()
+    .AddScoped<IUrlServiceClientFactory, UrlServiceClientFactory>()
+    .AddScoped<IIdentityServiceClientFactory, IdentityServiceClientFactory>()
     .AddScoped<IUrlService, ShortURLGenerator.GrpcHelper.Services.URL.UrlService>()
     .AddScoped<IIdentityService, ShortURLGenerator.GrpcHelper.Services.Identity.IdentityService>();
 

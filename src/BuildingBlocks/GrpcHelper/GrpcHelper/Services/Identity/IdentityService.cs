@@ -9,13 +9,25 @@ public class IdentityService : IConnectionService, IIdentityService
     /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
+    /// <summary>GRPC channel object factory.</summary>
+    private readonly IGrpcChannelFactory _grpcChannelFactory;
+
+    /// <summary>Identity service client factory.</summary>
+    private readonly IIdentityServiceClientFactory _identityServiceClientFactory;
+
     /// <summary>Address of the user identification service.</summary>
     private readonly string _identityServiceHost;
 
     /// <summary>Initialization of the user identification service service object.</summary>
+    /// <param name="grpcChannelFactory">GRPC channel object factory.</param>
+    /// <param name="identityServiceClientFactory">Identity service client factory.</param>
     /// <param name="logger">Log service.</param>
-    public IdentityService(ILogger<IdentityService> logger)
+    public IdentityService(IGrpcChannelFactory grpcChannelFactory,
+        IIdentityServiceClientFactory identityServiceClientFactory,
+        ILogger<IdentityService> logger)
     {
+        _grpcChannelFactory = grpcChannelFactory;
+        _identityServiceClientFactory = identityServiceClientFactory;
         _logger = logger;
 
         var identityServiceConfiguration = new IdentityServiceConfiguration();
@@ -41,8 +53,8 @@ public class IdentityService : IConnectionService, IIdentityService
 
         try
         {
-            using var channel = GrpcChannel.ForAddress(_identityServiceHost);
-            var client = new Grpc.Services.IdentityService.IdentityServiceClient(channel);
+            using var channel = _grpcChannelFactory.ForAddress(_identityServiceHost);
+            var client = _identityServiceClientFactory.New(channel);
             var response = await client.GetVerificationCodeAsync(request);
 
             if (response.Response.ResponseStatus == ResponseStatus.Ok)
@@ -86,8 +98,8 @@ public class IdentityService : IConnectionService, IIdentityService
 
         try
         {
-            using var channel = GrpcChannel.ForAddress(_identityServiceHost);
-            var client = new Grpc.Services.IdentityService.IdentityServiceClient(channel);
+            using var channel = _grpcChannelFactory.ForAddress(_identityServiceHost);
+            var client = _identityServiceClientFactory.New(channel);
             var response = await client.GetConnectionsAsync(request);
 
             if (response.Response.ResponseStatus == ResponseStatus.Ok)
@@ -132,8 +144,8 @@ public class IdentityService : IConnectionService, IIdentityService
 
         try
         {
-            using var channel = GrpcChannel.ForAddress(_identityServiceHost);
-            var client = new Grpc.Services.IdentityService.IdentityServiceClient(channel);
+            using var channel = _grpcChannelFactory.ForAddress(_identityServiceHost);
+            var client = _identityServiceClientFactory.New(channel);
             var response = await client.CloseConnectionAsync(request);
 
             if (response.ResponseStatus == ResponseStatus.Ok)
@@ -179,8 +191,8 @@ public class IdentityService : IConnectionService, IIdentityService
 
         try
         {
-            using var channel = GrpcChannel.ForAddress(_identityServiceHost);
-            var client = new Grpc.Services.IdentityService.IdentityServiceClient(channel);
+            using var channel = _grpcChannelFactory.ForAddress(_identityServiceHost);
+            var client = _identityServiceClientFactory.New(channel);
             var response = await client.SignInAsync(request);
 
             if (response.Response.ResponseStatus == ResponseStatus.Ok)
@@ -228,8 +240,8 @@ public class IdentityService : IConnectionService, IIdentityService
 
         try
         {
-            using var channel = GrpcChannel.ForAddress(_identityServiceHost);
-            var client = new Grpc.Services.IdentityService.IdentityServiceClient(channel);
+            using var channel = _grpcChannelFactory.ForAddress(_identityServiceHost);
+            var client = _identityServiceClientFactory.New(channel);
             var response = await client.RefreshTokenAsync(request);
 
             if (response.Response.ResponseStatus == ResponseStatus.Ok)

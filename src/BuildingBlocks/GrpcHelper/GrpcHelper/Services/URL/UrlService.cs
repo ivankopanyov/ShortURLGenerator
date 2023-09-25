@@ -6,16 +6,28 @@
 /// </summary>
 public class UrlService : IUrlService
 {
-    /// <summary>Address of the service for generating short URLs.</summary>
-    private readonly string _urlServiceHost;
-
     /// <summary>Log service.</summary>
     private readonly ILogger _logger;
 
+    /// <summary>GRPC channel object factory.</summary>
+    private readonly IGrpcChannelFactory _grpcChannelFactory;
+
+    /// <summary>URL service client factory.</summary>
+    private readonly IUrlServiceClientFactory _urlServiceClientFactory;
+
+    /// <summary>Address of the service for generating short URLs.</summary>
+    private readonly string _urlServiceHost;
+
     /// <summary>Initialization of the service object for generating short URLs.</summary>
+    /// <param name="grpcChannelFactory">GRPC channel object factory.</param>
+    /// <param name="urlServiceClientFactory">URL service client factory.</param>
     /// <param name="logger">Log service.</param>
-    public UrlService(ILogger<UrlService> logger)
+    public UrlService(IGrpcChannelFactory grpcChannelFactory,
+        IUrlServiceClientFactory urlServiceClientFactory,
+        ILogger<UrlService> logger)
     {
+        _grpcChannelFactory = grpcChannelFactory;
+        _urlServiceClientFactory = urlServiceClientFactory;
         _logger = logger;
 
         var urlServiceConfiguration = new UrlServiceConfiguration();
@@ -48,8 +60,8 @@ public class UrlService : IUrlService
 
         try
         {
-            using var channel = GrpcChannel.ForAddress(_urlServiceHost);
-            var client = new Grpc.Services.UrlService.UrlServiceClient(channel);
+            using var channel = _grpcChannelFactory.ForAddress(_urlServiceHost);
+            var client = _urlServiceClientFactory.New(channel);
             var response = await client.GenerateAsync(request);
 
             if (response.Response.ResponseStatus == ResponseStatus.Ok)
@@ -96,8 +108,8 @@ public class UrlService : IUrlService
 
         try
         {
-            using var channel = GrpcChannel.ForAddress(_urlServiceHost);
-            var client = new Grpc.Services.UrlService.UrlServiceClient(channel);
+            using var channel = _grpcChannelFactory.ForAddress(_urlServiceHost);
+            var client = _urlServiceClientFactory.New(channel);
             var response = await client.GetAsync(request);
 
             if (response.Response.ResponseStatus == ResponseStatus.Ok)

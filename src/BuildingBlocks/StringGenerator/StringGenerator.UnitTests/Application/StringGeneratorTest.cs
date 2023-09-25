@@ -2,10 +2,6 @@
 
 public class StringGeneratorTest
 {
-    private const string DEFAULT_SOURCE_SYMBOLS = "0123456789";
-
-    private const int DEFAULT_STRING_LENGTH = 1;
-
     [Fact]
     public void Generate_string_success()
     {
@@ -40,10 +36,10 @@ public class StringGeneratorTest
         var stringGenerator = new StringGenerator(configuration);
         var result = stringGenerator.GenerateString();
 
-        Assert.Equal(DEFAULT_STRING_LENGTH, result.Length);
+        Assert.Equal(StringGenerator.DEFAULT_STRING_LENGTH, result.Length);
 
         foreach (var symbol in result)
-            Assert.True(DEFAULT_SOURCE_SYMBOLS.Contains(symbol));
+            Assert.True(StringGenerator.DEFAULT_SOURCE_SYMBOLS.Contains(symbol));
     }
 
     [Fact]
@@ -65,7 +61,7 @@ public class StringGeneratorTest
             var stringGenerator = new StringGenerator(configuration);
             var result = stringGenerator.GenerateString();
 
-            Assert.Equal(DEFAULT_STRING_LENGTH, result.Length);
+            Assert.Equal(StringGenerator.DEFAULT_STRING_LENGTH, result.Length);
 
             foreach (var symbol in result)
                 Assert.True(configuration.SourceSymbols.Contains(symbol));
@@ -89,7 +85,7 @@ public class StringGeneratorTest
             Assert.Equal(configuration.StringLength, result.Length);
 
             foreach (var symbol in result)
-                Assert.True(DEFAULT_SOURCE_SYMBOLS.Contains(symbol));
+                Assert.True(StringGenerator.DEFAULT_SOURCE_SYMBOLS.Contains(symbol));
         }
     }
 
@@ -110,7 +106,7 @@ public class StringGeneratorTest
             Assert.Equal(configuration.StringLength, result.Length);
 
             foreach (var symbol in result)
-                Assert.True(DEFAULT_SOURCE_SYMBOLS.Contains(symbol));
+                Assert.True(StringGenerator.DEFAULT_SOURCE_SYMBOLS.Contains(symbol));
         }
     }
 }

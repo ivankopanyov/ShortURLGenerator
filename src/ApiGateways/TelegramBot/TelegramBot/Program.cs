@@ -13,6 +13,9 @@ builder.Services
 
 builder.Services
     .AddScoped<IUpdateHandler, UpdateHandler>()
+    .AddScoped<IGrpcChannelFactory, GrpcChannelFactory>()
+    .AddScoped<IUrlServiceClientFactory, UrlServiceClientFactory>()
+    .AddScoped<IIdentityServiceClientFactory, IdentityServiceClientFactory>()
     .AddScoped<IConnectionService, ShortURLGenerator.GrpcHelper.Services.Identity.IdentityService>()
     .AddScoped<IUrlGenerator, ShortURLGenerator.GrpcHelper.Services.URL.UrlService>();
 

@@ -32,6 +32,9 @@
     <None Remove="Extensions\" />
     <None Remove="Services\Identity\" />
     <None Remove="Abstraction\" />
+    <None Remove="Services\IdentityServiceClientFactory\" />
+    <None Remove="Services\GrpcChannelFactory\" />
+    <None Remove="Services\UrlServiceClientFactory\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
@@ -39,5 +42,8 @@
     <Folder Include="Extensions\" />
     <Folder Include="Services\Identity\" />
     <Folder Include="Abstraction\" />
+    <Folder Include="Services\IdentityServiceClientFactory\" />
+    <Folder Include="Services\GrpcChannelFactory\" />
+    <Folder Include="Services\UrlServiceClientFactory\" />
   </ItemGroup>
 </Project>
